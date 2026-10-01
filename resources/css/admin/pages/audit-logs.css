@@ -1,0 +1,22 @@
+/* partials/audit-log-tabs.blade.php */
+.audit-log-tabs .nav-link {
+    background: #ffffff;
+    border: 1px solid #d7e6f7;
+    color: #0a326c;
+    font-weight: 500;
+}
+
+.audit-log-tabs .nav-link:hover,
+.audit-log-tabs .nav-link:focus {
+    background: #e8f0fe;
+    border-color: #b8d4f0;
+    color: #0a326c;
+}
+
+.audit-log-tabs .nav-link.active,
+.audit-log-tabs .nav-link.active:hover,
+.audit-log-tabs .nav-link.active:focus {
+    background: #0877ed;
+    border-color: #0877ed;
+    color: #ffffff;
+}

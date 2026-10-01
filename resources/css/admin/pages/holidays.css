@@ -1,0 +1,510 @@
+/* Admin > Holidays (Telemedicine + Face to Face) */
+
+.admin-holidays-page .admin-doctor-table-wrap {
+    max-height: none;
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+.admin-holiday-table th,
+.admin-holiday-table td {
+    vertical-align: middle;
+}
+
+.admin-holiday-table th {
+    color: #7f97b5;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 10px 12px;
+    border-bottom: 2px solid #eaf1f9;
+}
+
+.admin-holiday-table td {
+    padding: 12px;
+    border-bottom: 1px solid #f0f5fa;
+    color: #16324f;
+    font-size: 13px;
+}
+
+.admin-holiday-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.admin-holiday-table tbody tr:hover td {
+    background: #fbfdff;
+}
+
+/* Holiday buttons on services page */
+.admin-holiday-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.admin-holiday-buttons .admin-secondary-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border: 1px solid #dce8f7;
+    border-radius: 9px;
+    background: #fff;
+    color: #5b7ba6;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.admin-holiday-buttons .admin-secondary-button:hover {
+    border-color: #9ec8f5;
+    background: #f0f7ff;
+    color: #1685ee;
+    text-decoration: none;
+}
+
+.admin-holiday-buttons .admin-secondary-button i {
+    font-size: 14px;
+}
+
+/* Toast notifications */
+.admin-toast {
+    border-radius: 9px;
+    box-shadow: 0 12px 28px rgba(8, 40, 82, .18);
+    border: 0;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.admin-toast .btn-close {
+    filter: invert(1) grayscale(100%);
+    opacity: .7;
+}
+
+.admin-toast .btn-close:hover {
+    opacity: 1;
+}
+
+/* Form styles */
+.admin-holidays-page .form-label {
+    color: #16324f;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.admin-holidays-page .form-control {
+    height: 42px;
+    border: 1px solid #dce8f7;
+    border-radius: 8px;
+    background: #fff;
+    color: #16324f;
+    font-size: 13px;
+    padding: 8px 12px;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.admin-holidays-page .form-control:focus {
+    border-color: #1685ee;
+    box-shadow: 0 0 0 3px rgba(22, 133, 238, .15);
+}
+
+.admin-holidays-page .form-control.is-invalid {
+    border-color: #d9534f;
+    box-shadow: 0 0 0 3px rgba(217, 83, 79, .15);
+}
+
+.admin-holidays-page .invalid-feedback {
+    color: #d9534f;
+    font-size: 11.5px;
+    font-weight: 500;
+    margin-top: 4px;
+}
+
+/* Panel styles */
+.admin-holidays-page .admin-panel {
+    border: 1px solid #e2ecf8;
+    border-radius: 13px;
+    background: #fff;
+    margin-bottom: 24px;
+}
+
+.admin-holidays-page .admin-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid #eaf1f9;
+    background: linear-gradient(120deg, #f5faff, #fff 70%);
+}
+
+.admin-holidays-page .admin-panel-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.admin-holidays-page .admin-panel-title i {
+    font-size: 18px;
+    color: #1685ee;
+}
+
+.admin-holidays-page .admin-panel-title h2 {
+    margin: 0;
+    color: #0a326c;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.admin-holidays-page .admin-doctor-form {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Delete button in table */
+.admin-holiday-table .admin-doctor-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-holiday-table .delete-holiday-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #d9534f;
+    text-decoration: none;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background-color .15s ease, color .15s ease;
+}
+
+.admin-holiday-table .delete-holiday-btn:hover:not(:disabled) {
+    background: #fdecec;
+    color: #c93f36;
+}
+
+.admin-holiday-table .delete-holiday-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.admin-holiday-table .delete-holiday-btn i {
+    font-size: 14px;
+}
+
+/* Empty state */
+.admin-doctor-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 24px;
+    text-align: center;
+    color: #7f97b5;
+}
+
+.admin-doctor-empty i {
+    font-size: 40px;
+    margin-bottom: 12px;
+    opacity: 0.5;
+}
+
+.admin-doctor-empty strong {
+    display: block;
+    color: #5b7ba6;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.admin-doctor-empty span {
+    font-size: 12.5px;
+    margin-bottom: 12px;
+}
+
+.admin-doctor-empty a {
+    color: #1685ee;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.admin-doctor-empty a:hover {
+    text-decoration: underline;
+}
+
+/* Form actions */
+.admin-doctor-form-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.admin-secondary-button {
+    display: inline-flex;
+    height: 40px;
+    align-items: center;
+    gap: 7px;
+    padding: 0 18px;
+    border: 1px solid #dce8f7;
+    border-radius: 9px;
+    background: #fff;
+    color: #5b7ba6;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.admin-secondary-button:hover {
+    border-color: #9ec8f5;
+    background: #f0f7ff;
+    color: #1685ee;
+    text-decoration: none;
+}
+
+.admin-primary-button {
+    display: inline-flex;
+    height: 40px;
+    align-items: center;
+    gap: 7px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: 9px;
+    background: linear-gradient(135deg, #1b8ffb, #0a6ed6);
+    box-shadow: 0 8px 16px rgba(22, 133, 238, .22);
+    color: #fff;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    transition: box-shadow .15s ease, transform .1s ease;
+}
+
+.admin-primary-button:hover:not(:disabled) {
+    box-shadow: 0 10px 20px rgba(22, 133, 238, .28);
+    transform: translateY(-1px);
+}
+
+.admin-primary-button:disabled {
+    background: #d9e3ef;
+    box-shadow: none;
+    color: #94a9c2;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Banner styles */
+.admin-telemedicine-banner {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 28px;
+    color: #fff;
+    background: linear-gradient(135deg, #1b8ffb, #0a6ed6);
+}
+
+.admin-telemedicine-glow {
+    position: absolute;
+    inset: -40%;
+    background: radial-gradient(ellipse at 30% 0%, rgba(255,255,255,.15), transparent 60%);
+    pointer-events: none;
+}
+
+.admin-telemedicine-content {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.admin-telemedicine-mark {
+    display: inline-flex;
+    width: 56px;
+    height: 56px;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: rgba(255,255,255,.18);
+    backdrop-filter: blur(6px);
+    font-size: 24px;
+}
+
+.admin-telemedicine-copy h1 {
+    margin: 0 0 4px;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: .01em;
+}
+
+.admin-telemedicine-welcome {
+    margin: 0 0 4px;
+    opacity: .95;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.admin-telemedicine-description {
+    margin: 0;
+    opacity: .8;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* Stat grid - matches doctor page */
+.admin-doctor-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr) minmax(130px, auto);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.admin-doctor-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border: 1px solid #e2ecf8;
+    border-radius: 13px;
+    background: #fff;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.admin-doctor-stat-card:hover {
+    border-color: #bcd5f7;
+    box-shadow: 0 6px 16px rgba(8, 40, 82, .06);
+}
+
+.admin-doctor-stat-icon {
+    display: inline-flex;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    font-size: 18px;
+}
+
+.admin-doctor-stat-icon.blue {
+    background: linear-gradient(135deg, #eaf3ff, #d6e9f9);
+    color: #1685ee;
+}
+
+.admin-doctor-stat-icon.green {
+    background: linear-gradient(135deg, #eaffea, #d0f5cd);
+    color: #28a745;
+}
+
+.admin-doctor-stat-icon.amber {
+    background: linear-gradient(135deg, #fff7e6, #ffe8c2);
+    color: #f0a13a;
+}
+
+.admin-doctor-stat-card span {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.admin-doctor-stat-card small {
+    color: #7f97b5;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.admin-doctor-stat-card strong {
+    color: #16324f;
+    font-size: 16px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+}
+
+.admin-doctor-add-button {
+    display: inline-flex;
+    height: 44px;
+    align-items: center;
+    gap: 8px;
+    padding: 0 20px;
+    border: 0;
+    border-radius: 11px;
+    background: linear-gradient(135deg, #1b8ffb, #0a6ed6);
+    box-shadow: 0 8px 16px rgba(22, 133, 238, .22);
+    color: #fff;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    transition: box-shadow .15s ease, transform .1s ease;
+}
+
+.admin-doctor-add-button:hover {
+    box-shadow: 0 10px 20px rgba(22, 133, 238, .28);
+    transform: translateY(-1px);
+}
+
+.admin-doctor-stat-action {
+    justify-content: center;
+}
+
+/* Responsive */
+@media (max-width: 1199px) {
+    .admin-doctor-stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .admin-doctor-stat-action {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 767px) {
+    .admin-doctor-stat-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-doctor-stat-action {
+        grid-column: auto;
+    }
+
+    .admin-holidays-page .admin-doctor-form {
+        gap: 14px;
+        padding: 16px;
+    }
+
+    .admin-holiday-buttons {
+        flex-direction: column;
+    }
+
+    .admin-holiday-buttons .admin-secondary-button {
+        justify-content: center;
+    }
+
+    .admin-telemedicine-banner {
+        padding: 20px;
+    }
+
+    .admin-telemedicine-content {
+        flex-direction: column;
+        text-align: center;
+    }
+}

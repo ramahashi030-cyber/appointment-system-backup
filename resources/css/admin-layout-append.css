@@ -1,0 +1,3 @@
+
+/* Page-swap loading state (was an inline <style> in layouts/admin.blade.php) */
+.admin-main.is-navigating { opacity: .88; pointer-events: none; transition: opacity .06s ease-out; }

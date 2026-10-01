@@ -1,0 +1,500 @@
+/* Admin > Services (Face to Face + Telemedicine) */
+
+/* The services listing is paginated by the data, not by a scroll container, so
+   the shared roster wrapper must not become a vertical scroller. Mirrors the
+   fix on the patients page. */
+.admin-services-page .admin-doctor-table-wrap {
+    max-height: none;
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+.admin-service-col-id {
+    width: 78px;
+}
+
+.admin-service-id {
+    display: inline-block;
+    padding: 3px 9px;
+    border: 1px solid #dce8f7;
+    border-radius: 999px;
+    background: #f4f9ff;
+    color: #5b7ba6;
+    font-size: 11px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.admin-service-name {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.admin-service-name strong {
+    color: #16324f;
+    font-size: 13.5px;
+    font-weight: 700;
+}
+
+.admin-service-name small {
+    color: #7f97b5;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+/* Available days */
+.admin-service-days {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-width: 240px;
+}
+
+.admin-service-day {
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: #eaf3ff;
+    color: #2f6fbd;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .03em;
+}
+
+/* Timeslot capacities */
+.admin-service-slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    max-width: 320px;
+}
+
+.admin-service-slot {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px;
+    border: 1px solid #e0eaf6;
+    border-radius: 7px;
+    background: #fbfdff;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.admin-service-slot-time {
+    color: #4a6484;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.admin-service-slot-cap {
+    display: inline-flex;
+    min-width: 19px;
+    height: 17px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    border-radius: 5px;
+    background: #1685ee;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.admin-service-slot-total {
+    display: block;
+    margin-top: 4px;
+    color: #7f97b5;
+    font-size: 10.5px;
+}
+
+.admin-service-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.admin-service-actions a,
+.admin-service-actions button {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.admin-service-actions a:hover {
+    text-decoration: underline;
+}
+
+/* Day picker inside the modals */
+.admin-service-day-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.admin-service-day-option input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.admin-service-day-option span {
+    display: inline-flex;
+    min-width: 46px;
+    height: 34px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    border: 1px solid #d8e5f4;
+    border-radius: 8px;
+    background: #fbfdff;
+    color: #5b7ba6;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.admin-service-day-option span:hover {
+    border-color: #9ec8f5;
+    background: #f0f7ff;
+}
+
+.admin-service-day-option input:checked + span {
+    border-color: #1685ee;
+    background: linear-gradient(135deg, #1685ee, #0a6ed6);
+    color: #fff;
+}
+
+.admin-service-day-option input:focus-visible + span {
+    outline: 2px solid #1685ee;
+    outline-offset: 2px;
+}
+
+/* Timeslot editor rows */
+.admin-service-slot-editor-head,
+.admin-service-slot-editor-row {
+    display: grid;
+    grid-template-columns: 1fr 110px 34px;
+    gap: 8px;
+    align-items: center;
+}
+
+.admin-service-slot-editor-head {
+    margin-bottom: 6px;
+    color: #7f97b5;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.admin-service-slot-editor-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.admin-service-slot-editor-row .form-control {
+    height: 38px;
+    font-size: 13px;
+}
+
+.admin-service-slot-remove {
+    display: inline-flex;
+    width: 34px;
+    height: 34px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #f3d3d3;
+    border-radius: 8px;
+    background: #fff6f6;
+    color: #d9534f;
+    cursor: pointer;
+    transition: background-color .15s ease, border-color .15s ease;
+}
+
+.admin-service-slot-remove:hover:not(:disabled) {
+    border-color: #e8b4b4;
+    background: #fdecec;
+}
+
+.admin-service-slot-remove:disabled {
+    border-color: #e6edf6;
+    background: #f7fafd;
+    color: #b6c6da;
+    cursor: not-allowed;
+}
+
+.admin-service-slot-add {
+    margin-top: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Add / Edit service form
+
+   Both modals render admin/services/_form.blade.php, so this block is what
+   gives the Face to Face / MFAM and Telemedicine edit modals one identical
+   layout, and the add modal the same one.
+   --------------------------------------------------------------------------- */
+
+.admin-service-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.admin-service-form-section {
+    overflow: hidden;
+    border: 1px solid #e2ecf8;
+    border-radius: 13px;
+    background: #fff;
+}
+
+.admin-service-form-section-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 16px;
+    border-bottom: 1px solid #eaf1f9;
+    background: linear-gradient(120deg, #f5faff, #fff 70%);
+}
+
+.admin-service-form-section-icon {
+    display: inline-flex;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #1b8ffb, #0a6ed6);
+    box-shadow: 0 6px 14px rgba(22, 133, 238, .22);
+    color: #fff;
+    font-size: 15px;
+}
+
+.admin-service-form-section-icon.amber {
+    background: linear-gradient(135deg, #f0a13a, #d97f11);
+    box-shadow: 0 6px 14px rgba(217, 127, 17, .22);
+}
+
+.admin-service-form-section-copy {
+    min-width: 0;
+}
+
+.admin-service-form-section-copy h3 {
+    margin: 0;
+    color: #0a326c;
+    font-size: 14.5px;
+    font-weight: 700;
+}
+
+.admin-service-form-section-copy p {
+    margin: 2px 0 0;
+    color: #6a83a4;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.admin-service-form-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+}
+
+.admin-service-field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.admin-field-required {
+    color: #d9534f;
+    font-weight: 700;
+}
+
+/* Timeslot editor gets its own inset panel so it reads as a working area
+   rather than another set of loose fields. */
+.admin-service-slot-editor {
+    padding: 14px;
+    border: 1px solid #e2ecf8;
+    border-radius: 11px;
+    background: #fbfdff;
+}
+
+.admin-service-slot-editor-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 13px;
+}
+
+.admin-service-slot-hint {
+    color: #7f97b5;
+    font-size: 11.5px;
+    font-weight: 600;
+}
+
+.admin-service-form-actions {
+    margin-top: 18px;
+    padding-top: 15px;
+    border-top: 1px solid #eaf1f9;
+}
+
+/*
+ * Outside click on the Add Service modal.
+
+ * The blink is one animation run and the class is dropped on `animationend`, so
+ * it cannot loop: a second outside click re-adds the class after a forced reflow
+ * and flashes once more, and the form is never touched.
+ */
+@keyframes adminServiceModalBlocked {
+    0%,
+    100% {
+        border-color: #e2ecf8;
+        box-shadow: 0 20px 50px rgba(8, 40, 82, .18);
+    }
+
+    45% {
+        border-color: #d9534f;
+        box-shadow: 0 0 0 4px rgba(217, 83, 79, .22), 0 20px 50px rgba(8, 40, 82, .18);
+    }
+}
+
+.admin-service-modal .modal-content.admin-service-modal-blocked {
+    border-color: #d9534f;
+    animation: adminServiceModalBlocked .5s ease-in-out 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .admin-service-modal .modal-content.admin-service-modal-blocked {
+        animation-duration: .4s;
+    }
+}
+
+/* Shared form field helpers */
+.admin-field-optional {
+    margin-left: 4px;
+    color: #9db2cc;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+.admin-field-hint {
+    color: #8ca2bd;
+    font-size: 11.5px;
+}
+
+/* Delete confirmation */
+.admin-service-delete-question {
+    margin-bottom: 6px;
+    color: #16324f;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.admin-service-delete-name {
+    margin-bottom: 12px;
+    color: #5b7ba6;
+    font-size: 13px;
+}
+
+.admin-danger-button {
+    display: inline-flex;
+    height: 40px;
+    align-items: center;
+    gap: 7px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: 9px;
+    background: linear-gradient(135deg, #e05a52, #c93f36);
+    box-shadow: 0 8px 16px rgba(201, 63, 54, .22);
+    color: #fff;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.admin-danger-button:disabled {
+    background: #d9e3ef;
+    box-shadow: none;
+    color: #94a9c2;
+    cursor: not-allowed;
+}
+
+/*
+ * Stat row. Nothing is declared here at desktop widths on purpose: the base
+ * `.admin-doctor-stat-grid` in admin-css/doctor.css is already
+ * `repeat(3, 1fr) minmax(130px, auto)`, i.e. three stat cards and the Add
+ * Service button on one line, and its media queries in admin-css/responsive.css
+ * narrow that at 1199px and 767px. Repeating the columns here would win over
+ * those, because pages/services.css is imported after responsive.css.
+ *
+ * Only the small-screen end is restated, to pin the button to a full-width row
+ * once the three cards can no longer sit beside it.
+ */
+@media (max-width: 767px) {
+    .admin-services-page .admin-doctor-stat-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-services-page .admin-service-field-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-service-form-body {
+        gap: 14px;
+        padding: 14px;
+    }
+
+    .admin-service-slot-editor {
+        padding: 12px;
+    }
+
+    .admin-service-slot-editor-foot {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .admin-service-slot-add {
+        justify-content: center;
+    }
+
+    .admin-service-slot-hint {
+        text-align: center;
+    }
+
+    .admin-service-days,
+    .admin-service-slots {
+        max-width: none;
+    }
+
+    .admin-service-day-picker {
+        gap: 5px;
+    }
+
+    .admin-service-slot-editor-head,
+    .admin-service-slot-editor-row {
+        grid-template-columns: 1fr 76px 34px;
+    }
+}

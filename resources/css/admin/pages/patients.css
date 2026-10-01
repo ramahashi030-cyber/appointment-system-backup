@@ -1,0 +1,328 @@
+/* admin/patients.blade.php
+   Scoped with .admin-patients-page (add this class to the page wrapper) so it no
+   longer leaks into other .admin-doctor-content pages now that CSS is global. */
+.admin-patients-page .admin-doctor-stat-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Patient roster: the table is paginated 20 rows at a time, so it must never
+   grow its own scrollbar. .admin-doctor-table-wrap only declares `overflow-x`,
+   and per CSS Overflow a `visible` axis combined with a non-visible one is
+   computed to `auto` — which silently turned the wrapper into a scroll
+   container. Pin both axes (and drop any height cap) so the panel grows with
+   the page instead. Narrow viewports get a swipeable table instead. */
+.admin-patients-page .admin-doctor-table-wrap {
+    max-height: none;
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+@media (max-width: 767px) {
+    .admin-patients-page .admin-doctor-table-wrap {
+        overflow-x: auto;
+    }
+
+    .admin-patients-page .admin-patient-table {
+        min-width: 620px;
+    }
+}
+
+/* Panel header: count + primary action stay grouped and never wrap */
+.admin-patients-page .admin-doctor-roster-header {
+    flex-wrap: wrap;
+    padding: 8px 16px;
+}
+
+.admin-patients-page .admin-patient-roster-actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 12px;
+}
+
+/* .admin-doctor-pagination is display:flex, which beats the UA [hidden] rule —
+   without this the empty strip stays visible on single-page results. */
+.admin-patients-page .admin-doctor-pagination[hidden] {
+    display: none;
+}
+
+/* Filter bar: labelled controls stacked so the inputs line up on one baseline */
+.admin-patients-page .admin-patient-filters {
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+}
+
+.admin-patients-page .admin-patient-filter {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.admin-patients-page .admin-patient-filter-search {
+    flex: 1 1 300px;
+}
+
+/* .admin-doctor-search carries `flex: 1 1 280px` from the base stylesheet, where
+   it sits in a row. Inside this column stack that basis resolves to the *height*,
+   inflating the wrapper to 280px around a 38px input. Pin it back to auto. */
+.admin-patients-page .admin-patient-filter .admin-doctor-search {
+    width: 100%;
+    flex: 0 0 auto;
+}
+
+.admin-patients-page .admin-patient-filter > label {
+    color: #6a83a4;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.admin-patients-page .admin-patient-filters .form-select {
+    min-width: 132px;
+}
+
+.admin-patients-page .admin-patient-filters .admin-clear-filter {
+    margin-left: auto;
+    padding-bottom: 9px;
+}
+
+/* Table */
+.admin-patients-page .admin-patient-table th {
+    padding: 11px 16px;
+}
+
+.admin-patients-page .admin-patient-table td {
+    padding: 12px 16px;
+}
+
+/* Subtle banding helps the eye follow a row across six columns */
+.admin-patients-page .admin-patient-table tbody tr:nth-child(even) {
+    background: #f8fbff;
+}
+
+.admin-patients-page .admin-patient-table tbody tr:hover,
+.admin-patients-page .admin-patient-table tbody tr:nth-child(even):hover {
+    background: #eaf3fc;
+}
+
+.admin-patients-page .admin-patient-actions-heading,
+.admin-patients-page .admin-patient-table td:last-child {
+    text-align: right;
+}
+
+.admin-patients-page .admin-patient-table td:nth-child(3),
+.admin-patients-page .admin-patient-table td:nth-child(4) {
+    white-space: nowrap;
+}
+
+.admin-patients-page .admin-patient-table .admin-doctor-person .admin-avatar {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    font-size: 10px;
+}
+
+.admin-patients-page .admin-patient-table .admin-doctor-person small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Hospital numbers read as identifiers, not prose */
+.admin-patients-page .admin-patient-code {
+    display: inline-block;
+    padding: 3px 9px;
+    border: 1px solid #dbe8f7;
+    border-radius: 6px;
+    background: #f4f8ff;
+    color: #0a326c;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .02em;
+}
+
+.admin-patients-page .admin-patient-empty-value {
+    color: #b1c3d8;
+}
+
+/* Status pill gains a leading dot so the state is readable at a glance */
+.admin-patients-page .admin-status-pill::before {
+    width: 6px;
+    height: 6px;
+    flex: 0 0 6px;
+    margin-right: 7px;
+    border-radius: 50%;
+    background: currentcolor;
+    content: "";
+}
+
+/* Row actions */
+.admin-patients-page .admin-doctor-actions {
+    gap: 6px;
+}
+
+.admin-patients-page .admin-doctor-actions a,
+.admin-patients-page .admin-doctor-actions button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.admin-patients-page .admin-doctor-actions a i,
+.admin-patients-page .admin-doctor-actions button i {
+    font-size: 14px;
+    line-height: 1;
+}
+
+/* Deactivate / Activate button in the actions column */
+.admin-patients-page .admin-doctor-actions button[data-patient-toggle] {
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    color: #b42318;
+    cursor: pointer;
+}
+
+.admin-patients-page .admin-doctor-actions button[data-patient-toggle] i {
+    font-size: 16px;
+}
+
+.admin-patients-page .admin-doctor-actions button[data-patient-toggle][data-active="0"] {
+    color: #067647;
+}
+
+.admin-patients-page .admin-doctor-actions button[data-patient-toggle]:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+/* Pagination strip: range summary on the left, page controls on the right */
+.admin-patients-page .admin-patient-pagination {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+}
+
+.admin-patients-page .admin-patient-pagination > nav {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.admin-patients-page .admin-patient-pagination .pagination {
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+}
+
+.admin-patients-page .admin-patient-pagination .page-link {
+    display: inline-flex;
+    min-width: 32px;
+    height: 32px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    border: 1px solid #d5e4f5;
+    border-radius: 7px;
+    background: #fff;
+    color: #315786;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+}
+
+.admin-patients-page .admin-patient-pagination .page-item.active .page-link {
+    border-color: #0877ed;
+    background: #0877ed;
+    color: #fff;
+}
+
+.admin-patients-page .admin-patient-pagination .page-item.disabled .page-link {
+    border-color: #e4edf7;
+    background: #f7faff;
+    color: #b1c3d8;
+}
+
+.admin-patients-page .admin-patient-pagination .page-item:not(.active):not(.disabled) .page-link:hover,
+.admin-patients-page .admin-patient-pagination .page-item:not(.active):not(.disabled) .page-link:focus {
+    border-color: #0877ed;
+    background: #edf6ff;
+    color: #0752a5;
+}
+
+.admin-patients-page .admin-patient-pagination .small.text-muted {
+    color: #6a83a4;
+    font-size: 12px;
+}
+
+.admin-patients-page .admin-patient-pagination .small.text-muted .fw-semibold {
+    color: #0a326c;
+    font-weight: 600;
+}
+
+/* Narrow viewports: stack the filters and let the table be swiped sideways */
+@media (max-width: 767px) {
+    .admin-patients-page .admin-patient-roster-actions {
+        gap: 8px;
+    }
+
+    .admin-patients-page .admin-patient-filters {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    /* The bar is a column here, so a flex-basis would resolve to height and
+       stretch the wrapper to 300px. Full-width auto height is what we want. */
+    .admin-patients-page .admin-patient-filter-search {
+        flex: 0 0 auto;
+    }
+
+    .admin-patients-page .admin-patient-filters .form-select,
+    .admin-patients-page .admin-patient-filters .admin-doctor-search,
+    .admin-patients-page .admin-patient-filters .admin-clear-filter {
+        width: 100%;
+        margin-left: 0;
+        padding-bottom: 0;
+    }
+
+    .admin-patients-page .admin-patient-pagination {
+        justify-content: center;
+    }
+
+    .admin-patients-page .admin-patient-pagination > nav {
+        justify-content: center;
+    }
+}
+
+/* Create Patient Modal */
+#createPatientModal .modal-dialog { max-width: 640px; }
+#createPatientModal .modal-body .form-label { font-size: 12px; margin-bottom: 4px; }
+#createPatientModal .modal-body .form-control,
+#createPatientModal .modal-body .form-select { font-size: 13px; padding: 0.375rem 0.5rem; }
+#createPatientModal .modal-body .form-control::placeholder { opacity: 0.5; }
+#createPatientModal .modal-footer { justify-content: center; border-top: none; padding-top: 0; gap: 8px; }
+#createPatientModal .modal-footer .btn {
+    background: var(--admin-bg);
+    border: 1px solid #d7e6f7;
+    color: #0a326c;
+    font-size: 13px;
+    padding: 0.375rem 1rem;
+}
+#createPatientModal .modal-footer .btn:hover,
+#createPatientModal .modal-footer .btn:focus {
+    background: #e8f0fe;
+    border-color: #b8d4f0;
+    color: #0a326c;
+}

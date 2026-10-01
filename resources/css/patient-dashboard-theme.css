@@ -1,0 +1,726 @@
+/*
+ * QMMC patient dashboard theme
+ *
+ * Keeps the patient experience visually aligned with the admin dashboard:
+ * deep navy canvas, blue navigation, dark elevated surfaces, and bright
+ * accent colors. The selectors are scoped to the dashboard body so the
+ * legacy patient pages that do not use the dashboard shell remain isolated.
+ */
+
+.patient-dashboard-body {
+    --dashboard-navy: #073a7b;
+    --dashboard-blue: #0877ed;
+    --dashboard-blue-dark: #55a9ff;
+    --dashboard-ink: #f4f8ff;
+    --dashboard-muted: #9db2d0;
+    --dashboard-border: #1e5eb1;
+    --dashboard-surface: #0d1c34;
+    --dashboard-page: #071528;
+    --dashboard-surface-raised: #10233f;
+    --dashboard-border-soft: #19365d;
+    --dashboard-faint: #6f88aa;
+    color-scheme: dark;
+    background:
+        radial-gradient(700px 500px at 94% 3%, rgba(8, 112, 228, .18), transparent 70%),
+        linear-gradient(135deg, #050f1f, #071528);
+    color: var(--dashboard-ink);
+}
+
+/* ---------- Navigation ---------- */
+.patient-dashboard-body .patient-sidebar {
+    background: linear-gradient(180deg, #073c82 0%, #06336f 62%, #062d62 100%);
+    box-shadow: 12px 0 35px rgba(0, 0, 0, .22);
+}
+
+.patient-dashboard-body .patient-sidebar-waves path:first-child {
+    fill: #0b56b5;
+}
+
+.patient-dashboard-body .patient-sidebar-waves path:last-child {
+    fill: #0870d7;
+}
+
+.patient-dashboard-body .patient-health-priority {
+    color: #b6d3f5;
+}
+
+.patient-dashboard-body .patient-health-priority > i {
+    color: #8fc3ff;
+}
+
+.patient-dashboard-body .patient-dashboard-header {
+    background: rgba(7, 21, 40, .93);
+    border-bottom: 1px solid rgba(46, 105, 181, .25);
+    backdrop-filter: blur(12px);
+}
+
+.patient-dashboard-body .patient-header-brand,
+.patient-dashboard-body .patient-account-button {
+    color: #f1f6ff;
+}
+
+.patient-dashboard-body .patient-menu-toggle {
+    border-color: #234a7d;
+    background: #0d2545;
+    color: #b9d9ff;
+}
+
+.patient-dashboard-body .patient-dashboard-search {
+    background: #0c1d37;
+    border: 1px solid #1c3d6c;
+    color: #7da4d5;
+}
+
+.patient-dashboard-body .patient-dashboard-search input {
+    color: #f4f8ff;
+}
+
+.patient-dashboard-body .patient-dashboard-search input::placeholder {
+    color: #7895ba;
+}
+
+.patient-dashboard-body .patient-header-icon {
+    color: #000;
+    background: #fff;
+    border-color: #234a7d;
+}
+
+.patient-dashboard-body .patient-account-chevron {
+    color: #75b6ff;
+}
+
+.patient-dashboard-body .patient-header-icon:hover {
+    color: #000;
+    background: #fff;
+}
+
+.patient-dashboard-body .patient-header-badge {
+    border-color: var(--dashboard-page);
+    background: #ff4164;
+}
+
+.patient-dashboard-body .patient-header-avatar {
+    border-color: #2d85e9;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .28);
+}
+
+.patient-dashboard-body .patient-header-avatar-fallback {
+    background: linear-gradient(135deg, #56b5ff, #1c69d1);
+    color: #fff;
+}
+
+.patient-dashboard-body .patient-account-menu {
+    border-color: #1e5eb1;
+    background: #0d1c34;
+    box-shadow: 0 14px 35px rgba(0, 0, 0, .32);
+}
+
+.patient-dashboard-body .patient-account-menu-header {
+    border-color: #19365d;
+    color: #f4f8ff;
+}
+
+.patient-dashboard-body .patient-account-menu-header small,
+.patient-dashboard-body .patient-account-menu .dropdown-item {
+    color: #9db2d0;
+}
+
+.patient-dashboard-body .patient-account-menu .dropdown-item:hover,
+.patient-dashboard-body .patient-account-menu .dropdown-item:focus {
+    background: #14315a;
+    color: #75b6ff;
+}
+
+.patient-dashboard-body .patient-logout-button,
+.patient-dashboard-body .patient-login-button {
+    border-color: #234a7d;
+    background: #fff;
+    color: #000;
+}
+
+.patient-dashboard-body .patient-logout-button:hover,
+.patient-dashboard-body .patient-login-button:hover {
+    background: #0e62bd;
+    color: #fff;
+}
+
+.patient-dashboard-body .patient-mobile-menu {
+    background:
+        linear-gradient(180deg, transparent 0 55%, rgba(11, 86, 181, .72) 55% 73%, rgba(8, 112, 215, .8) 73% 100%),
+        var(--dashboard-navy);
+}
+
+.patient-dashboard-body .patient-mobile-menu::before {
+    background: #0b56b5;
+}
+
+.patient-dashboard-body .patient-mobile-menu::after {
+    background: rgba(8, 112, 215, .72);
+}
+
+.patient-dashboard-body .patient-menu-logout:hover {
+    color: var(--dashboard-blue-dark);
+}
+
+/* ---------- Main surfaces ---------- */
+.patient-dashboard-body .patient-dashboard-main {
+    background: transparent;
+}
+
+.patient-dashboard-body .patient-dashboard-content {
+    position: relative;
+}
+
+.patient-dashboard-body .dashboard-search-empty {
+    border-color: #2a5e9e;
+    background: #0d1c34;
+    color: #9db2d0;
+}
+
+.patient-dashboard-body .dashboard-hero,
+.patient-dashboard-body .dashboard-next-appointment,
+.patient-dashboard-body .dashboard-shortcut,
+.patient-dashboard-body .dashboard-visits-card,
+.patient-dashboard-body .dashboard-quick-actions,
+.patient-dashboard-body .dashboard-service-card,
+.patient-dashboard-body .dashboard-services-empty {
+    border-color: var(--dashboard-border);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .18);
+}
+
+.patient-dashboard-body .dashboard-hero {
+    background:
+        linear-gradient(90deg, rgba(5, 30, 62, .98) 0%, rgba(7, 57, 112, .9) 48%, rgba(7, 21, 40, .42) 100%),
+        url('/images/qmmc-telemedicine-banner.jpg') center 55% / cover no-repeat;
+}
+
+.patient-dashboard-body .dashboard-hero::before {
+    background: rgba(44, 156, 255, .12);
+}
+
+.patient-dashboard-body .dashboard-hero::after {
+    border-color: rgba(121, 183, 237, .28);
+}
+
+.patient-dashboard-body .dashboard-hero-glow {
+    border-color: rgba(121, 183, 237, .65);
+}
+
+.patient-dashboard-body .dashboard-hero-copy h1,
+.patient-dashboard-body .dashboard-welcome,
+.patient-dashboard-body .dashboard-hero-description {
+    color: #f4f8ff;
+}
+
+.patient-dashboard-body .dashboard-hero-description {
+    color: #b8c9df;
+}
+
+.patient-dashboard-body .dashboard-trust-list {
+    background: rgba(13, 36, 68, .82);
+    color: #c8ddff;
+    border: 1px solid rgba(72, 139, 224, .35);
+}
+
+.patient-dashboard-body .dashboard-trust-list b {
+    color: #6fa9ed;
+}
+
+.patient-dashboard-body .dashboard-next-appointment {
+    background: var(--dashboard-surface);
+}
+
+.patient-dashboard-body .dashboard-next-header {
+    border-color: var(--dashboard-border-soft);
+    background: var(--dashboard-surface-raised);
+}
+
+.patient-dashboard-body .dashboard-next-header h2,
+.patient-dashboard-body .dashboard-next-body,
+.patient-dashboard-body .dashboard-next-empty,
+.patient-dashboard-body .dashboard-next-meta {
+    color: #f4f8ff;
+}
+
+.patient-dashboard-body .dashboard-next-status.upcoming {
+    background: #123d72;
+    color: #75b6ff;
+}
+
+.patient-dashboard-body .dashboard-next-status.expired {
+    background: #5b4610;
+    color: #ffd66b;
+}
+
+.patient-dashboard-body .dashboard-next-body,
+.patient-dashboard-body .dashboard-next-empty {
+    background: #10233f;
+}
+
+.patient-dashboard-body .dashboard-next-body:hover,
+.patient-dashboard-body .dashboard-next-empty:hover {
+    background: #14315a;
+    color: #fff;
+}
+
+.patient-dashboard-body .dashboard-next-service-icon {
+    background: #123d72;
+    color: #75b6ff;
+}
+
+.patient-dashboard-body .dashboard-next-empty small,
+.patient-dashboard-body .dashboard-next-chevron,
+.patient-dashboard-body .dashboard-next-empty > i {
+    color: #9db2d0;
+}
+
+.patient-dashboard-body .dashboard-next-empty small {
+    color: #9db2d0;
+}
+
+/* ---------- Shortcuts, tables, and services ---------- */
+.patient-dashboard-body .dashboard-shortcut {
+    background: var(--dashboard-surface);
+    color: #f4f8ff;
+}
+
+.patient-dashboard-body .dashboard-shortcut:hover,
+.patient-dashboard-body .dashboard-service-card:hover,
+.patient-dashboard-body .dashboard-quick-action:hover {
+    border-color: #2d7ddd;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, .24);
+    color: #fff;
+}
+
+.patient-dashboard-body .dashboard-shortcut-copy strong,
+.patient-dashboard-body .dashboard-service-copy strong,
+.patient-dashboard-body .dashboard-quick-action strong {
+    color: #eef5ff;
+}
+
+.patient-dashboard-body .dashboard-shortcut-copy small,
+.patient-dashboard-body .dashboard-service-copy small,
+.patient-dashboard-body .dashboard-quick-action small {
+    color: var(--dashboard-muted);
+}
+
+.patient-dashboard-body .dashboard-section-header {
+    background: linear-gradient(90deg, #0b6fdd, #0752b7);
+}
+
+.patient-dashboard-body .dashboard-visits-card,
+.patient-dashboard-body .dashboard-quick-actions {
+    background: var(--dashboard-surface);
+}
+
+.patient-dashboard-body .dashboard-visits-table thead {
+    background: #10233f;
+}
+
+.patient-dashboard-body .dashboard-visits-table th {
+    color: #9db2d0;
+}
+
+.patient-dashboard-body .dashboard-visits-table td {
+    border-color: var(--dashboard-border-soft);
+    color: #dbe8f8;
+}
+
+.patient-dashboard-body .dashboard-table-service strong {
+    color: #eef5ff;
+}
+
+.patient-dashboard-body .dashboard-table-service-icon {
+    background: #123d72;
+    color: #75b6ff;
+}
+
+.patient-dashboard-body .dashboard-status.booked {
+    background: #123f36;
+    color: #69e0ae;
+}
+
+.patient-dashboard-body .dashboard-status.cancelled {
+    background: #4a1e2c;
+    color: #ff8da2;
+}
+
+.patient-dashboard-body .dashboard-link-pending,
+.patient-dashboard-body .dashboard-more-button {
+    color: #9db2d0;
+}
+
+.patient-dashboard-body .dashboard-empty-state {
+    color: #9db2d0;
+}
+
+.patient-dashboard-body .dashboard-empty-state > i {
+    color: #55a9ff;
+}
+
+.patient-dashboard-body .dashboard-empty-state button,
+.patient-dashboard-body .dashboard-empty-state a {
+    color: #75b6ff;
+}
+
+.patient-dashboard-body .dashboard-services > h2,
+.patient-dashboard-body .dashboard-services > h2 > i,
+.patient-dashboard-body .dashboard-quick-actions > h2,
+.patient-dashboard-body .dashboard-quick-actions > h2 > i {
+    color: #f4f8ff;
+}
+
+.patient-dashboard-body .dashboard-service-card,
+.patient-dashboard-body .dashboard-services-empty {
+    background: var(--dashboard-surface);
+    color: #f4f8ff;
+}
+
+.patient-dashboard-body .dashboard-service-icon {
+    background: #123d72;
+    color: #75b6ff;
+}
+
+.patient-dashboard-body .dashboard-service-card:nth-child(even) .dashboard-service-icon {
+    background: #30245d;
+    color: #c2a7ff;
+}
+
+.patient-dashboard-body .dashboard-service-copy > span {
+    border-color: #176acb;
+    color: #75b6ff;
+}
+
+.patient-dashboard-body .dashboard-service-arrow,
+.patient-dashboard-body .dashboard-shortcut-arrow,
+.patient-dashboard-body .dashboard-quick-action > i {
+    color: #55a9ff;
+}
+
+.patient-dashboard-body .dashboard-quick-actions {
+    border-color: var(--dashboard-border);
+    background: #0a1a30;
+}
+
+.patient-dashboard-body .dashboard-quick-actions > h2 {
+    border-color: var(--dashboard-border-soft);
+    background: linear-gradient(90deg, #f0f5fb, #dceafa);
+    color: #163c68;
+}
+
+.patient-dashboard-body .dashboard-quick-actions > h2 > i {
+    color: #0b67d3;
+}
+
+.patient-dashboard-body .dashboard-quick-action {
+    border-color: #1c4b88;
+    background: #0f2745;
+    color: #dbeaff;
+}
+
+.patient-dashboard-body .dashboard-quick-action:hover {
+    background: #14315a;
+}
+
+.patient-dashboard-body .patient-dashboard-footer {
+    border-color: #1b4d91;
+    color: #9db2d0;
+}
+
+.patient-dashboard-body .patient-dashboard-footer a:hover,
+.patient-dashboard-body .patient-dashboard-footer em,
+.patient-dashboard-body .patient-dashboard-footer > div:last-child > i:last-child {
+    color: #75b6ff;
+}
+
+.patient-dashboard-body .patient-dashboard-footer > div:first-child i {
+    color: #55a9ff;
+}
+
+/* ---------- Dropdowns and modal surfaces ---------- */
+.patient-dashboard-body .dropdown-menu {
+    border-color: #1e5eb1;
+    background: #0d1c34;
+    color: #dbeaff;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .35);
+}
+
+.patient-dashboard-body .dropdown-item {
+    color: #b8c9df;
+}
+
+.patient-dashboard-body .dropdown-item:hover,
+.patient-dashboard-body .dropdown-item:focus,
+.patient-dashboard-body .dropdown-item:active {
+    background: #14315a;
+    color: #fff;
+}
+
+.patient-dashboard-body .dashboard-modal .modal-content {
+    background: #0d1c34;
+    color: #f4f8ff;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, .45);
+}
+
+.patient-dashboard-body .dashboard-modal-header,
+.patient-dashboard-body .dashboard-modal-footer {
+    border-color: #1b4d91;
+    background: #10233f;
+}
+
+.patient-dashboard-body .dashboard-modal-body {
+    background: #0d1c34;
+}
+
+.patient-dashboard-body .dashboard-modal-title-group h2,
+.patient-dashboard-body .consent-section-heading h3,
+.patient-dashboard-body .consent-declaration h3,
+.patient-dashboard-body .modal-visit-copy strong,
+.patient-dashboard-body .modal-empty-state strong,
+.patient-dashboard-body .dashboard-alert-body h2 {
+    color: #f4f8ff;
+}
+
+.patient-dashboard-body .dashboard-modal-title-group small,
+.patient-dashboard-body .dashboard-modal-footer-note,
+.patient-dashboard-body .consent-section-heading p,
+.patient-dashboard-body .modal-visit-copy > span,
+.patient-dashboard-body .modal-empty-state span,
+.patient-dashboard-body .dashboard-alert-body > p {
+    color: #9db2d0;
+}
+
+.patient-dashboard-body .dashboard-modal-close {
+    border-color: #1e5eb1;
+    background: #10233f;
+    color: #9db2d0;
+}
+
+.patient-dashboard-body .dashboard-modal-close:hover {
+    background: #14315a;
+    color: #fff;
+}
+
+.patient-dashboard-body .dashboard-modal-body::-webkit-scrollbar-thumb {
+    border-color: #0d1c34;
+    background: #2b5f9f;
+}
+
+/* Consent, notification, profile, and booking cards */
+.patient-dashboard-body .consent-assurance,
+.patient-dashboard-body .consent-section,
+.patient-dashboard-body .consent-selected-service,
+.patient-dashboard-body .consent-care-types > div,
+.patient-dashboard-body .consent-declaration,
+.patient-dashboard-body .modal-visit-row,
+.patient-dashboard-body .modal-service-option,
+.patient-dashboard-body .modal-record-option,
+.patient-dashboard-body .modal-empty-state,
+.patient-dashboard-body .notification-item,
+.patient-dashboard-body .profile-summary-card,
+.patient-dashboard-body .profile-detail-grid > div,
+.patient-dashboard-body .booking-calendar-panel,
+.patient-dashboard-body .booking-selection-panel,
+.patient-dashboard-body .booking-existing-appointment {
+    border-color: #1b4d91;
+    background: #10233f;
+    color: #dbeaff;
+}
+
+.patient-dashboard-body .consent-assurance span,
+.patient-dashboard-body .consent-section > p,
+.patient-dashboard-body .consent-care-types p,
+.patient-dashboard-body .consent-declaration p,
+.patient-dashboard-body .consent-purpose-list li,
+.patient-dashboard-body .consent-translation,
+.patient-dashboard-body .booking-field-label,
+.patient-dashboard-body .booking-step-label,
+.patient-dashboard-body .booking-service-select,
+.patient-dashboard-body .booking-complaint-input,
+.patient-dashboard-body .booking-time-slot,
+.patient-dashboard-body .booking-date-summary,
+.patient-dashboard-body .booking-recommendation,
+.patient-dashboard-body .profile-summary-card small,
+.patient-dashboard-body .profile-detail-grid small,
+.patient-dashboard-body .notification-item > div > span,
+.patient-dashboard-body .modal-service-option small,
+.patient-dashboard-body .modal-record-option small,
+.patient-dashboard-body .cancelled-appointment-summary > span {
+    color: #9db2d0;
+}
+
+.patient-dashboard-body .consent-purpose-list li::before {
+    background: #123f36;
+    color: #69e0ae;
+}
+
+.patient-dashboard-body .consent-selected-service,
+.patient-dashboard-body .consent-translation,
+.patient-dashboard-body .booking-existing-appointment {
+    background: #0a1a30;
+}
+
+.patient-dashboard-body .consent-section-heading > span,
+.patient-dashboard-body .consent-declaration-icon {
+    background: linear-gradient(145deg, #2c9cff, #0764d5);
+}
+
+.patient-dashboard-body .consent-care-types > div > i,
+.patient-dashboard-body .modal-service-option-icon,
+.patient-dashboard-body .modal-service-mode,
+.patient-dashboard-body .modal-record-option > span,
+.patient-dashboard-body .notification-item-icon {
+    background: #123d72;
+    color: #75b6ff;
+}
+
+.patient-dashboard-body .modal-service-mode.face,
+.patient-dashboard-body .dashboard-service-mode[data-mode="FACE"] {
+    background: #0f3a2c;
+    color: #69e0ae;
+}
+
+.patient-dashboard-body .dashboard-service-mode {
+    background: #123d72;
+    color: #75b6ff;
+}
+
+.patient-dashboard-body .consent-selected-service .modal-service-mode i {
+    background: transparent;
+    color: inherit;
+}
+
+.patient-dashboard-body .consent-care-types p strong,
+.patient-dashboard-body .profile-summary-card strong,
+.patient-dashboard-body .profile-detail-grid strong,
+.patient-dashboard-body .modal-record-option strong,
+.patient-dashboard-body .modal-service-option strong,
+.patient-dashboard-body .notification-item strong,
+.patient-dashboard-body .cancelled-appointment-summary strong {
+    color: #eef5ff;
+}
+
+.patient-dashboard-body .modal-service-option:hover,
+.patient-dashboard-body .modal-record-option:hover,
+.patient-dashboard-body .notification-item:hover {
+    border-color: #2d7ddd;
+    background: #14315a;
+    color: #fff;
+}
+
+.patient-dashboard-body .modal-visit-date,
+.patient-dashboard-body .profile-detail-grid > div > i {
+    background: #123d72;
+    color: #75b6ff;
+}
+
+.patient-dashboard-body .modal-visit-copy b,
+.patient-dashboard-body .modal-action-pending {
+    color: #6f88aa;
+}
+
+.patient-dashboard-body .notification-item.unread {
+    border-color: #2d7ddd;
+    background: #102d53;
+}
+
+.patient-dashboard-body .notification-item.read .notification-item-icon {
+    background: #19365d;
+    color: #9db2d0;
+}
+
+.patient-dashboard-body .profile-summary-card > span,
+.patient-dashboard-body .profile-summary-card > img {
+    border-color: #2d85e9;
+}
+
+.patient-dashboard-body .profile-summary-card > span {
+    background: #123d72;
+    color: #75b6ff;
+}
+
+.patient-dashboard-body .profile-summary-card > i {
+    color: #69e0ae;
+}
+
+.patient-dashboard-body .booking-step-label > span {
+    background: #0877ed;
+}
+
+.patient-dashboard-body .booking-service-select,
+.patient-dashboard-body .booking-complaint-input,
+.patient-dashboard-body .booking-time-slot {
+    border-color: #1e5eb1;
+    background: #0a1a30;
+    color: #f4f8ff;
+}
+
+.patient-dashboard-body .booking-service-select:focus,
+.patient-dashboard-body .booking-complaint-input:focus,
+.patient-dashboard-body .booking-time-slot:focus {
+    border-color: #55a9ff;
+    box-shadow: 0 0 0 3px rgba(8, 119, 237, .18);
+}
+
+.patient-dashboard-body .booking-time-slot:hover,
+.patient-dashboard-body .booking-time-slot.selected {
+    border-color: #55a9ff;
+    background: #14315a;
+    color: #fff;
+}
+
+.patient-dashboard-body .booking-recommendation {
+    background: #10233f;
+}
+
+/* Alert modal keeps its warning accent while using the dark surface. */
+.patient-dashboard-body .dashboard-alert-header {
+    background: linear-gradient(135deg, #b51f43, #dc3e58);
+}
+
+.patient-dashboard-body .dashboard-alert-badge {
+    background: #4a1e2c;
+    color: #ff9caf;
+}
+
+.patient-dashboard-body .dashboard-alert-footer {
+    background: #10233f;
+}
+
+@media (max-width: 767.98px) {
+    .patient-dashboard-body .dashboard-hero {
+        background:
+            linear-gradient(180deg, rgba(5, 30, 62, .98) 0%, rgba(7, 57, 112, .92) 62%, rgba(7, 21, 40, .48) 100%),
+            url('/images/qmmc-telemedicine-banner.jpg') 58% 54% / cover no-repeat;
+    }
+
+    .patient-dashboard-body .dashboard-visits-table tr {
+        border-color: #1b4d91;
+        background: #10233f;
+    }
+
+    .patient-dashboard-body .dashboard-visits-table td {
+        border-color: #19365d;
+    }
+
+    .patient-dashboard-body .dashboard-visits-table td::before {
+        color: #7895ba;
+    }
+}
+
+/* Keep the patient page canvas white while retaining the dark admin-style surfaces. */
+.patient-dashboard-body {
+    background: #fff;
+}
+
+.patient-dashboard-body .dashboard-services > h2 {
+    color: #0a326c;
+}
+
+.patient-dashboard-body .dashboard-services > h2 > i {
+    color: #0752b5;
+}
+
+.patient-dashboard-body .patient-dashboard-footer {
+    color: #315786;
+}

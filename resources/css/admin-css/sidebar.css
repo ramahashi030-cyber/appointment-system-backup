@@ -1,0 +1,311 @@
+/* QMMC Admin Sidebar */
+.admin-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 1035;
+    width: 240px;
+    min-height: 100vh;
+    flex-direction: column;
+    overflow: hidden;
+    background: linear-gradient(180deg, #073c82 0%, #06336f 62%, #062d62 100%);
+    box-shadow: 12px 0 35px rgba(0, 0, 0, .16);
+}
+
+.admin-sidebar-waves {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: .7;
+}
+
+.admin-sidebar-waves::before,
+.admin-sidebar-waves::after {
+    position: absolute;
+    left: -25%;
+    width: 150%;
+    border-radius: 50%;
+    content: '';
+}
+
+.admin-sidebar-waves::before {
+    bottom: 15%;
+    height: 260px;
+    background: rgba(7, 70, 151, .8);
+    transform: rotate(-8deg);
+}
+
+.admin-sidebar-waves::after {
+    right: -45%;
+    bottom: -3%;
+    height: 340px;
+    background: rgba(4, 44, 101, .9);
+    transform: rotate(13deg);
+}
+
+.admin-brand {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    width: max-content;
+    color: #fff;
+    text-decoration: none;
+}
+
+.admin-sidebar > .admin-brand {
+    margin: 25px 0 0 25px;
+}
+
+.admin-brand-mark {
+    position: relative;
+    display: inline-flex;
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    align-items: center;
+    justify-content: center;
+    border: 5px solid #fff;
+    border-radius: 50%;
+    color: #fff;
+}
+
+.admin-brand-mark::after {
+    position: absolute;
+    right: -8px;
+    bottom: -5px;
+    width: 21px;
+    height: 5px;
+    border-radius: 999px;
+    background: #fff;
+    content: '';
+    transform: rotate(48deg);
+    transform-origin: left center;
+}
+
+.admin-brand-mark i {
+    font-size: 21px;
+}
+
+.admin-brand-copy {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+}
+
+.admin-brand-copy strong {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: .3px;
+}
+
+.admin-brand-copy small {
+    margin-top: 7px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 4.5px;
+}
+
+.admin-sidebar-nav {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 43px;
+    padding: 0 12px;
+}
+
+.admin-sidebar-link {
+    display: flex;
+    min-height: 45px;
+    align-items: center;
+    gap: 15px;
+    padding: 0 14px;
+    border-radius: 9px;
+    color: #dbeaff;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color .16s ease, color .16s ease, transform .16s ease;
+}
+
+.admin-sidebar-link i {
+    width: 19px;
+    color: #b9d7f8;
+    font-size: 16px;
+    text-align: center;
+}
+
+.admin-sidebar-link:hover,
+.admin-sidebar-link:focus-visible {
+    background: rgba(255, 255, 255, .1);
+    color: #fff;
+    transform: translateX(2px);
+}
+
+.admin-sidebar-link.active {
+    background: linear-gradient(90deg, #1685ee, #0a6ed6);
+    box-shadow: 0 8px 18px rgba(0, 48, 120, .25);
+    color: #fff;
+}
+
+.admin-sidebar-link.active i {
+    color: #fff;
+}
+
+.admin-sidebar-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.admin-sidebar-group-toggle {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+}
+
+/* The toggle is a button, so it needs the same focus ring the links get. */
+.admin-sidebar-group-toggle:focus-visible {
+    outline: 2px solid rgba(143, 195, 255, .75);
+    outline-offset: 2px;
+}
+
+.admin-sidebar-group-chevron {
+    width: auto;
+    margin-left: auto;
+    font-size: 11px;
+    transition: transform .18s ease;
+}
+
+.admin-sidebar-group-toggle[aria-expanded="true"] .admin-sidebar-group-chevron {
+    transform: rotate(180deg);
+}
+
+/* A parent stays highlighted while one of its sub-pages is open. */
+.admin-sidebar-group.active > .admin-sidebar-group-toggle {
+    background: linear-gradient(90deg, #1685ee, #0a6ed6);
+    box-shadow: 0 8px 18px rgba(0, 48, 120, .25);
+    color: #fff;
+}
+
+.admin-sidebar-group.active > .admin-sidebar-group-toggle i {
+    color: #fff;
+}
+
+.admin-sidebar-subnav {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0 0 3px 18px;
+    padding: 3px 0 3px 12px;
+    border-left: 1px solid rgba(255, 255, 255, .16);
+}
+
+.admin-sidebar-sublink {
+    display: flex;
+    min-height: 38px;
+    align-items: center;
+    gap: 11px;
+    padding: 0 12px;
+    border-radius: 8px;
+    color: #cfe4ff;
+    font-size: 12.5px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color .16s ease, color .16s ease, transform .16s ease;
+}
+
+.admin-sidebar-sublink i {
+    width: 16px;
+    color: #a9cdf6;
+    font-size: 14px;
+    text-align: center;
+}
+
+.admin-sidebar-sublink:hover,
+.admin-sidebar-sublink:focus-visible {
+    background: rgba(255, 255, 255, .1);
+    color: #fff;
+    transform: translateX(2px);
+}
+
+.admin-sidebar-sublink.active {
+    background: rgba(255, 255, 255, .16);
+    color: #fff;
+    font-weight: 600;
+}
+
+.admin-sidebar-sublink.active i {
+    color: #fff;
+}
+
+.admin-sidebar-footer {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: auto 22px 25px;
+    color: #b6d3f5;
+    font-size: 10px;
+    font-style: italic;
+    line-height: 1.3;
+}
+
+.admin-sidebar-footer i {
+    color: #8fc3ff;
+    font-size: 23px;
+}
+
+.admin-sidebar-footer em {
+    color: #fff;
+    font-size: 12px;
+}
+
+.admin-mobile-menu {
+    --bs-offcanvas-width: 270px;
+    background: var(--admin-sidebar);
+    color: #fff;
+}
+
+.admin-mobile-menu-header {
+    border-bottom: 1px solid rgba(255, 255, 255, .12);
+}
+
+.admin-mobile-menu-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-mobile-menu-body .admin-sidebar-nav {
+    margin-top: 15px;
+    padding: 0;
+}
+
+.admin-mobile-logout {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: auto 20px 20px;
+    color: #c8e0ff;
+    font-size: 12px;
+    text-decoration: none;
+}
+
+.admin-mobile-logout button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}

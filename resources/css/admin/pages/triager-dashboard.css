@@ -1,0 +1,436 @@
+/* admin/triager-dashboard.blade.php + partials/triager-request-card.blade.php */
+.triager-dashboard-content {
+    display: flex !important;
+    flex-direction: column;
+    gap: 22px !important;
+    padding: 4px 2px 28px;
+    color: #1e293b;
+    background: linear-gradient(180deg, #eef3f9 0%, #f4f7fb 48%, #eef2f7 100%);
+    border-radius: 16px;
+}
+
+.triager-dashboard-content > * { margin: 0 !important; }
+
+/* Hero banner */
+.triager-dashboard-content .admin-telemedicine-banner {
+    height: 200px;
+    border: 1px solid #7ec0ff;
+    border-radius: 18px;
+    box-shadow: 0 10px 28px rgba(26, 76, 137, .12);
+}
+.triager-dashboard-content .admin-telemedicine-mark {
+    width: 92px;
+    height: 92px;
+    flex: 0 0 92px;
+    background: linear-gradient(145deg, #2a8cff 0%, #0668d4 100%);
+    box-shadow: 0 12px 24px rgba(0, 78, 171, .28);
+}
+.triager-dashboard-content .admin-telemedicine-mark > i { font-size: 38px; }
+.triager-dashboard-content .admin-telemedicine-copy h1 {
+    color: #08356f;
+    font-size: clamp(26px, 2vw, 34px);
+    letter-spacing: -.6px;
+}
+.triager-dashboard-content .admin-telemedicine-welcome { color: #1d5a9e; font-size: 18px; }
+.triager-dashboard-content .admin-telemedicine-description {
+    color: #4a678a;
+    font-size: 13px;
+    max-width: 520px;
+    line-height: 1.45;
+}
+
+.triager-trust-pills {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+.triager-trust-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border: 1px solid rgba(37, 99, 235, .18);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .72);
+    color: #1e4a7a;
+    font-size: 11px;
+    font-weight: 600;
+}
+.triager-trust-pill i { color: #2589f4; font-size: 12px; }
+
+/* Stat cards */
+.triager-dashboard-content .admin-doctor-stat-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+}
+.triager-dashboard-content .triager-stat-card {
+    position: relative;
+    min-height: 88px;
+    padding: 16px 44px 16px 16px;
+    border: 1px solid #dce8f6;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 8px 22px rgba(33, 86, 145, .08);
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+.triager-dashboard-content .triager-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(33, 86, 145, .12);
+}
+.triager-dashboard-content .admin-doctor-stat-icon {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    border-radius: 12px;
+    font-size: 18px;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, .12);
+}
+.triager-dashboard-content .admin-doctor-stat-icon.blue { background: linear-gradient(145deg, #3b9bff, #1a6fd8); }
+.admin-doctor-content .admin-doctor-stat-icon.cyan,
+.triager-dashboard-content .admin-doctor-stat-icon.cyan { background: linear-gradient(145deg, #2bc9dc, #148fae); }
+.triager-dashboard-content .admin-doctor-stat-icon.orange { background: linear-gradient(145deg, #f59a54, #e8742e); }
+.triager-dashboard-content .admin-doctor-stat-icon.green { background: linear-gradient(145deg, #22c58b, #12a36a); }
+.triager-dashboard-content .admin-doctor-stat-card small {
+    color: #6b86a8;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .02em;
+}
+.triager-dashboard-content .admin-doctor-stat-card strong {
+    color: #0a326c;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+.triager-stat-chevron {
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+    color: #94b4d6;
+    font-size: 18px;
+}
+
+/* Main layout & panels */
+.triager-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 22px;
+    align-items: start;
+}
+.triager-main {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    min-width: 0;
+}
+.triager-dashboard-content .admin-panel {
+    border: 1px solid #c5daf2;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 10px 26px rgba(15, 23, 42, .08);
+}
+.triager-dashboard-content .admin-panel-header {
+    min-height: 52px;
+    padding: 0 18px;
+    background: linear-gradient(90deg, #0877ed 0%, #0660c7 100%);
+}
+.triager-dashboard-content .admin-panel-title h2 {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: .01em;
+}
+.triager-dashboard-content .admin-panel-title i { font-size: 17px; opacity: .95; }
+.triager-dashboard-content .triager-panel-count {
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .22);
+    color: #fff !important;
+    font-size: 11px !important;
+    font-weight: 600;
+}
+.triager-card-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    padding: 18px;
+    background: linear-gradient(180deg, #f8fbff 0%, #fff 100%);
+}
+.triager-card-grid .triager-card:last-child { margin-bottom: 0; }
+.triager-dashboard-content .admin-doctor-empty {
+    grid-column: 1 / -1;
+    padding: 2.5rem 1rem;
+    border-radius: 14px;
+    border: 1px dashed #c5daf2;
+    background: #f8fbff;
+}
+
+.triager-start-btn {
+    border: none;
+    background: rgba(255, 255, 255, .95);
+    color: #1d4ed8;
+    font: inherit;
+    font-weight: 700;
+    font-size: .78rem;
+    cursor: pointer;
+    padding: .35rem .65rem;
+    border-radius: 8px;
+}
+.triager-start-btn:hover { background: #fff; }
+
+/* Request cards */
+.triager-dashboard-content .triager-card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #dbe7f5;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, .07);
+    margin-bottom: 0;
+    overflow: hidden;
+    transition: box-shadow .2s ease, transform .2s ease;
+}
+.triager-dashboard-content .triager-card:hover { box-shadow: 0 10px 24px rgba(15, 23, 42, .1); }
+.triager-card-locked { opacity: .58; pointer-events: none; }
+.triager-locked-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .35rem .8rem;
+    border-radius: 999px;
+    font-size: .75rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, .25);
+    color: #fff;
+}
+.triager-dashboard-content .triager-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    padding: .55rem .85rem;
+    background: linear-gradient(135deg, #1e4a8a 0%, #163d75 100%);
+}
+.triager-card-status {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .35rem .75rem;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: .02em;
+}
+.triager-card-status.pending { background: rgba(255, 255, 255, .18); border: 1px solid rgba(255, 255, 255, .25); }
+.triager-card-status.processing { background: #16a34a; box-shadow: 0 2px 8px rgba(22, 163, 74, .35); }
+.triager-card-status.in-progress { background: #2563eb; box-shadow: 0 2px 8px rgba(37, 99, 235, .35); }
+.triager-card-status.approved { background: #0ea5e9; }
+.triager-card-status .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #fde047;
+    box-shadow: 0 0 0 2px rgba(253, 224, 71, .35);
+}
+.triager-card-pending-badge {
+    padding: .3rem .7rem;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 700;
+    background: #fbbf24;
+    color: #1e293b;
+}
+.triager-dashboard-content .triager-card-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1rem .95rem 1rem;
+}
+.triager-dashboard-content .triager-patient-name {
+    font-size: .95rem;
+    font-weight: 800;
+    color: #1e40af;
+    margin-bottom: .2rem;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    line-height: 1.25;
+}
+.triager-patient-meta { font-size: .78rem; color: #64748b; margin-bottom: .65rem; }
+.triager-patient-meta strong { color: #475569; font-weight: 600; }
+.triager-symptoms { font-size: .82rem; color: #334155; margin-bottom: .55rem; line-height: 1.45; }
+.triager-symptoms strong {
+    display: block;
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: #64748b;
+    margin-bottom: .25rem;
+    font-weight: 700;
+}
+.triager-timestamp { font-size: .75rem; color: #94a3b8; margin-bottom: .75rem; }
+.triager-card-actions { display: flex; flex-direction: column; gap: .5rem; margin-bottom: .75rem; }
+.triager-select-action {
+    width: 100%;
+    padding: .55rem .75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    background: #f8fafc;
+    font-size: .85rem;
+    color: #334155;
+}
+.triager-select-action:focus {
+    outline: none;
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, .25);
+}
+.triager-remarks {
+    width: 100%;
+    min-height: 72px;
+    padding: .55rem .75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    background: #f8fafc;
+    font-size: .85rem;
+    color: #334155;
+    resize: vertical;
+}
+.triager-remarks:focus {
+    outline: none;
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, .25);
+}
+.triager-appointments { margin-bottom: .65rem; padding: .5rem .6rem; border-radius: 10px; background: #f1f5f9; }
+.triager-appointments strong {
+    display: block;
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: #64748b;
+    margin-bottom: .35rem;
+    font-weight: 700;
+}
+.triager-appointment-item { font-size: .78rem; color: #475569; padding: .2rem 0; line-height: 1.4; }
+.triager-appointment-item strong {
+    display: inline;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: .78rem;
+    color: #1e293b;
+}
+.triager-schedule-buttons { display: flex; flex-direction: column; gap: .35rem; margin-bottom: .75rem; }
+.triager-schedule-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: .4rem;
+    padding: .25rem 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    font-size: .82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: color .15s ease;
+}
+.triager-schedule-btn:hover:not(:disabled) { text-decoration: underline; }
+.triager-schedule-btn.telemed { color: #0369a1; }
+.triager-schedule-btn.face { color: #1d4ed8; }
+.triager-schedule-btn.disabled,
+.triager-schedule-btn:disabled { color: #94a3b8; cursor: not-allowed; }
+.triager-save-btn {
+    width: 100%;
+    margin-top: auto;
+    padding: .7rem 1rem;
+    border: none;
+    border-radius: 10px;
+    font-size: .9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: filter .15s ease, transform .15s ease;
+}
+.triager-save-btn:hover:not(:disabled) { filter: brightness(1.05); }
+.triager-save-btn.active {
+    background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(22, 163, 74, .35);
+}
+.triager-save-btn.disabled { background: #e2e8f0; color: #94a3b8; cursor: not-allowed; box-shadow: none; }
+
+/* Processed sidebar */
+.triager-sidebar { position: sticky; top: 1rem; }
+.triager-print-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px !important;
+    height: auto !important;
+    border: 1px solid rgba(255, 255, 255, .85) !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, .12);
+    color: #fff !important;
+    font-size: 11px !important;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background .15s ease;
+}
+.triager-print-btn:hover { background: rgba(255, 255, 255, .22); color: #fff !important; }
+.triager-processed-list { max-height: calc(100vh - 220px); overflow-y: auto; padding: 4px 0 8px; }
+.triager-processed-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    padding: .85rem 1.15rem;
+    border-bottom: 1px solid #eef2f7;
+}
+.triager-processed-item:last-child { border-bottom: none; }
+.triager-processed-item .admin-doctor-person { display: flex; align-items: center; gap: .65rem; min-width: 0; }
+.triager-processed-item .admin-avatar {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #3b9bff, #1a6fd8);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.triager-processed-item .admin-doctor-person strong { display: block; font-size: .82rem; color: #0f172a; line-height: 1.25; }
+.triager-processed-item .admin-doctor-person small { color: #94a3b8; font-size: .72rem; }
+.triager-processed-badge {
+    padding: .25rem .65rem;
+    border-radius: 999px;
+    font-size: .68rem;
+    font-weight: 700;
+    white-space: nowrap;
+    background: #e2e8f0;
+    color: #475569;
+}
+.triager-processed-badge.approved { background: #dcfce7; color: #166534; }
+.triager-processed-badge.denied { background: #fee2e2; color: #991b1b; }
+.triager-processed-badge.suspend { background: #fef3c7; color: #92400e; }
+
+@media (max-width: 1399.98px) {
+    .triager-card-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 1199.98px) {
+    .triager-dashboard-content .admin-doctor-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .triager-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 991.98px) {
+    .triager-layout { grid-template-columns: 1fr; }
+    .triager-sidebar { position: static; }
+    .triager-processed-list { max-height: 420px; }
+}
+@media (max-width: 575.98px) {
+    .triager-dashboard-content .admin-doctor-stat-grid { grid-template-columns: 1fr; }
+    .triager-card-grid { grid-template-columns: 1fr; }
+    .triager-dashboard-content .admin-telemedicine-banner { height: auto; min-height: 180px; }
+}

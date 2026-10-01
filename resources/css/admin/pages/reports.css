@@ -1,0 +1,17 @@
+/* admin/reports.blade.php */
+.admin-reports-page { display: flex !important; flex-direction: column; gap: 20px !important; }
+.admin-reports-page > * { margin: 0 !important; }
+
+.admin-doctor-content .admin-doctor-stat-icon.cyan {
+    background: linear-gradient(145deg, #2bc9dc, #148fae);
+}
+
+.admin-reports-page .admin-doctor-table-wrap { overflow-y: hidden; max-height: none; height: auto; }
+.admin-reports-page [data-report-table-wrap] .admin-doctor-table { min-width: 760px; }
+.admin-reports-page .admin-doctor-table th,
+.admin-reports-page .admin-doctor-table td { padding: 14px 18px; }
+.admin-reports-page .admin-doctor-table td { overflow-wrap: break-word; }
+.admin-reports-page .admin-doctor-primary-text,
+.admin-reports-page .admin-doctor-person strong { font-size: 13px; line-height: 1.35; }
+.admin-reports-page .admin-doctor-secondary-text,
+.admin-reports-page .admin-doctor-person small { margin-top: 3px; font-size: 12px; }

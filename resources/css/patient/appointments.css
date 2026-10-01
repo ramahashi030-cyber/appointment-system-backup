@@ -1,0 +1,52 @@
+/* patients/appointment.blade.php */
+.visit-card {
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, .07);
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+.visit-card .visit-date {
+    background: linear-gradient(160deg, #0d6efd, #0a58ca);
+    color: #fff;
+    min-width: 92px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: .85rem .5rem;
+    text-align: center;
+}
+.visit-card .visit-date .day { font-size: 1.6rem; font-weight: 700; line-height: 1; }
+.visit-card .visit-date .month { text-transform: uppercase; font-size: .78rem; letter-spacing: 1px; }
+
+.request-card {
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, .07);
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+.request-card .request-mode {
+    color: #fff;
+    min-width: 92px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: .85rem .5rem;
+    text-align: center;
+    font-weight: 600;
+    font-size: .85rem;
+}
+.request-card .request-mode.face { background: linear-gradient(160deg, #0d6efd, #0a58ca); }
+.request-card .request-mode.tele { background: linear-gradient(160deg, #6f42c1, #593196); }
+
+@media (max-width: 575.98px) {
+    .visit-card .flex-md-row,
+    .request-card .flex-md-row { flex-direction: row !important; }
+    .visit-card .visit-date,
+    .request-card .request-mode { min-width: 78px; }
+    .visit-card .btn,
+    .request-card .btn { width: 100%; }
+}

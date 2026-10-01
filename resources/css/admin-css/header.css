@@ -1,0 +1,140 @@
+/* QMMC Admin Header */
+.admin-header {
+    position: sticky;
+    top: 0;
+    z-index: 1025;
+    min-height: 74px;
+    margin-top: 10px;
+}
+
+.admin-header-inner {
+    display: flex;
+    min-height: 74px;
+    align-items: center;
+    gap: 18px;
+    padding: 0 30px;
+}
+
+.admin-menu-toggle {
+    display: inline-flex;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #234a7d;
+    border-radius: 10px;
+    background: #0d2545;
+    color: #b9d9ff;
+    font-size: 25px;
+}
+
+.admin-header-actions {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 20px;
+    margin-left: auto;
+    padding: 10px;
+    border: 1px solid #0877ed;
+    border-radius: 50px;
+    background: #0877ed;
+}
+
+.admin-header-icon {
+    position: relative;
+    display: inline-flex;
+    width: 34px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 20px;
+    text-decoration: none;
+    transition: color .16s ease, filter .16s ease;
+}
+
+.admin-header-icon:hover,
+.admin-header-icon:focus-visible {
+    color: #dbeaff;
+    filter: drop-shadow(0 2px 4px rgba(13, 28, 52, .35));
+}
+
+.admin-user {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 9px;
+}
+
+.admin-user-avatar {
+    display: inline-flex;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #2d85e9;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #56b5ff, #1c69d1);
+    color: #fff;
+    font-size: 18px;
+}
+
+.admin-user-copy {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+}
+
+.admin-user-copy strong {
+    overflow: hidden;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-user-copy small {
+    margin-top: 2px;
+    color: #dbeaff;
+    font-size: 10px;
+}
+
+.admin-logout {
+    display: inline-flex;
+    height: 34px;
+    align-items: center;
+    gap: 5px;
+    padding: 0 12px;
+    border: 1px solid #fff;
+    border-radius: 999px;
+    background: #fff;
+    color: #0877ed;
+    font-size: 11px;
+    text-decoration: none;
+    transition: background-color .16s ease, border-color .16s ease, color .16s ease;
+}
+
+.admin-logout button {
+    display: inline-flex;
+    height: 100%;
+    align-items: center;
+    gap: 5px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+.admin-logout i {
+    color: inherit;
+}
+
+.admin-logout:hover,
+.admin-logout:focus-visible {
+    border-color: #dc3545;
+    background: #dc3545;
+    color: #fff;
+}

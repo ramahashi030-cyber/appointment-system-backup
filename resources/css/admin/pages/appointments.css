@@ -1,0 +1,69 @@
+/* admin/appointments.blade.php */
+.admin-doctor-stat-icon.red { background: #e9445f; }
+
+.admin-doctor-stat-grid.admin-appointment-stat-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 14px;
+}
+.admin-appointment-stat-grid .admin-doctor-stat-card,
+.admin-appointment-stat-grid .admin-doctor-stat-action {
+    min-height: 88px;
+    padding: 16px 18px;
+    gap: 14px;
+}
+.admin-appointment-stat-grid .admin-doctor-stat-card small { font-size: 12px; }
+.admin-appointment-stat-grid .admin-doctor-stat-card strong { font-size: 24px; }
+.admin-appointment-stat-grid .admin-doctor-stat-action { font-size: 13px; }
+
+@media (max-width: 1199px) {
+    .admin-doctor-stat-grid.admin-appointment-stat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 767px) {
+    .admin-doctor-stat-grid.admin-appointment-stat-grid { grid-template-columns: 1fr; }
+}
+
+/* Add / edit appointment modal */
+#addAppointmentModal .modal-body { background: #f4f8ff; }
+#addAppointmentModal .admin-panel { border: 1px solid #0877ed; background: #f4f8ff; }
+#addAppointmentModal .admin-panel-title { background: #0877ed; padding: 12px 20px; }
+#addAppointmentModal .admin-panel-title h3 { color: #ffffff; font-size: 15px; font-weight: 600; margin: 0; }
+#addAppointmentModal .admin-panel-title i { color: #ffffff; font-size: 16px; }
+#addAppointmentModal .form-field > label { color: #315786; font-size: 14px; font-weight: 600; }
+#addAppointmentModal .form-field > label span { color: #8ca2bd; font-size: 13px; font-weight: 400; }
+#addAppointmentModal .form-control,
+#addAppointmentModal .form-select {
+    min-height: 40px;
+    border-color: #d5e4f5;
+    background-color: #ffffff;
+    color: #0a326c;
+    font-size: 15px;
+}
+#addAppointmentModal .form-control:focus,
+#addAppointmentModal .form-select:focus {
+    border-color: #55a9ff;
+    box-shadow: 0 0 0 3px rgba(85, 169, 255, .14);
+}
+#addAppointmentModal .admin-doctor-form { display: grid; gap: 0; padding: 0 32px; }
+#addAppointmentModal .form-field { padding: 14px 0 14px 8px; border-bottom: 1px solid #d5e4f5; }
+#addAppointmentModal .form-field:last-child { border-bottom: none; }
+
+/* View appointment modal */
+#viewAppointmentModal .modal-body { background: #f4f8ff; }
+#viewAppointmentModal .admin-doctor-profile-hero {
+    background: #ffffff;
+    border: 1px solid #d5e4f5;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 18px;
+}
+#viewAppointmentModal .admin-doctor-profile-hero h2 { color: #0a326c; font-size: 20px; font-weight: 700; margin: 0; }
+#viewAppointmentModal .admin-doctor-profile-hero p { color: #8ca2bd; font-size: 14px; margin: 4px 0 0; }
+#viewAppointmentModal .admin-panel { border: 1px solid #0877ed; background: #f4f8ff; }
+#viewAppointmentModal .admin-panel-title { background: #0877ed; padding: 12px 20px; }
+#viewAppointmentModal .admin-panel-title h3 { color: #ffffff; font-size: 15px; font-weight: 600; margin: 0; }
+#viewAppointmentModal .admin-panel-title i { color: #ffffff; font-size: 16px; }
+#viewAppointmentModal .form-field > label { color: #315786; font-size: 14px; font-weight: 600; }
+#viewAppointmentModal .form-field p { color: #0a326c; font-size: 15px; font-weight: 500; margin: 0; }
+#viewAppointmentModal .admin-doctor-form { display: grid; gap: 0; padding: 0 20px; }
+#viewAppointmentModal .form-field { padding: 14px 0; border-bottom: 1px solid #d5e4f5; }
+#viewAppointmentModal .form-field:last-child { border-bottom: none; }

@@ -1,0 +1,20 @@
+/* QMMC Admin – single Vite entry. Order matters (later files override earlier ones). */
+@import '../admin-css/variables.css';
+@import '../admin-css/layout.css';
+@import '../admin-css/sidebar.css';
+@import '../admin-css/header.css';
+@import '../admin-css/dashboard.css';
+@import '../admin-css/doctor.css';
+@import '../admin-css/responsive.css';
+
+/* Page-specific styles (previously inline <style> blocks in the Blade files) */
+@import './pages/appointments.css';
+@import './pages/patients.css';
+@import './pages/triagers.css';
+@import './pages/records.css';
+@import './pages/services.css';
+@import './pages/holidays.css';
+@import './pages/settings.css';
+@import './pages/reports.css';
+@import './pages/audit-logs.css';
+@import './pages/triager-dashboard.css';

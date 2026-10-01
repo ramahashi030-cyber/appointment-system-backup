@@ -1,0 +1,8 @@
+/* Patient page styles (were inline @section('styles') blocks).
+   Loaded by layouts/app.blade.php so pages fetched into the dashboard modal
+   (layouts/modal) are styled too. */
+@import './appointments.css';
+@import './book.css';
+@import './records.css';
+@import './profile.css';
+@import './notifications.css';

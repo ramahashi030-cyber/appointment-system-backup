@@ -1,0 +1,26 @@
+td
+DOCTORS AND PATIENT PAGE
+ - view doctors always show same doctor even though admin click different doctor
+ - change the background color of column header
+ - in view doctors modal appointments table is too little		
+ - increase the text size of schedule and status column data including the actions
+
+DOCTORS AND PATIENT MODAL
+ - increase all the text sizes inside the doctors and staff modal both view and edit
+ - close button of doctors modal needs to double click to close make it one single click
+ - make the width of appointments history and consultation history on top of each other so that it extent in the end side of the modal
+ - availability schedule background color of the table change to #ffffff
+
+
+
+
+ PS C:\Projects\QALINGA> php artisan route:list --name=timeslot
+
+  GET|HEAD       telemed/timeslots ........................................................................................ telemed.timeslots › Patient\TelemedController@timeslots
+  GET|HEAD       triager/timeslots/face .......................................................................... triager.timeslots.face › Triager\TriagerController@faceTimeslots
+  GET|HEAD       triager/timeslots/telemed ................................................................. triager.timeslots.telemed › Triager\TriagerController@telemedTimeslots
+
+
+
+    2026_09_30_000001_add_cancellation_reason_and_room_opened_by_to_appointments_table ....................................................... Pending  
+  2026_10_01_000001_create_holidays_table .................................................................................................. Pending  

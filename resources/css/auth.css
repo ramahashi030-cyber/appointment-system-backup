@@ -1,0 +1,1188 @@
+:root {
+    --auth-ink: #10142a;
+    --auth-muted: #848aa3;
+    --auth-coral: #ff5470;
+    --auth-coral-dark: #e13a58;
+    --auth-navy: #0a1330;
+    --auth-navy-mid: #16234e;
+    --auth-teal: #2fb8c6;
+    --auth-teal-dark: #1f8f9b;
+    --auth-line: #eceaf5;
+    --auth-link: #2d3f6b;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    min-height: 100%;
+}
+
+body {
+    min-height: 100%;
+}
+
+body.auth-body {
+    margin: 0;
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
+    color: var(--auth-ink);
+    background:
+        radial-gradient(680px 680px at 88% 6%, rgba(47, 184, 198, .18) 0, rgba(47, 184, 198, 0) 62%),
+        radial-gradient(760px 760px at 8% 96%, rgba(30, 43, 88, .55) 0, rgba(30, 43, 88, 0) 60%),
+        #070c1c;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* ============ CARD ============ */
+.auth-card {
+    position: relative;
+    width: 100%;
+    max-width: 1080px;
+    min-height: 660px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 44px 100px rgba(3, 8, 24, .55), 0 2px 0 rgba(255, 255, 255, .04) inset;
+    background: #ffffff;
+    animation: authFade .45s ease both;
+}
+
+/* Accent bar that ties both panes together visually. */
+.auth-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    z-index: 5;
+    background: linear-gradient(90deg, var(--auth-coral) 0%, #ffb877 32%, var(--auth-teal) 68%, var(--auth-teal-dark) 100%);
+}
+
+@keyframes authFade {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============ FORM PANE ============ */
+.auth-pane-form {
+    position: relative;
+    z-index: 2;
+    background: linear-gradient(150deg, #fffaf4 0%, #faf7ff 46%, #eef6f7 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 72px 44px 64px;
+}
+
+.auth-frond {
+    position: absolute;
+    top: -6px;
+    left: -14px;
+    width: 215px;
+    height: 180px;
+    pointer-events: none;
+    opacity: .95;
+}
+
+.auth-inner {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    max-width: 400px;
+}
+
+.auth-registration-page .auth-submit {
+    margin: 16px auto 0;
+}
+
+/* Brand row — Qalinga | QMMC Patient Portal / Login page. */
+.auth-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 26px;
+}
+
+.auth-brand-logo {
+    height: 46px;
+    width: auto;
+    display: block;
+}
+
+.auth-brand-wordmark {
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--auth-coral), var(--auth-teal-dark));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.auth-brand-rule {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(180deg, var(--auth-coral), var(--auth-teal));
+    opacity: .35;
+    flex: none;
+}
+
+.auth-brand-text {
+    line-height: 1.25;
+}
+
+.auth-brand-text strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    color: #141a30;
+}
+
+.auth-brand-text span {
+    display: block;
+    font-size: 13px;
+    color: var(--auth-muted);
+}
+
+.auth-heading {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6a7090;
+    margin: 0 0 18px;
+}
+
+/* Alerts. */
+.auth-inner .alert {
+    border-radius: 14px;
+    font-size: 12.5px;
+    padding: 10px 14px;
+    border: none;
+}
+
+/* Pill inputs. */
+.auth-field {
+    position: relative;
+    margin-bottom: 14px;
+}
+
+.auth-input {
+    width: 100%;
+    height: 46px;
+    padding: 0 22px;
+    font-size: 13.5px;
+    font-family: inherit;
+    color: var(--auth-ink);
+    background: #fff;
+    border: 1px solid var(--auth-line);
+    border-radius: 999px;
+    box-shadow: 0 8px 20px rgba(20, 30, 70, .06);
+    outline: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.auth-input::placeholder {
+    color: #9ca1b3;
+}
+
+.auth-input:focus {
+    border-color: rgba(47, 184, 198, .55);
+    box-shadow: 0 0 0 4px rgba(47, 184, 198, .16);
+}
+
+.auth-input.has-eye {
+    padding-right: 48px;
+}
+
+.auth-input-wrap {
+    position: relative;
+    width: 100%;
+}
+
+.auth-input-wrap .auth-input {
+    display: block;
+}
+
+.auth-input.is-invalid {
+    border-color: var(--auth-coral);
+}
+
+.auth-eye {
+    position: absolute;
+    right: 14px;
+    top: 0;
+    height: 100%;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: transparent;
+    color: #a7abbd;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.auth-eye:hover,
+.auth-eye:focus {
+    color: var(--auth-teal-dark);
+}
+
+.auth-error-text {
+    display: block;
+    font-size: 11.5px;
+    color: var(--auth-coral-dark);
+    margin: -6px 0 12px 18px;
+}
+
+/* Labels used by the longer forms. */
+.auth-label {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: #6a7090;
+    margin: 0 0 6px 18px;
+}
+
+select.auth-input,
+input[type="date"].auth-input {
+    padding-right: 16px;
+}
+
+textarea.auth-input {
+    height: auto;
+    min-height: 76px;
+    padding: 12px 22px;
+    border-radius: 20px;
+    line-height: 1.5;
+    resize: vertical;
+}
+
+.auth-grid {
+    display: grid;
+    grid-template-columns: 2fr 2fr;
+    gap: 0 12px;
+}
+
+@media (max-width: 420px) {
+    .auth-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Secondary text button and alternate-screen link. */
+.auth-linkbtn {
+    display: block;
+    width: 100%;
+    margin-top: 12px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--auth-link);
+    font-size: 12.5px;
+    font-family: inherit;
+    text-align: center;
+    text-decoration: underline;
+}
+
+.auth-linkbtn:hover {
+    color: var(--auth-coral);
+}
+
+.auth-alt {
+    text-align: center;
+    font-size: 12px;
+    color: #6a7090;
+    margin: 18px 0 0;
+}
+
+.auth-alt a {
+    color: var(--auth-link);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-alt a:hover {
+    text-decoration: underline;
+}
+
+.auth-note {
+    font-size: 11.5px;
+    color: #8b90a3;
+    text-align: center;
+    margin: 12px 0 0;
+}
+
+/* Small utility rows (checkbox / hint). */
+.auth-switch {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #6a7090;
+    margin-bottom: 14px;
+}
+
+.auth-switch input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: var(--auth-teal-dark);
+    border-radius: 4px;
+}
+
+.auth-hint {
+    font-size: 11.5px;
+    color: #7b81a0;
+    margin: -6px 0 14px;
+}
+
+/* Text links row. */
+.auth-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 12.5px;
+    margin: 4px 0 20px;
+}
+
+.auth-links a {
+    color: var(--auth-link);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-links a:hover {
+    text-decoration: underline;
+}
+
+.auth-links .auth-sep {
+    color: #c6c3d6;
+}
+
+/* Primary button. */
+.auth-submit {
+    display: block;
+    width: 175px;
+    height: 42px;
+    margin: 0 auto;
+    border: 0;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--auth-coral) 0%, #ff8a5c 100%);
+    color: #fff;
+    font-size: 13.5px;
+    font-weight: 500;
+    font-family: inherit;
+    letter-spacing: .2px;
+    box-shadow: 0 14px 26px rgba(255, 84, 112, .32);
+    transition: background-color .15s ease, transform .15s ease, box-shadow .15s ease;
+}
+
+.auth-submit:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--auth-coral-dark) 0%, var(--auth-coral) 100%);
+    box-shadow: 0 18px 32px rgba(255, 84, 112, .4);
+    transform: translateY(-1px);
+}
+
+.auth-submit:disabled {
+    opacity: .8;
+}
+
+.auth-foot {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 20px;
+    text-align: center;
+    font-size: 11px;
+    color: #9ea3b8;
+    z-index: 3;
+}
+
+/* ============ ART PANE ============ */
+.auth-art {
+    position: relative;
+    z-index: 1;
+    background:
+        radial-gradient(420px 420px at 74% 22%, rgba(47, 184, 198, .28) 0, rgba(47, 184, 198, 0) 70%),
+        radial-gradient(520px 520px at 30% 86%, rgba(24, 40, 98, .85) 0, rgba(24, 40, 98, 0) 72%),
+        linear-gradient(160deg, #101c42 0%, #0d1430 62%, #0a1027 100%);
+    overflow: visible;
+}
+
+/* Faint medical icon pattern. */
+.auth-icons {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: space-around;
+    justify-content: space-evenly;
+    gap: 26px;
+    padding: 34px 18px 34px 150px;
+    font-size: 24px;
+    color: #7fd8e0;
+    opacity: .09;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Organic wave that spills into the light pane. */
+.auth-wave {
+    position: absolute;
+    top: 0;
+    left: -48px;
+    width: calc(100% + 48px);
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.auth-deco {
+    position: absolute;
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Leaves frame the pane — kept clear of the heart, which sits on the left. */
+.auth-leaf-top {
+    top: 10px;
+    left: 138px;
+    width: 118px;
+    transform: rotate(-12deg);
+}
+
+.auth-leaf-top-2 {
+    top: 44px;
+    left: -6px;
+    width: 82px;
+    transform: rotate(32deg);
+    opacity: .9;
+}
+
+.auth-leaf-bottom {
+    bottom: -34px;
+    left: 168px;
+    width: 152px;
+    transform: rotate(172deg);
+}
+
+.auth-leaf-bottom-2 {
+    bottom: 34px;
+    right: 16px;
+    width: 112px;
+    transform: rotate(214deg);
+    opacity: .92;
+}
+
+.auth-leaf-right {
+    top: 24px;
+    right: -26px;
+    width: 124px;
+    transform: rotate(142deg);
+    opacity: .85;
+}
+
+.auth-heart {
+    top: 49%;
+    left: 5%;
+    width: 150px;
+    transform: translateY(-50%);
+    filter: drop-shadow(0 18px 30px rgba(0, 0, 0, .35));
+}
+
+.auth-steth {
+    top: 18%;
+    right: 4%;
+    width: 250px;
+    filter: drop-shadow(0 22px 34px rgba(0, 0, 0, .4));
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 991.98px) {
+    body.auth-body {
+        height: auto;
+        min-height: 100vh;
+        padding: 0;
+        align-items: stretch;
+        overflow-y: auto;
+    }
+
+    .auth-card {
+        grid-template-columns: 1fr;
+        min-height: 100vh;
+        height: auto;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .auth-art {
+        display: none;
+    }
+
+    .auth-pane-form {
+        min-height: 100vh;
+        justify-content: flex-start;
+        padding: 64px 26px 76px;
+    }
+
+    .auth-foot {
+        position: static;
+        margin-top: 28px;
+    }
+
+    .auth-inner {
+        max-width: 400px;
+    }
+}
+
+@media (max-width: 420px) {
+    .auth-pane-form {
+        padding: 52px 18px 72px;
+    }
+
+    .auth-frond {
+        width: 150px;
+        height: 130px;
+    }
+
+    .auth-brand-logo {
+        height: 40px;
+    }
+
+    .auth-brand-wordmark {
+        font-size: 25px;
+    }
+
+    .auth-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .auth-card {
+        animation: none;
+    }
+
+    .auth-submit {
+        transition: none;
+    }
+}
+
+/* ============ PATIENT REGISTRATION ============ */
+@media (min-width: 992px) {
+    body.auth-body.auth-registration-page {
+        padding-top: 16px;
+        padding-bottom: 16px;
+    }
+
+    .auth-registration-page .auth-card {
+        min-height: 0;
+    }
+
+    .auth-registration-page .auth-pane-form {
+        padding: 12px 44px;
+    }
+
+    .auth-registration-page .auth-brand {
+        margin-bottom: 14px;
+    }
+
+    .auth-registration-page .auth-field {
+        margin-bottom: 6px;
+    }
+
+    .auth-registration-page .auth-label {
+        margin-bottom: 3px;
+    }
+
+    .auth-registration-page input.auth-input,
+    .auth-registration-page select.auth-input,
+    .auth-registration-page .auth-eye {
+        height: 40px;
+    }
+
+    .auth-registration-page textarea.auth-input {
+        min-height: 64px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .auth-registration-page .auth-links {
+        margin: 0 0 10px;
+    }
+
+    .auth-registration-page .auth-alt {
+        margin-top: 8px;
+    }
+
+    .auth-registration-page .auth-foot {
+        position: static;
+        margin: 2px 0 0;
+    }
+
+    .auth-registration-page .auth-submit {
+        height: 42px;
+    }
+}
+
+@media (min-width: 992px) and (max-height: 740px) {
+    body.auth-body.auth-registration-page {
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+
+    .auth-registration-page .auth-pane-form {
+        padding: 10px 44px;
+    }
+
+    .auth-registration-page .auth-brand {
+        margin-bottom: 12px;
+    }
+
+    .auth-registration-page .auth-field {
+        margin-bottom: 5px;
+    }
+
+    .auth-registration-page .auth-label {
+        margin-bottom: 2px;
+    }
+
+    .auth-registration-page input.auth-input,
+    .auth-registration-page select.auth-input,
+    .auth-registration-page .auth-eye {
+        height: 38px;
+    }
+
+    .auth-registration-page textarea.auth-input {
+        min-height: 62px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+
+    .auth-registration-page .auth-links {
+        margin: 0 0 8px;
+    }
+
+    .auth-registration-page .auth-alt {
+        margin-top: 6px;
+    }
+
+    .auth-registration-page .auth-foot {
+        margin-top: 1px;
+    }
+
+    .auth-registration-page .auth-submit {
+        height: 40px;
+    }
+}
+
+/* ============ FLATPICKR DATE PICKER ============ */
+.auth-date-alt-input {
+    padding-right: 48px !important;
+    cursor: pointer;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236a7090' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4.5' width='18' height='16' rx='2'/%3E%3Cpath d='M16 2.5v4M8 2.5v4M3 9.5h18'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 17px center;
+    background-size: 16px 16px;
+}
+
+body.auth-body .flatpickr-calendar {
+    border: 1px solid var(--auth-line);
+    border-radius: 18px;
+    box-shadow: 0 18px 45px rgba(20, 30, 70, .18);
+    overflow: hidden;
+}
+
+body.auth-body .flatpickr-months {
+    background: linear-gradient(135deg, var(--auth-coral) 0%, #ff8a5c 100%);
+    color: #fff;
+}
+
+body.auth-body .flatpickr-months .flatpickr-month,
+body.auth-body .flatpickr-months .flatpickr-current-month,
+body.auth-body .flatpickr-months .flatpickr-monthDropdown-months {
+    background: transparent;
+    color: #fff;
+    fill: #fff;
+}
+
+body.auth-body .flatpickr-months .flatpickr-prev-month svg,
+body.auth-body .flatpickr-months .flatpickr-next-month svg {
+    fill: #fff;
+}
+
+body.auth-body .flatpickr-weekdays {
+    background: #fffaf4;
+    border-color: var(--auth-line);
+}
+
+body.auth-body .flatpickr-weekdays span {
+    color: #6a7090;
+    font-weight: 500;
+}
+
+body.auth-body .flatpickr-day {
+    border-radius: 50%;
+    color: var(--auth-ink);
+}
+
+body.auth-body .flatpickr-day:hover,
+body.auth-body .flatpickr-day:focus {
+    background: rgba(47, 184, 198, .16);
+    border-color: rgba(47, 184, 198, .16);
+}
+
+body.auth-body .flatpickr-day.selected,
+body.auth-body .flatpickr-day.startRange,
+body.auth-body .flatpickr-day.endRange {
+    background: var(--auth-coral);
+    border-color: var(--auth-coral);
+}
+
+body.auth-body .flatpickr-day.today {
+    border-color: var(--auth-teal-dark);
+}
+
+body.auth-body .flatpickr-day.today:hover {
+    background: rgba(47, 184, 198, .16);
+}
+
+/* Give the registration identity and footer breathing room without changing
+   the shared auth card or its two-column container. */
+.auth-registration-page .auth-brand {
+    padding: 10px 0 12px;
+}
+
+.auth-registration-page .auth-foot {
+    margin-top: 18px;
+    padding-top: 10px;
+}
+
+/* The login form grows inside the existing card; the card's max-width stays
+   unchanged so the split-screen composition is preserved. */
+.auth-login-page .auth-pane-form {
+    padding: 88px 64px 80px;
+}
+
+.auth-login-page .auth-brand {
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.auth-login-page .auth-brand-logo {
+    height: 58px;
+}
+
+.auth-login-page .auth-brand-rule {
+    height: 50px;
+}
+
+.auth-login-page .auth-brand-text strong {
+    font-size: 16px;
+}
+
+.auth-login-page .auth-brand-text span {
+    font-size: 13.5px;
+}
+
+.auth-login-page .auth-field {
+    margin-bottom: 18px;
+}
+
+.auth-login-page .auth-input {
+    height: 50px;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+.auth-login-page .auth-input.has-eye {
+    padding-right: 52px;
+}
+
+.auth-login-page .auth-eye {
+    right: 14px;
+    height: 100%;
+}
+
+.auth-login-page .auth-submit {
+    width: 190px;
+    height: 46px;
+}
+
+.auth-login-page .auth-links {
+    margin-top: 20px;
+}
+
+@media (max-width: 991.98px) {
+    .auth-login-page .auth-pane-form {
+        min-height: 100vh;
+        padding: 40px 18px 56px;
+    }
+
+    .auth-login-page .auth-brand {
+        margin-bottom: 24px;
+    }
+
+    .auth-login-page .auth-brand-logo {
+        height: 44px;
+    }
+
+    .auth-login-page .auth-brand-rule {
+        height: 40px;
+    }
+
+    .auth-login-page .auth-field {
+        margin-bottom: 14px;
+    }
+
+    .auth-login-page .auth-input {
+        height: 46px;
+        padding-left: 22px;
+        padding-right: 22px;
+    }
+
+    .auth-login-page .auth-input.has-eye {
+        padding-right: 48px;
+    }
+
+    .auth-login-page .auth-submit {
+        width: 175px;
+        height: 42px;
+    }
+}
+
+/* Keep the expanded registration form visible on standard laptop-height
+   desktop screens while retaining more generous spacing on taller screens. */
+@media (min-width: 992px) and (max-height: 820px) {
+    body.auth-body.auth-registration-page {
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+
+    .auth-registration-page .auth-pane-form {
+        padding: 8px 44px;
+    }
+
+    .auth-registration-page .auth-brand {
+        margin-bottom: 10px;
+        padding: 6px 0 8px;
+    }
+
+    .auth-registration-page .auth-field {
+        margin-bottom: 4px;
+    }
+
+    .auth-registration-page .auth-foot {
+        margin-top: 10px;
+        padding-top: 6px;
+    }
+}
+
+@media (min-width: 992px) and (max-height: 740px) {
+    body.auth-body.auth-registration-page {
+        padding-top: 4px;
+        padding-bottom: 4px;
+    }
+
+    .auth-registration-page .auth-pane-form {
+        padding: 6px 44px;
+    }
+
+    .auth-registration-page .auth-brand {
+        margin-bottom: 8px;
+        padding: 4px 0 6px;
+    }
+
+    .auth-registration-page .auth-field {
+        margin-bottom: 4px;
+    }
+
+    .auth-registration-page .auth-foot {
+        margin-top: 6px;
+        padding-top: 4px;
+    }
+}
+
+/* Patient signup keeps its fields narrower than the shared auth form. */
+.auth-registration-page .auth-inner {
+    max-width: 360px;
+}
+
+.auth-registration-page .auth-brand {
+    margin-top: 4px;
+}
+
+/* Add breathing room above and below the patient signup action. */
+.auth-registration-page .auth-submit {
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+/* ============ SIGNUP OTP MODAL ============ */
+.auth-body .d-none {
+    display: none !important;
+}
+
+body.auth-modal-open {
+    overflow: hidden;
+}
+
+.auth-otp-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.auth-otp-modal[hidden] {
+    display: none;
+}
+
+.auth-otp-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(7, 12, 28, .72);
+    backdrop-filter: blur(5px);
+}
+
+.auth-otp-modal__dialog {
+    position: relative;
+    width: min(100%, 440px);
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    border: 2px solid transparent;
+    border-radius: 24px;
+    background: #fff;
+    box-shadow: 0 30px 80px rgba(3, 8, 24, .42);
+    animation: authModalIn .2s ease both;
+}
+
+.auth-otp-modal__dialog::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border: 2px solid transparent;
+    border-radius: inherit;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.auth-otp-modal__dialog--attention::after {
+    animation: authModalBorderBlink .6s ease-in-out 2;
+}
+
+@keyframes authModalBorderBlink {
+    0%,
+    100% {
+        border-color: var(--auth-coral);
+        opacity: 1;
+    }
+
+    50% {
+        border-color: #fff;
+        opacity: .35;
+    }
+}
+
+@keyframes authModalIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.auth-otp-modal__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 1;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 50%;
+    background: #f3f2f8;
+    color: #6a7090;
+    cursor: pointer;
+}
+
+.auth-otp-modal__close:hover,
+.auth-otp-modal__close:focus-visible {
+    background: #ece9f5;
+    color: var(--auth-coral-dark);
+}
+
+.auth-otp-modal__body {
+    padding: 32px 30px 22px;
+    text-align: center;
+}
+
+.auth-otp-modal__icon {
+    width: 54px;
+    height: 54px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(47, 184, 198, .16), rgba(255, 84, 112, .14));
+    color: var(--auth-teal-dark);
+    font-size: 26px;
+}
+
+.auth-otp-modal h2 {
+    margin: 0 0 8px;
+    color: var(--auth-ink);
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.auth-otp-modal p {
+    margin: 0 auto 18px;
+    max-width: 340px;
+    color: #6a7090;
+    font-size: 12.5px;
+    line-height: 1.6;
+}
+
+.auth-otp-status {
+    margin: 0 auto 14px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-size: 11.5px;
+    line-height: 1.5;
+    text-align: left;
+}
+
+.auth-otp-status--info {
+    background: #eef9fa;
+    color: #1d6f79;
+}
+
+.auth-otp-status--success {
+    background: #edfaf2;
+    color: #187443;
+}
+
+.auth-otp-status--error {
+    background: #fff0f2;
+    color: var(--auth-coral-dark);
+}
+
+.auth-otp-modal .auth-field {
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.auth-otp-input {
+    height: 52px !important;
+    text-align: center;
+    letter-spacing: 8px;
+    font-size: 18px !important;
+    font-weight: 600;
+}
+
+.auth-otp-modal .auth-submit {
+    width: 100%;
+    height: 44px;
+    margin: 4px 0 0;
+}
+
+.auth-otp-modal__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 30px 22px;
+    border-top: 1px solid var(--auth-line);
+}
+
+.auth-otp-resend {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--auth-link);
+    font: inherit;
+    font-size: 12px;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.auth-otp-resend:hover:not(:disabled),
+.auth-otp-resend:focus-visible:not(:disabled) {
+    color: var(--auth-coral);
+}
+
+.auth-otp-resend:disabled {
+    color: #a7abbd;
+    cursor: not-allowed;
+}
+
+.auth-otp-countdown {
+    color: #8b90a3;
+    font-size: 10.5px;
+    text-align: right;
+}
+
+@media (max-width: 480px) {
+    .auth-otp-modal {
+        padding: 12px;
+    }
+
+    .auth-otp-modal__dialog {
+        max-height: calc(100vh - 24px);
+        border-radius: 20px;
+    }
+
+    .auth-otp-modal__body {
+        padding: 28px 20px 18px;
+    }
+
+    .auth-otp-modal__footer {
+        padding: 14px 20px 18px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .auth-otp-modal__dialog {
+        animation: none;
+    }
+
+    .auth-otp-modal__dialog--attention::after {
+        border-color: var(--auth-coral);
+        opacity: 1;
+        animation: none;
+    }
+}

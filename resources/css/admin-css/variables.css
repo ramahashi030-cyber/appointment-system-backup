@@ -1,0 +1,20 @@
+/* QMMC Admin CSS Variables */
+:root {
+    --admin-bg: #f4f8ff;
+    --admin-bg-deep: #f4f8ff;
+    --admin-sidebar: #073a7b;
+    --admin-surface: #0d1c34;
+    --admin-surface-raised: #10233f;
+    --admin-border: #1e5eb1;
+    --admin-border-soft: #19365d;
+    --admin-blue: #0877ed;
+    --admin-blue-light: #2c9cff;
+    --admin-text: #f4f8ff;
+    --admin-muted: #9db2d0;
+    --admin-faint: #6f88aa;
+    --admin-green: #18c981;
+    --admin-orange: #ff884d;
+    --admin-red: #ff4164;
+    --admin-purple: #8e5cff;
+    --admin-cyan: #28b8d1;
+}

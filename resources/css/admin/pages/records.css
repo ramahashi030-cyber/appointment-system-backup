@@ -1,0 +1,46 @@
+/* admin/records.blade.php */
+/* Add record modal */
+#addRecordModal .modal-body { background: #f4f8ff; }
+#addRecordModal .admin-panel { border: 1px solid #0877ed; background: #f4f8ff; }
+#addRecordModal .admin-panel-title { background: #0877ed; padding: 12px 20px; }
+#addRecordModal .admin-panel-title h3 { color: #ffffff; font-size: 15px; font-weight: 600; margin: 0; }
+#addRecordModal .admin-panel-title i { color: #ffffff; font-size: 16px; }
+#addRecordModal .form-field > label { color: #315786; font-size: 14px; font-weight: 600; }
+#addRecordModal .form-field > label span { color: #8ca2bd; font-size: 13px; font-weight: 400; }
+#addRecordModal .form-control,
+#addRecordModal .form-select {
+    min-height: 40px;
+    border-color: #d5e4f5;
+    background-color: #ffffff;
+    color: #0a326c;
+    font-size: 15px;
+}
+#addRecordModal .form-control:focus,
+#addRecordModal .form-select:focus {
+    border-color: #55a9ff;
+    box-shadow: 0 0 0 3px rgba(85, 169, 255, .14);
+}
+#addRecordModal .admin-doctor-form { display: grid; gap: 0; padding: 0 32px; }
+#addRecordModal .form-field { padding: 14px 0 14px 8px; border-bottom: 1px solid #d5e4f5; }
+#addRecordModal .form-field:last-child { border-bottom: none; }
+
+/* View record modal */
+#viewRecordModal .modal-body { background: #f4f8ff; }
+#viewRecordModal .admin-doctor-profile-hero {
+    background: #ffffff;
+    border: 1px solid #d5e4f5;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 18px;
+}
+#viewRecordModal .admin-doctor-profile-hero h2 { color: #0a326c; font-size: 20px; font-weight: 700; margin: 0; }
+#viewRecordModal .admin-doctor-profile-hero p { color: #8ca2bd; font-size: 14px; margin: 4px 0 0; }
+#viewRecordModal .admin-panel { border: 1px solid #0877ed; background: #f4f8ff; }
+#viewRecordModal .admin-panel-title { background: #0877ed; padding: 12px 20px; }
+#viewRecordModal .admin-panel-title h3 { color: #ffffff; font-size: 15px; font-weight: 600; margin: 0; }
+#viewRecordModal .admin-panel-title i { color: #ffffff; font-size: 16px; }
+#viewRecordModal .form-field > label { color: #315786; font-size: 14px; font-weight: 600; }
+#viewRecordModal .form-field p { color: #0a326c; font-size: 15px; font-weight: 500; margin: 0; }
+#viewRecordModal .admin-doctor-form { display: grid; gap: 0; padding: 0 20px; }
+#viewRecordModal .form-field { padding: 14px 0; border-bottom: 1px solid #d5e4f5; }
+#viewRecordModal .form-field:last-child { border-bottom: none; }

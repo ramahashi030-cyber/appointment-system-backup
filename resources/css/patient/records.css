@@ -1,0 +1,45 @@
+/* patients/records.blade.php */
+.record-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: #e7f1ff;
+    color: #0d6efd;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+#recordsAlert:empty { display: none; }
+
+@media (max-width: 576px) {
+    /* Turn table rows into stacked cards on phones */
+    .responsive-table thead { display: none; }
+    .responsive-table tr {
+        display: block;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        margin-bottom: .75rem;
+        padding: .35rem .6rem;
+        background: #fff;
+    }
+    .responsive-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: .75rem;
+        border: none;
+        border-bottom: 1px dashed #e2e8f0;
+        padding: .55rem .25rem;
+        text-align: right;
+    }
+    .responsive-table td:last-child { border-bottom: none; }
+    .responsive-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #475569;
+        font-size: .78rem;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+    }
+}

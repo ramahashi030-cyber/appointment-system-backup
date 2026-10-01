@@ -1,0 +1,20 @@
+/* admin/settings.blade.php */
+.admin-settings-page { display: flex !important; flex-direction: column; gap: 20px !important; }
+.admin-settings-page > * { margin: 0 !important; }
+.admin-settings-page .admin-doctor-form-actions { background: #fff !important; }
+
+.admin-settings-page .admin-secondary-button.active,
+.admin-settings-page .admin-secondary-button.active:hover { border-color: #0877ed; background: #0877ed; color: #fff; }
+.admin-settings-page .admin-doctor-form { gap: 0; }
+.admin-settings-page .admin-doctor-form-grid { border: 0; }
+.admin-settings-page .admin-doctor-form .form-field.field-wide { grid-column: 1 / -1; }
+.admin-settings-page .admin-doctor-form .form-field > label { font-size: 13px; }
+.admin-settings-page .admin-doctor-form .form-control { font-size: 14px; }
+.admin-settings-page .admin-settings-toggle-field { justify-content: center; }
+.admin-settings-page .admin-settings-toggle-field .form-check-label { color: #315786; font-size: 14px; font-weight: 600; }
+.admin-settings-page .admin-settings-toggle-field .form-text { display: block; margin-top: 4px; color: #7893b6; font-size: 12px; }
+.admin-settings-page .admin-doctor-form-actions { padding: 16px 20px 20px; border-top: 1px solid #e4edf7; background: #fff; }
+
+@media (max-width: 768px) {
+    .admin-settings-page .admin-doctor-form-grid { grid-template-columns: minmax(0, 1fr); }
+}

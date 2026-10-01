@@ -1,0 +1,216 @@
+/* QMMC Admin Responsive Styles */
+@media (max-width: 1199px) {
+    .admin-stat-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .admin-dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-quick-panel {
+        min-height: 0;
+    }
+
+    .admin-doctor-stat-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(115px, auto);
+    }
+
+    .admin-doctor-activity-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 991px) {
+    .admin-page {
+        margin-left: 0;
+    }
+
+    .admin-header-inner {
+        padding: 0 18px;
+    }
+
+    .admin-user-copy {
+        display: none;
+    }
+
+    .admin-logout span {
+        display: none;
+    }
+}
+
+@media (max-width: 767px) {
+    .admin-header-inner {
+        gap: 10px;
+    }
+
+    .admin-header-actions {
+        gap: 7px;
+    }
+
+    .admin-header-icon {
+        display: none;
+    }
+
+    .admin-dashboard-content {
+        padding: 16px 15px 0;
+    }
+
+    .admin-footer {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+        margin: 0 15px 20px;
+        padding-top: 14px;
+    }
+
+    .admin-page-heading {
+        padding-top: 20px;
+    }
+
+    .admin-page-heading p {
+        max-width: 250px;
+    }
+
+    .admin-stat-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-telemedicine-banner {
+        height: auto;
+        min-height: 190px;
+    }
+
+    .admin-telemedicine-content {
+        gap: 14px;
+        padding: 16px;
+    }
+
+    .admin-telemedicine-mark {
+        width: 62px;
+        height: 62px;
+        flex-basis: 62px;
+    }
+
+    .admin-telemedicine-mark > i {
+        font-size: 28px;
+    }
+
+    .admin-telemedicine-mark > span {
+        width: 29px;
+        height: 29px;
+        font-size: 12px;
+    }
+
+    .admin-telemedicine-copy h1 {
+        font-size: 21px;
+    }
+
+    .admin-telemedicine-welcome {
+        font-size: 14px;
+    }
+
+    .admin-telemedicine-description {
+        font-size: 12px;
+    }
+
+    .admin-telemedicine-trust {
+        max-width: 100%;
+        gap: 6px;
+        padding: 0 9px;
+        border-radius: 12px;
+        font-size: 10px;
+    }
+
+    .admin-telemedicine-trust i {
+        width: 20px;
+        height: 17px;
+    }
+
+    .admin-table-row.pending-row {
+        grid-template-columns: 1.2fr 1fr;
+    }
+
+    .admin-table-row.pending-row .admin-table-cell:nth-child(3),
+    .admin-table-row.pending-row .admin-table-cell:nth-child(4) {
+        display: none;
+    }
+
+    .admin-doctor-banner .admin-telemedicine-content {
+        flex-wrap: wrap;
+        padding: 18px;
+    }
+
+    .admin-doctor-stat-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-doctor-modal .admin-doctor-modal-header .admin-telemedicine-content {
+        gap: 12px;
+        padding: 16px 50px 16px 16px;
+    }
+
+    .admin-doctor-modal .admin-doctor-modal-header .btn-close {
+        top: 10px;
+        right: 10px;
+    }
+
+    .admin-doctor-modal .admin-doctor-modal-header .admin-telemedicine-mark {
+        width: 54px;
+        height: 54px;
+        flex-basis: 54px;
+    }
+
+    .admin-doctor-modal .modal-dialog {
+        width: calc(100% - 16px);
+        margin: 8px auto;
+    }
+
+    .admin-doctor-modal .modal-body {
+        padding: 14px;
+    }
+
+    .admin-doctor-heading,
+    .admin-doctor-profile-hero {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .admin-doctor-heading .admin-primary-button,
+    .admin-heading-actions {
+        width: 100%;
+    }
+
+    .admin-heading-actions > * {
+        flex: 1;
+    }
+
+    .admin-doctor-filters {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-doctor-filters .form-select,
+    .admin-doctor-filters .admin-secondary-button {
+        width: 100%;
+    }
+
+    .admin-doctor-form-grid,
+    .admin-doctor-profile-details,
+    .admin-doctor-schedule-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-doctor-assignment-form {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-doctor-day-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .admin-doctor-profile-hero .admin-secondary-button {
+        width: 100%;
+    }
+}

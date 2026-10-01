@@ -1,0 +1,572 @@
+/* QMMC Admin Dashboard Components */
+.admin-page-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 26px 0 20px;
+}
+
+.admin-page-heading h1 {
+    margin: 0;
+    color: #0a326c;
+    font-size: clamp(23px, 2vw, 30px);
+    font-weight: 700;
+    letter-spacing: -.4px;
+}
+
+.admin-page-heading p {
+    margin: 6px 0 0;
+    color: #315786;
+    font-size: 12px;
+}
+
+.admin-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    color: #75b6ff;
+    font-size: 12px;
+    text-decoration: none;
+}
+
+.admin-back-link:hover {
+    color: #fff;
+}
+
+.admin-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 16px;
+}
+
+.admin-stat-card {
+    display: flex;
+    min-height: 90px;
+    align-items: center;
+    gap: 13px;
+    padding: 15px 17px;
+    border: 1px solid #55a9ff;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 8px 18px rgba(42, 91, 153, .1);
+}
+
+.admin-stat-icon {
+    display: inline-flex;
+    width: 43px;
+    height: 43px;
+    flex: 0 0 43px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    color: #fff;
+    font-size: 20px;
+}
+
+.admin-stat-icon.blue { background: linear-gradient(145deg, #2c98ff, #086be0); }
+.admin-stat-icon.purple { background: linear-gradient(145deg, #a365ff, #7134e9); }
+.admin-stat-icon.green { background: linear-gradient(145deg, #23d48e, #08a66e); }
+.admin-stat-icon.orange { background: linear-gradient(145deg, #ff9a58, #f05a32); }
+.admin-stat-icon.red { background: linear-gradient(145deg, #ff5d78, #e9143b); }
+.admin-stat-icon.cyan { background: linear-gradient(145deg, #2bc9dc, #148fae); }
+
+.admin-stat-copy {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+}
+
+.admin-stat-copy strong {
+    color: #0a326c;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.admin-stat-copy span {
+    margin-top: 5px;
+    overflow: hidden;
+    color: #315786;
+    font-size: 10px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-dashboard-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.75fr) minmax(300px, 1fr);
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.admin-dashboard-primary,
+.admin-dashboard-secondary {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.admin-panel {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid #1b4d91;
+    border-radius: 12px;
+    background: var(--admin-surface);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .1);
+}
+
+.admin-panel-header {
+    display: flex;
+    min-height: 43px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 16px;
+    background: #0877ed;
+    color: #fff;
+}
+
+.admin-panel-title {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-panel-title i {
+    font-size: 15px;
+}
+
+.admin-panel-title h2 {
+    margin: 0;
+    overflow: hidden;
+    font-size: 12px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-panel-link {
+    display: inline-flex;
+    height: 25px;
+    align-items: center;
+    padding: 0 10px;
+    border: 1px solid rgba(255, 255, 255, .7);
+    border-radius: 999px;
+    color: #fff;
+    font-size: 10px;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.admin-panel-link:hover {
+    background: rgba(255, 255, 255, .14);
+    color: #fff;
+}
+
+.admin-telemedicine-banner {
+    position: relative;
+    isolation: isolate;
+    min-width: 0;
+    height: 190px;
+    overflow: hidden;
+    border: 1px solid #55a9ff;
+    border-radius: 12px;
+    background:
+        linear-gradient(90deg, rgba(235, 247, 255, .99) 0%, rgba(231, 245, 255, .94) 46%, rgba(224, 242, 255, .48) 66%, rgba(224, 242, 255, .1) 100%),
+        url('/images/qmmc-telemedicine-banner.jpg') center 55% / cover no-repeat;
+    box-shadow: 0 4px 10px rgba(26, 76, 137, .08);
+}
+
+.admin-telemedicine-banner::before {
+    position: absolute;
+    z-index: -1;
+    top: -132px;
+    left: 39%;
+    width: 225px;
+    height: 225px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .44);
+    content: '';
+}
+
+.admin-telemedicine-banner::after {
+    position: absolute;
+    z-index: -1;
+    right: 18%;
+    bottom: -74px;
+    width: 255px;
+    height: 150px;
+    border: 3px solid rgba(255, 255, 255, .38);
+    border-radius: 50%;
+    content: '';
+    transform: rotate(-8deg);
+}
+
+.admin-telemedicine-glow {
+    position: absolute;
+    z-index: -1;
+    right: 8%;
+    bottom: 34px;
+    width: 80px;
+    height: 24px;
+    border-bottom: 4px solid rgba(255, 255, 255, .75);
+    border-radius: 50%;
+    opacity: .55;
+}
+
+.admin-telemedicine-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    height: 100%;
+    align-items: center;
+    gap: 24px;
+    padding: 20px 25px;
+}
+
+.admin-telemedicine-mark {
+    position: relative;
+    display: flex;
+    width: 86px;
+    height: 86px;
+    flex: 0 0 86px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #2a8cff, #075ed3);
+    box-shadow: 0 9px 20px rgba(0, 78, 171, .2);
+    color: #fff;
+    transform: translateY(-8px);
+}
+
+.admin-telemedicine-mark > i {
+    font-size: 36px;
+    transform: translate(-3px, -1px);
+}
+
+.admin-telemedicine-mark > span {
+    position: absolute;
+    right: -2px;
+    bottom: 2px;
+    display: flex;
+    width: 35px;
+    height: 35px;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #dff1ff;
+    border-radius: 50%;
+    background: #79b7ed;
+    color: #fff;
+    font-size: 15px;
+}
+
+.admin-telemedicine-copy {
+    min-width: 0;
+}
+
+.admin-telemedicine-copy h1 {
+    margin: 0 0 4px;
+    color: #0a326c;
+    font-size: clamp(24px, 1.8vw, 31px);
+    font-weight: 700;
+    line-height: 1.18;
+    letter-spacing: -.55px;
+}
+
+.admin-telemedicine-welcome {
+    margin: 0;
+    color: #092f6d;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.admin-telemedicine-description {
+    margin: 1px 0 8px;
+    color: #315782;
+    font-size: 14px;
+}
+
+.admin-telemedicine-trust {
+    display: inline-flex;
+    min-height: 30px;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .72);
+    color: #174d8d;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.admin-telemedicine-trust > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.admin-telemedicine-trust i {
+    display: inline-flex;
+    width: 23px;
+    height: 19px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: #0b69db;
+    color: #fff;
+    font-size: 10px;
+}
+
+.admin-telemedicine-trust b {
+    color: #4388cf;
+    font-size: 10px;
+}
+
+.admin-table-panel {
+    min-height: 180px;
+}
+
+.admin-table-body {
+    min-height: 112px;
+}
+
+.admin-table-row {
+    display: grid;
+    min-height: 53px;
+    align-items: center;
+    gap: 12px;
+    padding: 7px 16px;
+    border-top: 1px solid rgba(40, 75, 119, .45);
+}
+
+.admin-table-row.pending-row {
+    grid-template-columns: 1.15fr 1fr 1fr .8fr;
+    background: #f4f8ff;
+}
+
+.admin-table-row.pending-row .admin-table-cell {
+    color: #2b4d70;
+}
+
+.admin-table-row.pending-row .admin-table-cell strong {
+    color: #0a2d55;
+}
+
+.admin-table-cell {
+    min-width: 0;
+    overflow: hidden;
+    color: #b8c9df;
+    font-size: 10px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-table-cell strong {
+    color: #eef5ff;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.admin-person-cell {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 9px;
+}
+
+.admin-avatar {
+    display: inline-flex;
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #123d72;
+    color: #75b6ff;
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.admin-person-copy {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+}
+
+.admin-person-copy strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-person-copy small {
+    margin-top: 2px;
+    overflow: hidden;
+    color: #7993b6;
+    font-size: 9px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-status-pill {
+    display: inline-flex;
+    width: max-content;
+    max-width: 100%;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #fff0d8;
+    color: #bd7a1b;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.admin-empty-row {
+    display: flex;
+    min-height: 105px;
+    align-items: center;
+    justify-content: center;
+    color: #7893b6;
+    font-size: 11px;
+}
+
+.admin-quick-panel {
+    min-height: 380px;
+    background: #f4f8ff;
+}
+
+.admin-quick-list {
+    background: #f4f8ff;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    padding: 12px 11px 15px;
+}
+
+.admin-quick-link {
+    display: flex;
+    min-height: 57px;
+    align-items: center;
+    gap: 13px;
+    padding: 9px 12px;
+    border: 1px solid #55a9ff;
+    border-radius: 10px;
+    background: #f4f8ff;
+    color: #0a326c;
+    text-decoration: none;
+    transition: background-color .16s ease, border-color .16s ease, transform .16s ease;
+}
+
+.admin-quick-link:hover {
+    border-color: #0877ed;
+    background: #fff;
+    transform: translateX(2px);
+}
+
+.admin-quick-icon {
+    display: inline-flex;
+    width: 35px;
+    height: 35px;
+    flex: 0 0 35px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 17px;
+}
+
+.admin-quick-icon.blue { background: linear-gradient(145deg, #2a9bff, #0868df); }
+.admin-quick-icon.purple { background: linear-gradient(145deg, #a565ff, #7337e8); }
+.admin-quick-icon.green { background: linear-gradient(145deg, #24cf8a, #08a36e); }
+.admin-quick-icon.orange { background: linear-gradient(145deg, #ff9654, #ef5a32); }
+
+.admin-quick-copy {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+}
+
+.admin-quick-copy strong {
+    color: #0a326c;
+    font-size: 11px;
+}
+
+.admin-quick-copy small {
+    margin-top: 3px;
+    overflow: hidden;
+    color: #315786;
+    font-size: 9px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-quick-link > i {
+    color: #55a9ff;
+    font-size: 15px;
+}
+
+.admin-module-card {
+    display: flex;
+    min-height: 360px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    padding: 35px;
+    border: 1px solid #1b4d91;
+    border-radius: 12px;
+    background: var(--admin-surface);
+    color: var(--admin-text);
+    text-align: center;
+}
+
+.admin-module-icon {
+    display: inline-flex;
+    width: 64px;
+    height: 64px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    background: linear-gradient(145deg, #2c9bff, #0968dd);
+    color: #fff;
+    font-size: 28px;
+}
+
+.admin-module-card h2 {
+    margin: 4px 0 0;
+    font-size: 20px;
+}
+
+.admin-module-card p {
+    max-width: 480px;
+    margin: 0;
+    color: var(--admin-muted);
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.admin-primary-button {
+    display: inline-flex;
+    min-height: 38px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 8px;
+    padding: 0 16px;
+    border-radius: 8px;
+    background: var(--admin-blue);
+    color: #fff;
+    font-size: 11px;
+    text-decoration: none;
+}
+
+.admin-primary-button:hover {
+    background: #146fd3;
+    color: #fff;
+}
