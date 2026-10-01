@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Appointments')
+@section('title', $config['title'])
 
 @section('sidebar')
     @include('partials.admin-sidebar')
@@ -16,13 +16,13 @@
             <div class="admin-telemedicine-glow" aria-hidden="true"></div>
             <div class="admin-telemedicine-content">
                 <div class="admin-telemedicine-mark" aria-hidden="true">
-                    <i class="bi bi-calendar2-check-fill"></i>
+                    <i class="bi {{ $config['banner_icon'] }}"></i>
                     <span><i class="bi bi-clock-fill"></i></span>
                 </div>
                 <div class="admin-telemedicine-copy">
-                    <h1 id="appointmentDirectoryTitle">Appointments</h1>
+                    <h1 id="appointmentDirectoryTitle">{{ $config['title'] }}</h1>
                     <p class="admin-telemedicine-welcome">Appointment Management</p>
-                    <p class="admin-telemedicine-description">Review, approve, reschedule, and manage patient appointments.</p>
+                    <p class="admin-telemedicine-description">{{ $config['description'] }} Review, approve, reschedule, and manage patient appointments.</p>
                     <div class="admin-telemedicine-trust" aria-label="Appointment features">
                         <span><i class="bi bi-calendar2-check" aria-hidden="true"></i> Scheduling</span>
                         <b aria-hidden="true">&bull;</b>
@@ -60,13 +60,13 @@
         <section class="admin-panel admin-doctor-roster-panel" aria-labelledby="appointmentRosterTitle">
             <header class="admin-panel-header admin-doctor-roster-header">
                 <div class="admin-panel-title">
-                    <i class="bi bi-calendar2-check-fill" aria-hidden="true"></i>
+                    <i class="bi {{ $config['icon'] }}" aria-hidden="true"></i>
                     <h2 id="appointmentRosterTitle">Appointment roster</h2>
                 </div>
                 <span class="admin-muted-text" data-appointment-result-count>{{ $appointments->total() ?? 0 }} appointment{{ ($appointments->total() ?? 0) === 1 ? '' : 's' }}</span>
             </header>
 
-            <form class="admin-doctor-filters" method="GET" action="{{ route('admin.appointments') }}" data-appointment-filters>
+            <form class="admin-doctor-filters" method="GET" action="{{ route("admin.appointments.{$serviceType}") }}" data-appointment-filters>
                 <div class="admin-doctor-search">
                     <i class="bi bi-search" aria-hidden="true"></i>
                     <label class="visually-hidden" for="appointmentSearch">Search appointments</label>
@@ -86,13 +86,13 @@
                 </select>
                 <input type="date" class="form-control" name="date" value="{{ $filters['date'] ?? '' }}" aria-label="Filter by date" style="width: auto;">
                 @if (($filters['search'] ?? '') !== '' || ($filters['status'] ?? '') !== '' || ($filters['doctor'] ?? '') !== '' || ($filters['date'] ?? '') !== '')
-                    <a class="admin-clear-filter" href="{{ route('admin.appointments') }}">Clear</a>
+                    <a class="admin-clear-filter" href="{{ route("admin.appointments.{$serviceType}") }}">Clear</a>
                 @endif
             </form>
 
             <div class="admin-doctor-table-wrap" data-appointment-table-wrap>
                 <table class="admin-doctor-table">
-                    <caption class="visually-hidden">Appointments</caption>
+                    <caption class="visually-hidden">{{ $config['title'] }}</caption>
                     <thead>
                         <tr>
                             <th scope="col">Patient</th>
@@ -134,7 +134,7 @@
                                 </td>
                                 <td>
                                     <div class="admin-doctor-actions">
-                                        <a href="{{ route('admin.appointments', ['view' => $appointment->id]) }}" aria-label="View appointment">View</a>
+                                        <a href="{{ route("admin.appointments.{$serviceType}", ['view' => $appointment->id]) }}" aria-label="View appointment">View</a>
                                         @if ($appointment->status === 'Pending')
                                             <button type="button" class="appointment-action-btn" data-action="approve" data-id="{{ $appointment->id }}">Approve</button>
                                             <button type="button" class="appointment-action-btn" data-action="reject" data-id="{{ $appointment->id }}">Reject</button>
@@ -163,7 +163,7 @@
                                         <i class="bi bi-calendar2-x" aria-hidden="true"></i>
                                         <strong>No appointments found</strong>
                                         <span>Adjust the filters or create a new appointment.</span>
-                                        <a href="{{ route('admin.appointments', ['create' => 1]) }}" data-bs-toggle="modal" data-bs-target="#addAppointmentModal">New appointment</a>
+                                        <a href="{{ route("admin.appointments.{$serviceType}", ['create' => 1]) }}" data-bs-toggle="modal" data-bs-target="#addAppointmentModal">New appointment</a>
                                     </div>
                                 </td>
                             </tr>
@@ -202,14 +202,16 @@
                         </div>
                         <div class="admin-telemedicine-copy">
                             <h2 class="modal-title" id="addAppointmentModalTitle">New appointment</h2>
-                            <p class="admin-telemedicine-description">Schedule a new patient appointment.</p>
+                            <p class="admin-telemedicine-description">Schedule a new {{ $mode === 'TELE' ? 'telemedicine' : 'face-to-face' }} appointment.</p>
                         </div>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </header>
                 <div class="modal-body">
-                    <form id="addAppointmentForm" class="admin-doctor-form" method="POST" action="{{ route('admin.appointments.store') }}">
+                    <form id="addAppointmentForm" class="admin-doctor-form" method="POST" action="{{ route("admin.appointments.{$serviceType}.store") }}">
                         @csrf
+                        {{-- Mode is fixed by the page. The server also forces it, so this value is not trusted. --}}
+                        <input type="hidden" id="appointmentMode" name="mode" value="{{ $mode }}">
                         <div class="admin-panel">
                             <div class="admin-panel-title">
                                 <i class="bi bi-person-fill" aria-hidden="true"></i>
@@ -240,13 +242,6 @@
                             <div class="form-field">
                                 <label for="appointmentTime">Time slot <span>*</span></label>
                                 <input type="time" class="form-control" id="appointmentTime" name="time_slot" required>
-                            </div>
-                            <div class="form-field">
-                                <label for="appointmentMode">Mode <span>*</span></label>
-                                <select class="form-select" id="appointmentMode" name="mode" required>
-                                    <option value="FACE">Face-to-Face</option>
-                                    <option value="TELE">Telemedicine</option>
-                                </select>
                             </div>
                             <div class="form-field">
                                 <label for="appointmentService">Service <span>*</span></label>
@@ -537,6 +532,7 @@
                 FACE: @json(($services ?? collect())->map(fn ($s) => ['id' => $s->id, 'name' => $s->service_name])->values()),
                 TELE: @json(($servicesTele ?? collect())->map(fn ($s) => ['id' => $s->id, 'name' => $s->service_name])->values()),
             };
+            // Hidden input fixed to this page's type (FACE or TELE).
             const $mode = $('#appointmentMode');
             const $service = $('#appointmentService');
             const populateServices = (mode, selected = '') => {
@@ -544,7 +540,6 @@
                 (servicesByMode[mode] ?? []).forEach((s) => $service.append($('<option>').val(s.id).text(s.name)));
                 $service.val(String(selected));
             };
-            $mode.on('change', () => populateServices($mode.val()));
             populateServices($mode.val());
 
             const setFormMode = (id = null) => {

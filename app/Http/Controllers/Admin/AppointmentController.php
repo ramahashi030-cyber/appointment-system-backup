@@ -21,14 +21,59 @@ class AppointmentController extends Controller
 
     private const DELETABLE = ['Pending', 'Rejected', 'Cancelled'];
 
-    public function index(Request $request): View
+    /**
+     * Route `type` segment => the `appointments.mode` value and page text.
+     */
+    private const TYPES = [
+        'face-to-face' => [
+            'mode' => 'FACE',
+            'title' => 'Appointments (Face to Face)',
+            'description' => 'Manage face-to-face appointments.',
+            'banner_icon' => 'bi-people-fill',
+            'icon' => 'bi-people-fill',
+        ],
+        'telemedicine' => [
+            'mode' => 'TELE',
+            'title' => 'Appointments (Telemedicine)',
+            'description' => 'Manage telemedicine appointments.',
+            'banner_icon' => 'bi-camera-video-fill',
+            'icon' => 'bi-camera-video-fill',
+        ],
+    ];
+
+    private function typeConfig(string $type): array
     {
+        abort_unless(isset(self::TYPES[$type]), 404);
+
+        return self::TYPES[$type];
+    }
+
+    /** Old /admin/appointments URL: redirect to the matching type page, keeping query filters. */
+    public function legacy(Request $request): RedirectResponse
+    {
+        $mode = 'FACE';
+
+        if ($request->filled('view')) {
+            $mode = Appointment::whereKey($request->integer('view'))->value('mode') ?? 'FACE';
+        }
+
+        $segment = $mode === 'TELE' ? 'telemedicine' : 'face-to-face';
+
+        return redirect()->route("admin.appointments.{$segment}", $request->query());
+    }
+
+    public function index(Request $request, string $type): View
+    {
+        $config = $this->typeConfig($type);
+        $mode = $config['mode'];
+
         $search = trim((string) $request->query('search', ''));
         $status = (string) $request->query('status', '');
         $doctor = (string) $request->query('doctor', '');
         $date = (string) $request->query('date', '');
 
         $query = Appointment::query()
+            ->where('mode', $mode)
             ->with(['patient', 'staff', 'service', 'serviceTele'])
             ->when($search !== '', function (Builder $builder) use ($search): void {
                 $builder->where(function (Builder $searchQuery) use ($search): void {
@@ -64,11 +109,14 @@ class AppointmentController extends Controller
 
         if ($request->has('view')) {
             $providerModal = 'view';
-            $appointmentDetail = Appointment::with(['patient', 'staff', 'service', 'serviceTele'])->findOrFail($request->integer('view'));
+            $appointmentDetail = Appointment::where('mode', $mode)
+                ->with(['patient', 'staff', 'service', 'serviceTele'])
+                ->findOrFail($request->integer('view'));
         }
 
-        // Read-only status counts (one grouped query).
+        // Read-only status counts for this type (one grouped query).
         $statusCounts = Appointment::query()
+            ->where('mode', $mode)
             ->selectRaw('status, COUNT(*) as total')
             ->groupBy('status')
             ->pluck('total', 'status')
@@ -78,9 +126,12 @@ class AppointmentController extends Controller
             ->sum(fn ($statusName) => $statusCounts->get($statusName, 0));
 
         return view('admin.appointments', [
+            'config' => $config,
+            'serviceType' => $type,
+            'mode' => $mode,
             'appointments' => $appointments,
             'appointmentStats' => [
-                'total' => Appointment::count(),
+                'total' => Appointment::where('mode', $mode)->count(),
                 'booked' => $countFor(['pending', 'booked']),
                 'approved' => $countFor(['approved', 'confirmed', 'in progress', 'completed']),
                 'cancelled' => $countFor(['cancelled']),
@@ -118,14 +169,17 @@ class AppointmentController extends Controller
         ];
     }
 
-    private function respond(Request $request, string $message, int $status = 200): RedirectResponse|JsonResponse
+    /** Non-AJAX redirects go back to the page of the appointment's type. */
+    private function respond(Request $request, string $message, int $status = 200, ?string $mode = null): RedirectResponse|JsonResponse
     {
         if ($request->expectsJson()) {
             return response()->json(['message' => $message], $status);
         }
 
+        $route = $mode === 'TELE' ? 'admin.appointments.telemedicine' : 'admin.appointments.face-to-face';
+
         return redirect()
-            ->route('admin.appointments')
+            ->route($route)
             ->with($status < 400 ? 'success' : 'error', $message);
     }
 
@@ -147,14 +201,19 @@ class AppointmentController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse|JsonResponse
+    public function store(Request $request, ?string $type = null): RedirectResponse|JsonResponse
     {
+        // On a type page the mode is forced by the page, never trusted from the form.
+        if ($type !== null) {
+            $request->merge(['mode' => $this->typeConfig($type)['mode']]);
+        }
+
         $validated = $request->validate($this->rules($request));
         $validated['status'] = 'Pending';
 
         Appointment::create($validated);
 
-        return $this->respond($request, 'Appointment created successfully.', 201);
+        return $this->respond($request, 'Appointment created successfully.', 201, $validated['mode']);
     }
 
     public function update(Request $request, int $id): RedirectResponse|JsonResponse
@@ -162,12 +221,15 @@ class AppointmentController extends Controller
         $appointment = Appointment::findOrFail($id);
 
         if (! in_array($appointment->status, self::EDITABLE, true)) {
-            return $this->respond($request, "Cannot edit an appointment with status '{$appointment->status}'.", 422);
+            return $this->respond($request, "Cannot edit an appointment with status '{$appointment->status}'.", 422, $appointment->mode);
         }
+
+        // An appointment keeps its type; it cannot move between Face to Face and Telemedicine.
+        $request->merge(['mode' => $appointment->mode]);
 
         $appointment->update($request->validate($this->rules($request)));
 
-        return $this->respond($request, 'Appointment updated successfully.');
+        return $this->respond($request, 'Appointment updated successfully.', 200, $appointment->mode);
     }
 
     public function destroy(Request $request, int $id): RedirectResponse|JsonResponse
@@ -175,12 +237,12 @@ class AppointmentController extends Controller
         $appointment = Appointment::findOrFail($id);
 
         if (! in_array($appointment->status, self::DELETABLE, true)) {
-            return $this->respond($request, "Cannot delete an appointment with status '{$appointment->status}'.", 422);
+            return $this->respond($request, "Cannot delete an appointment with status '{$appointment->status}'.", 422, $appointment->mode);
         }
 
         $appointment->delete();
 
-        return $this->respond($request, 'Appointment deleted successfully.');
+        return $this->respond($request, 'Appointment deleted successfully.', 200, $appointment->mode);
     }
 
     public function action(Request $request, int $id, string $action): RedirectResponse|JsonResponse
@@ -198,17 +260,17 @@ class AppointmentController extends Controller
         ];
 
         if (! isset($transitions[$action])) {
-            return $this->respond($request, 'Invalid action.', 422);
+            return $this->respond($request, 'Invalid action.', 422, $appointment->mode);
         }
 
         [$fromStatuses, $toStatus] = $transitions[$action];
 
         if (! in_array($appointment->status, $fromStatuses, true)) {
-            return $this->respond($request, "Cannot {$action} an appointment with status '{$appointment->status}'.", 422);
+            return $this->respond($request, "Cannot {$action} an appointment with status '{$appointment->status}'.", 422, $appointment->mode);
         }
 
         $appointment->update(['status' => $toStatus]);
 
-        return $this->respond($request, "Appointment marked as {$toStatus}.");
+        return $this->respond($request, "Appointment marked as {$toStatus}.", 200, $appointment->mode);
     }
 }

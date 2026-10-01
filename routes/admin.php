@@ -109,7 +109,21 @@ Route::prefix('admin')->name('admin.')->group(function (): void {
             }
         });
 
-        Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments');
+        /*
+         | Appointments. The old /appointments URL redirects to the matching
+         | type page. Each type page filters the single `appointments` table by
+         | its `mode` column (FACE / TELE). show/update/destroy/action stay
+         | id-based because ids are unique within that one table.
+         */
+        Route::get('/appointments', [AppointmentController::class, 'legacy'])->name('appointments');
+
+        Route::prefix('/appointments')->name('appointments.')->group(function (): void {
+            foreach (['face-to-face', 'telemedicine'] as $segment) {
+                Route::get("/{$segment}", [AppointmentController::class, 'index'])->defaults('type', $segment)->name($segment);
+                Route::post("/{$segment}", [AppointmentController::class, 'store'])->defaults('type', $segment)->name("{$segment}.store");
+            }
+        });
+
         Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
         Route::get('/appointments/{id}', [AppointmentController::class, 'show'])->whereNumber('id')->name('appointments.show');
         Route::put('/appointments/{id}', [AppointmentController::class, 'update'])->whereNumber('id')->name('appointments.update');

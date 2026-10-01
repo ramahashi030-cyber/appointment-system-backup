@@ -316,12 +316,12 @@
         <footer class="patient-dashboard-footer">
             <div>
                 <strong>QMMC Patient Portal</strong>
-                <i aria-hidden="true">â€¢</i>
+                <i aria-hidden="true">•</i>
                 <a href="{{ route('telemed.home') }}">Services</a>
             </div>
             <div>
                 <em>Dekalidad na Serbisyo, Alagang QMMC.</em>
-                <i aria-hidden="true">â€¢</i>
+                <i aria-hidden="true">•</i>
                 <i class="bi bi-heart-fill" aria-hidden="true"></i>
             </div>
         </footer>

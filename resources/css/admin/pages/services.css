@@ -498,3 +498,192 @@
         grid-template-columns: 1fr 76px 34px;
     }
 }
+
+
+/* ===========================================================================
+   Service modals (Add / Edit / Delete) — compact layout, navy sections.
+   Appended to the end of services.css so it wins on equal specificity; the
+   selectors are doubled up (.admin-doctor-modal.admin-service-modal) to beat
+   the larger Doctors & staff modal typography in doctor.css.
+   =========================================================================== */
+
+/* Not unnecessarily wide */
+.admin-doctor-modal.admin-service-modal .modal-dialog {
+    max-width: 720px;
+}
+
+.admin-doctor-modal.admin-service-modal.admin-service-modal-narrow .modal-dialog {
+    max-width: 460px;
+}
+
+.admin-doctor-modal.admin-service-modal .modal-body {
+    padding: 16px;
+}
+
+/* Bootstrap's static-backdrop "bump" is replaced by the border blink */
+.admin-service-modal.modal-static .modal-dialog {
+    transform: none;
+}
+
+/* Blink: the keyframes return to the modal's real border, not the light one */
+@keyframes adminServiceModalBlocked {
+    0%,
+    100% {
+        border-color: #1b4d91;
+        box-shadow: 0 24px 60px rgba(7, 30, 61, .3);
+    }
+
+    45% {
+        border-color: #d9534f;
+        box-shadow: 0 0 0 4px rgba(217, 83, 79, .28), 0 24px 60px rgba(7, 30, 61, .3);
+    }
+}
+
+/* Dark navy sections */
+.admin-doctor-modal.admin-service-modal .admin-service-form {
+    gap: 12px;
+}
+
+.admin-doctor-modal.admin-service-modal .admin-service-form-section {
+    border-color: #123f7c;
+    background: linear-gradient(180deg, #0a326c, #082a5a);
+}
+
+.admin-doctor-modal.admin-service-modal .admin-service-form-section-head {
+    padding: 11px 14px;
+    border-bottom-color: rgba(255, 255, 255, .12);
+    background: transparent;
+}
+
+.admin-doctor-modal.admin-service-modal .admin-service-form-section-copy h3 {
+    color: #fff;
+    font-size: 14px;
+}
+
+.admin-doctor-modal.admin-service-modal .admin-service-form-section-copy p {
+    color: #a9c2e3;
+    font-size: 11.5px;
+}
+
+.admin-doctor-modal.admin-service-modal .admin-service-form-body {
+    gap: 12px;
+    padding: 14px;
+}
+
+.admin-doctor-modal.admin-service-modal .admin-service-field-grid {
+    gap: 12px;
+}
+
+/* Compact labels and fields */
+.admin-doctor-modal.admin-service-modal .admin-service-form.admin-doctor-form .form-field {
+    gap: 5px;
+}
+
+.admin-doctor-modal.admin-service-modal .admin-service-form.admin-doctor-form .form-field > label {
+    color: #dbe8f8;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.admin-doctor-modal.admin-service-modal .admin-service-form.admin-doctor-form .form-field > label .admin-field-required {
+    color: #ff8f8a;
+    font-size: 12px;
+}
+
+.admin-doctor-modal.admin-service-modal .admin-service-form.admin-doctor-form .form-field > label .admin-field-optional {
+    color: #8fb0d8;
+    font-size: 9.5px;
+}
+
+.admin-doctor-modal.admin-service-modal .admin-service-form.admin-doctor-form .form-control {
+    min-height: 36px;
+    padding: 6px 10px;
+    font-size: 13px;
+}
+
+.admin-doctor-modal.admin-service-modal .admin-service-slot-editor-row .form-control {
+    height: 36px;
+}
+
+/* Lower-opacity placeholders */
+.admin-doctor-modal.admin-service-modal .admin-service-form .form-control::placeholder {
+    color: #0a326c;
+    opacity: .35;
+}
+
+.admin-doctor-modal.admin-service-modal .admin-service-form .admin-field-hint {
+    color: #8fb0d8;
+    font-size: 11px;
+}
+
+.admin-doctor-modal.admin-service-modal .admin-service-form .invalid-feedback {
+    color: #ffa7a2;
+    font-size: 12px;
+}
+
+/* Available days: blue buttons, solid when selected */
+.admin-doctor-modal.admin-service-modal .admin-service-day-picker {
+    gap: 5px;
+}
+
+.admin-doctor-modal.admin-service-modal .admin-service-day-option span {
+    min-width: 44px;
+    height: 32px;
+    padding: 0 10px;
+    border-color: rgba(98, 170, 245, .55);
+    background: rgba(22, 133, 238, .14);
+    color: #cfe3fa;
+    font-size: 12px;
+}
+
+.admin-doctor-modal.admin-service-modal .admin-service-day-option span:hover {
+    border-color: #62aaf5;
+    background: rgba(22, 133, 238, .28);
+}
+
+.admin-doctor-modal.admin-service-modal .admin-service-day-option input:checked + span {
+    border-color: #1685ee;
+    background: linear-gradient(135deg, #1b8ffb, #0a6ed6);
+    color: #fff;
+}
+
+/* Timeslot editor sits on the navy section */
+.admin-doctor-modal.admin-service-modal .admin-service-slot-editor {
+    padding: 12px;
+    border-color: rgba(255, 255, 255, .14);
+    background: rgba(255, 255, 255, .06);
+}
+
+.admin-doctor-modal.admin-service-modal .admin-service-slot-editor-head {
+    color: #a9c2e3;
+}
+
+.admin-doctor-modal.admin-service-modal .admin-service-slot-hint {
+    color: #a9c2e3;
+}
+
+.admin-doctor-modal.admin-service-modal .admin-service-slot-add {
+    min-height: 34px;
+    font-size: 12px;
+}
+
+/* Footer buttons */
+.admin-doctor-modal.admin-service-modal .admin-service-form-actions {
+    margin-top: 14px;
+    padding-top: 12px;
+}
+
+.admin-doctor-modal.admin-service-modal .admin-primary-button,
+.admin-doctor-modal.admin-service-modal .admin-secondary-button {
+    font-size: 13px;
+}
+
+/* Delete modal text */
+.admin-doctor-modal.admin-service-modal .admin-service-delete-question {
+    font-size: 15px;
+}
+
+.admin-doctor-modal.admin-service-modal .admin-service-delete-name {
+    font-size: 14px;
+    font-weight: 600;
+}

@@ -28,7 +28,14 @@
             ],
         ],
         ['route' => 'admin.triagers', 'label' => 'Triagers', 'icon' => 'bi-clipboard2-pulse-fill'],
-        ['route' => 'admin.appointments', 'label' => 'Appointments', 'icon' => 'bi-calendar2-week-fill'],
+        [
+            'label' => 'Reports',
+            'icon' => 'bi-calendar2-week-fill',
+            'children' => [
+                ['route' => 'admin.appointments.face-to-face', 'label' => 'Face to Face', 'icon' => 'bi-people-fill'],
+                ['route' => 'admin.appointments.telemedicine', 'label' => 'Telemedicine', 'icon' => 'bi-camera-video-fill'],
+            ],
+        ],
         ['route' => 'admin.audit-logs', 'label' => 'Audit Logs', 'icon' => 'bi-journal-text'],
         ['route' => 'admin.records', 'label' => 'Records', 'icon' => 'bi-file-earmark-medical-fill'],
         ['route' => 'admin.reports', 'label' => 'Reports', 'icon' => 'bi-bar-chart-fill'],
