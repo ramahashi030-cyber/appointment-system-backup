@@ -19,6 +19,8 @@ Route::prefix('triager')->name('triager.')->group(function (): void {
         Route::post('/requests/{appointment}/schedule/telemed', [TriagerController::class, 'scheduleTelemed'])->name('requests.schedule.telemed');
         Route::post('/requests/{appointment}/schedule/face', [TriagerController::class, 'scheduleFace'])->name('requests.schedule.face');
         Route::get('/processed/print', [TriagerController::class, 'printProcessed'])->name('processed.print');
+        Route::get('/calendar/telemed', [TriagerController::class, 'telemedCalendar'])->name('calendar.telemed');
+        Route::get('/calendar/face', [TriagerController::class, 'faceCalendar'])->name('calendar.face');
         Route::get('/timeslots/telemed', [TriagerController::class, 'telemedTimeslots'])->name('timeslots.telemed');
         Route::get('/timeslots/face', [TriagerController::class, 'faceTimeslots'])->name('timeslots.face');
     });

@@ -458,7 +458,7 @@
 
                     <div class="profile-detail-grid">
                         <div><i class="bi bi-calendar3" aria-hidden="true"></i><span><small>Date of Birth</small><strong>{{ $patient->dob?->format('M d, Y') ?: 'Not provided' }}</strong></span></div>
-                        <div><i class="bi bi-venus-mars" aria-hidden="true"></i><span><small>Gender</small><strong>{{ $patient->gender ?: 'Not provided' }}</strong></span></div>
+                        <div><i class="bi bi-gender-ambiguous" aria-hidden="true"></i><span><small>Gender</small><strong>{{ $patient->gender ?: 'Not provided' }}</strong></span></div>
                         <div><i class="bi bi-telephone-fill" aria-hidden="true"></i><span><small>Contact Number</small><strong>{{ $patient->contact_number ?: 'Not provided' }}</strong></span></div>
                         <div><i class="bi bi-envelope-fill" aria-hidden="true"></i><span><small>Email Address</small><strong>{{ $patient->email ?: 'Not provided' }}</strong></span></div>
                     </div>

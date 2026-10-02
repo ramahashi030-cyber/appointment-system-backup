@@ -310,7 +310,7 @@
 }
 
 /* Banner styles */
-.admin-telemedicine-banner {
+.admin-holidays-page .admin-telemedicine-banner {
     position: relative;
     overflow: hidden;
     border-radius: 16px;
@@ -499,7 +499,7 @@
         justify-content: center;
     }
 
-    .admin-telemedicine-banner {
+    .admin-holidays-page .admin-telemedicine-banner {
         padding: 20px;
     }
 

@@ -328,6 +328,71 @@
             });
         });
     </script>
+    <script id="admin-responsive-tables">
+        /*
+         * Phones: turns data tables into stacked cards. Adds `.admin-table-stack` and a
+         * `data-label` (from the <thead>) to each cell; the CSS lives in admin-css/mobile.css.
+         * Runs once. The page-swap code re-evaluates inline scripts, hence the guard.
+         * A MutationObserver covers AJAX-replaced tables and rows rendered by page scripts.
+         */
+        (function () {
+            if (window.__adminResponsiveTables) {
+                return;
+            }
+
+            window.__adminResponsiveTables = true;
+
+            function labelOf(th) {
+                const copy = th.cloneNode(true);
+                copy.querySelectorAll('.visually-hidden').forEach(function (node) { node.remove(); });
+
+                return copy.textContent.replace(/\s+/g, ' ').trim();
+            }
+
+            function prepare(table) {
+                if (table.classList.contains('compact')
+                    || table.classList.contains('admin-patient-table')
+                    || table.classList.contains('no-stack')
+                    || table.closest('.modal')) {
+                    return;
+                }
+
+                const heads = table.querySelectorAll('thead tr:last-child th');
+
+                if (!heads.length) {
+                    return;
+                }
+
+                const labels = Array.prototype.map.call(heads, labelOf);
+
+                table.classList.add('admin-table-stack');
+
+                table.querySelectorAll('tbody tr').forEach(function (row) {
+                    Array.prototype.forEach.call(row.children, function (cell, index) {
+                        if (cell.tagName !== 'TD' || cell.hasAttribute('colspan') || cell.hasAttribute('data-label')) {
+                            return;
+                        }
+
+                        if (labels[index]) {
+                            cell.setAttribute('data-label', labels[index]);
+                        }
+                    });
+                });
+            }
+
+            function run() {
+                document.querySelectorAll('.admin-main table.admin-doctor-table').forEach(prepare);
+            }
+
+            run();
+
+            const main = document.querySelector('.admin-main');
+
+            if (main && 'MutationObserver' in window) {
+                new MutationObserver(run).observe(main, { childList: true, subtree: true });
+            }
+        })();
+    </script>
     @stack('scripts')
 </body>
 </html>

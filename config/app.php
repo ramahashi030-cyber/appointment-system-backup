@@ -69,6 +69,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Application Display Timezone
+    |--------------------------------------------------------------------------
+    |
+    | Timestamps are stored in UTC ("timezone" above). This is the timezone
+    | used only when a stored timestamp is rendered for a user, so audit
+    | trails and other reports read in local hospital time (Asia/Manila).
+    | Nothing is written back using it, so stored data stays in UTC.
+    |
+    */
+
+    'display_timezone' => env('APP_DISPLAY_TIMEZONE', 'Asia/Manila'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Locale Configuration
     |--------------------------------------------------------------------------
     |

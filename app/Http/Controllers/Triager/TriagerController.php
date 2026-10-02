@@ -16,6 +16,7 @@ use App\Models\UnavailableTimeslot;
 use App\Models\UnavailableTimeslotTele;
 use App\Support\AppointmentJitsiRoom;
 use App\Support\AppointmentQrCode;
+use App\Support\ScheduleCalendar;
 use App\Support\Telemed;
 use App\Support\TriageAuthorization;
 use App\Symptom;
@@ -375,6 +376,16 @@ class TriagerController extends Controller
             ? ConsultationReason::tryFrom($appointment->consultation_reason)?->label()
             : null;
 
+        $symptomsText = implode(' | ', $symptomLabels);
+        $complaintDetails = is_string($appointment->complaint_details) ? trim($appointment->complaint_details) : '';
+
+        // Mirror what the card shows: face-to-face requests lead with the
+        // consultation reason, telemedicine requests with the written details.
+        $complaintParts = strtoupper((string) $appointment->request_mode) === 'FACE'
+            ? [$symptomsText, $reasonLabel ?? '']
+            : [$symptomsText, $complaintDetails];
+        $complaintText = trim(implode(' | ', array_filter($complaintParts)));
+
         $currentAdminId = auth('admin')->id();
         $isProcessedByOther = TriageAuthorization::isLockedByOther($appointment, $currentAdminId);
         $isOwner = TriageAuthorization::ownsRequest($appointment, $currentAdminId);
@@ -389,7 +400,10 @@ class TriagerController extends Controller
             'hospital_number' => $patient?->hospital_number ?: '—',
             'initials' => $this->initials($this->patientName($patient)),
             'symptoms' => $symptomLabels,
-            'symptoms_text' => implode(' | ', $symptomLabels),
+            'symptoms_text' => $symptomsText,
+            'complaint_text' => $complaintText,
+            'age' => Telemed::age($patient?->dob)['display'],
+            'gender' => $patient?->gender ?: '',
             'consultation_reason' => $appointment->consultation_reason,
             'consultation_reason_label' => $reasonLabel,
             'complaint_details' => $appointment->complaint_details,
@@ -434,6 +448,54 @@ class TriagerController extends Controller
                     : 'Consultation',
             ])
             ->all();
+    }
+
+    /**
+     * GET /triager/calendar/telemed?service_id=&month=YYYY-MM — monthly
+     * availability for the schedule modal's booking calendar.
+     */
+    public function telemedCalendar(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'service_id' => ['required', 'integer', 'exists:services_tele,id'],
+            'month' => ['required', 'string', 'regex:/^\d{4}-\d{2}$/'],
+        ]);
+
+        $service = ServiceTele::findOrFail($validated['service_id']);
+
+        return response()->json(array_merge(
+            [
+                'service' => [
+                    'id' => $service->id,
+                    'name' => $service->service_name,
+                ],
+            ],
+            ScheduleCalendar::month('TELE', $service->id, $service->availability_day, $validated['month']),
+        ));
+    }
+
+    /**
+     * GET /triager/calendar/face?service_id=&month=YYYY-MM — monthly
+     * availability for the face-to-face schedule modal's booking calendar.
+     */
+    public function faceCalendar(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'service_id' => ['required', 'integer', 'exists:services,id'],
+            'month' => ['required', 'string', 'regex:/^\d{4}-\d{2}$/'],
+        ]);
+
+        $service = Service::findOrFail($validated['service_id']);
+
+        return response()->json(array_merge(
+            [
+                'service' => [
+                    'id' => $service->id,
+                    'name' => $service->service_name,
+                ],
+            ],
+            ScheduleCalendar::month('FACE', $service->id, $service->availability_day, $validated['month']),
+        ));
     }
 
     /**

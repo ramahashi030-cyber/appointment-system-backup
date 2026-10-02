@@ -73,10 +73,7 @@
                            data-patient-modal data-title="Procedures">
                             <i class="bi bi-activity" aria-hidden="true"></i> Procedures
                         </a>
-                        <a href="{{ route('patient.profile') }}" class="dropdown-item"
-                           data-patient-modal data-title="My Profile">
-                            <i class="bi bi-person-circle" aria-hidden="true"></i> Profile
-                        </a>
+                       
                     </div>
                 </div>
 

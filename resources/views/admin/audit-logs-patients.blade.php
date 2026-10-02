@@ -11,6 +11,11 @@
 @endsection
 
 @section('content')
+    @php
+        // Audit timestamps are stored in UTC; render them in the app display timezone (Asia/Manila).
+        $auditTimezone = config('app.display_timezone');
+    @endphp
+
     <div class="admin-dashboard-content admin-doctor-content">
         <section class="admin-telemedicine-banner admin-doctor-banner" aria-labelledby="patientLogTitle">
             <div class="admin-telemedicine-glow" aria-hidden="true"></div>
@@ -84,13 +89,13 @@
                         @forelse ($logs as $log)
                             <tr>
                                 <td>
-                                    <span class="admin-doctor-primary-text">{{ $log->created_at?->format('M d, Y') ?? 'N/A' }}</span>
-                                    <small class="admin-doctor-secondary-text">{{ $log->created_at?->format('h:i:s A') ?? '' }}</small>
+                                    <span class="admin-doctor-primary-text">{{ $log->created_at?->copy()->timezone($auditTimezone)->format('M d, Y') ?? 'N/A' }}</span>
+                                    <small class="admin-doctor-secondary-text">{{ $log->created_at?->copy()->timezone($auditTimezone)->format('h:i:s A') ?? '' }}</small>
                                 </td>
                                 <td>
                                     @if ($log->logout_at)
-                                        <span class="admin-doctor-primary-text">{{ $log->logout_at->format('M d, Y') }}</span>
-                                        <small class="admin-doctor-secondary-text">{{ $log->logout_at->format('h:i:s A') }}</small>
+                                        <span class="admin-doctor-primary-text">{{ $log->logout_at->copy()->timezone($auditTimezone)->format('M d, Y') }}</span>
+                                        <small class="admin-doctor-secondary-text">{{ $log->logout_at->copy()->timezone($auditTimezone)->format('h:i:s A') }}</small>
                                     @else
                                         <span class="admin-muted-text">&mdash;</span>
                                     @endif

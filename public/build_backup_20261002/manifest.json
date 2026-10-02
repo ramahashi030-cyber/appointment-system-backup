@@ -1,0 +1,105 @@
+{
+  "resources/css/admin-layout-append.css": {
+    "file": "assets/admin-layout-append-CfN9wcIM.css",
+    "name": "admin-layout-append",
+    "names": [
+      "admin-layout-append.css"
+    ],
+    "src": "resources/css/admin-layout-append.css",
+    "isEntry": true
+  },
+  "resources/css/admin/admin.css": {
+    "file": "assets/admin-CwEwv8mS.css",
+    "name": "admin",
+    "names": [
+      "admin.css"
+    ],
+    "src": "resources/css/admin/admin.css",
+    "isEntry": true
+  },
+  "resources/css/admin/triager-processed.css": {
+    "file": "assets/triager-processed-Dj9th-1s.css",
+    "name": "triager-processed",
+    "names": [
+      "triager-processed.css"
+    ],
+    "src": "resources/css/admin/triager-processed.css",
+    "isEntry": true
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-HSFkDTT6.css",
+    "name": "app",
+    "names": [
+      "app.css"
+    ],
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/css/auth.css": {
+    "file": "assets/auth-Ck9ERks3.css",
+    "name": "auth",
+    "names": [
+      "auth.css"
+    ],
+    "src": "resources/css/auth.css",
+    "isEntry": true
+  },
+  "resources/css/doctor-dashboard.css": {
+    "file": "assets/doctor-dashboard-CTaDFOus.css",
+    "name": "doctor-dashboard",
+    "names": [
+      "doctor-dashboard.css"
+    ],
+    "src": "resources/css/doctor-dashboard.css",
+    "isEntry": true
+  },
+  "resources/css/doctor-patients-append.css": {
+    "file": "assets/doctor-patients-append-R1Gtf9PJ.css",
+    "name": "doctor-patients-append",
+    "names": [
+      "doctor-patients-append.css"
+    ],
+    "src": "resources/css/doctor-patients-append.css",
+    "isEntry": true
+  },
+  "resources/css/patient-dashboard.css": {
+    "file": "assets/patient-dashboard-D5xSZ1Fv.css",
+    "name": "patient-dashboard",
+    "names": [
+      "patient-dashboard.css"
+    ],
+    "src": "resources/css/patient-dashboard.css",
+    "isEntry": true
+  },
+  "resources/css/patient/pages.css": {
+    "file": "assets/pages-SEmxRHhG.css",
+    "name": "pages",
+    "names": [
+      "pages.css"
+    ],
+    "src": "resources/css/patient/pages.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-qV3eE3VH.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "imports": [
+      "resources/js/patient-dashboard.js",
+      "resources/js/patient-dashboard.js"
+    ]
+  },
+  "resources/js/doctor-dashboard.js": {
+    "file": "assets/doctor-dashboard-mUHSNf6-.js",
+    "name": "doctor-dashboard",
+    "src": "resources/js/doctor-dashboard.js",
+    "isEntry": true
+  },
+  "resources/js/patient-dashboard.js": {
+    "file": "assets/patient-dashboard-BM0elM5T.js",
+    "name": "patient-dashboard",
+    "src": "resources/js/patient-dashboard.js",
+    "isEntry": true
+  }
+}

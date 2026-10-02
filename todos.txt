@@ -22,5 +22,9 @@ DOCTORS AND PATIENT MODAL
 
 
 
-    2026_09_30_000001_add_cancellation_reason_and_room_opened_by_to_appointments_table ....................................................... Pending  
-  2026_10_01_000001_create_holidays_table .................................................................................................. Pending  
+  -- remove the 'administrator text under the name of navbar'
+  -- 
+  -- create a profile page for admin
+        functionalities:
+            change first name, last name, middle name,
+            change the password

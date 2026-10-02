@@ -3593,6 +3593,113 @@ body .modal-backdrop.show {
     white-space: nowrap;
 }
 
+/* Keep the profile modal's header and footer at their natural size so they
+   never get squeezed when the modal body is taller than the screen. */
+#profileModal .dashboard-modal-header,
+#profileModal .dashboard-modal-footer,
+#editProfileModal .dashboard-modal-header,
+#editProfileModal .dashboard-modal-footer {
+    flex: 0 0 auto;
+}
+
+#profileModal .dashboard-modal-body,
+#editProfileModal .dashboard-modal-body {
+    min-height: 0;
+}
+
+/* ---------- Edit profile modal ---------- */
+#editProfileModal form {
+    display: flex;
+    max-height: calc(100dvh - 2rem);
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.modal-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 13px;
+}
+
+.modal-form-group {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.modal-form-group-full {
+    grid-column: 1 / -1;
+}
+
+.modal-form-group label {
+    color: #647e9d;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .01em;
+}
+
+.modal-form-group input:not([type='file']),
+.modal-form-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d3e2f2;
+    border-radius: 10px;
+    background: #fff;
+    color: var(--dashboard-ink);
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.4;
+    outline: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.modal-form-group input:not([type='file']):focus,
+.modal-form-group select:focus {
+    border-color: #6aa9ea;
+    box-shadow: 0 0 0 3px rgba(20, 116, 212, .15);
+}
+
+.modal-form-group input[type='file'] {
+    padding: 9px 11px;
+    border: 1px dashed #b9d2ea;
+    border-radius: 10px;
+    background: #f7fbff;
+    color: #395b7c;
+    font-size: 12px;
+}
+
+.modal-form-error {
+    margin-top: 13px;
+    padding: 10px 12px;
+    border: 1px solid #efb1bc;
+    border-radius: 10px;
+    background: #fff0f2;
+    color: #b9253e;
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.modal-form-error:not([hidden]) {
+    display: block;
+}
+
+@media (max-width: 575.98px) {
+    #editProfileModal form {
+        max-height: calc(100dvh - 0.8rem);
+    }
+
+    .modal-form-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .modal-form-group input:not([type='file']),
+    .modal-form-group select {
+        font-size: 16px;
+    }
+}
+
 /* ---------- Dashboard booking modal ---------- */
 .dashboard-booking-modal .modal-dialog {
     max-width: 1080px;

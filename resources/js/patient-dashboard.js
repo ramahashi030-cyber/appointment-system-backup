@@ -692,7 +692,26 @@ onDashboardReady(() => {
         }
     };
 
-    bookingReasons.forEach((input) => input.addEventListener('change', () => handleClinicalIntakeChange()));
+    bookingReasons.forEach((input) => input.addEventListener('change', () => {
+        handleClinicalIntakeChange();
+
+        // Mobile view: "None of the above" reveals the symptom and complaint
+        // choices below — bring them into view so the patient immediately sees
+        // the next step instead of a screen that appears not to react.
+        const revealedSection = document.querySelector('[data-symptom-section]');
+        const shouldScrollToChoices = input.value === 'none_of_the_above'
+            && revealedSection
+            && !revealedSection.hidden
+            && window.matchMedia('(max-width: 991.98px)').matches;
+
+        if (shouldScrollToChoices) {
+            revealedSection.scrollIntoView({
+                behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+                block: 'start',
+                inline: 'nearest',
+            });
+        }
+    }));
 
     bookingSymptoms.forEach((input) => {
         input.addEventListener('change', () => {
@@ -703,6 +722,23 @@ onDashboardReady(() => {
             }
 
             handleClinicalIntakeChange(!exceededLimit);
+
+            // Mobile view: after the first symptom is chosen in step 2, bring
+            // step 3 (Details about your Complaint) into view so the patient
+            // continues straight to filling it in.
+            const complaintStep = bookingComplaintDetails?.closest('fieldset');
+            const shouldScrollToDetails = input.checked
+                && selectedSymptomCount() === 1
+                && complaintStep
+                && window.matchMedia('(max-width: 991.98px)').matches;
+
+            if (shouldScrollToDetails) {
+                complaintStep.scrollIntoView({
+                    behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+                    block: 'start',
+                    inline: 'nearest',
+                });
+            }
         });
     });
 

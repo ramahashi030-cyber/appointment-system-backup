@@ -11,6 +11,11 @@
 @endsection
 
 @section('content')
+    @php
+        // The roster loop below reuses $patient; keep the requested patient for the View/Edit modals.
+        $selectedPatient = $patient ?? null;
+    @endphp
+
     <div class="admin-dashboard-content admin-doctor-content admin-patients-page">
         <section class="admin-telemedicine-banner admin-doctor-banner" aria-labelledby="patientDirectoryTitle">
             <div class="admin-telemedicine-glow" aria-hidden="true"></div>
@@ -211,13 +216,13 @@
                             </div>
                             <div class="admin-telemedicine-copy">
                                 <h2 class="modal-title" id="viewPatientModalTitle">Patient profile</h2>
-                                <p class="admin-telemedicine-description">Review {{ trim(implode(' ', array_filter([$patient->first_name, $patient->middlename, $patient->last_name]))) ?: 'this patient' }}'s information, medical summary, and activity.</p>
+                                <p class="admin-telemedicine-description">Review {{ trim(implode(' ', array_filter([$selectedPatient->first_name, $selectedPatient->middlename, $selectedPatient->last_name]))) ?: 'this patient' }}'s information, medical summary, and activity.</p>
                             </div>
                         </div>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </header>
                     <div class="modal-body">
-                        @include('admin.patients._profile')
+                        @include('admin.patients._profile', ['patient' => $selectedPatient])
                     </div>
                 </div>
             </div>
@@ -236,15 +241,15 @@
                             </div>
                             <div class="admin-telemedicine-copy">
                                 <h2 class="modal-title" id="editPatientModalTitle">Edit patient</h2>
-                                <p class="admin-telemedicine-description">Update {{ trim(implode(' ', array_filter([$patient->first_name, $patient->middlename, $patient->last_name]))) ?: 'this patient' }}'s profile and account settings.</p>
+                                <p class="admin-telemedicine-description">Update {{ trim(implode(' ', array_filter([$selectedPatient->first_name, $selectedPatient->middlename, $selectedPatient->last_name]))) ?: 'this patient' }}'s profile and account settings.</p>
                             </div>
                         </div>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </header>
                     <div class="modal-body">
                         @include('admin.patients._form', [
-                            'patient' => $patient,
-                            'formAction' => route('admin.patients.update', $patient),
+                            'patient' => $selectedPatient,
+                            'formAction' => route('admin.patients.update', $selectedPatient),
                             'formMethod' => 'PUT',
                             'submitLabel' => 'Save',
                         ])

@@ -18,3 +18,6 @@
 @import './pages/reports.css';
 @import './pages/audit-logs.css';
 @import './pages/triager-dashboard.css';
+
+/* Cross-device layer: keep LAST so it overrides the files above */
+@import '../admin-css/mobile.css';

@@ -209,121 +209,375 @@
                 });
             });
 
-            // Telemed schedule modal
-            const telemedModal = document.getElementById('telemedScheduleModal');
-            const telemedForm = document.getElementById('telemedScheduleForm');
-            const telemedService = document.getElementById('telemedService');
-            const telemedDate = document.getElementById('telemedDate');
-            const telemedTimeSlot = document.getElementById('telemedTimeSlot');
-            const telemedError = document.querySelector('[data-telemed-error]');
-            const telemedPatientLabel = document.querySelector('[data-telemed-patient-label]');
-            let telemedRequestId = null;
+            // Schedule modals — Create Appointment Module (calendar + time slots).
+            // The telemed and face-to-face modals share identical markup; each is
+            // initialised against its own modal id, trigger attribute and endpoints.
+            const initScheduleModal = ({ modalId, requestAttr, calendarUrl, timeslotsUrl, submitUrl }) => {
+                const modalRoot = document.getElementById(modalId);
+                if (!modalRoot) return;
 
-            document.querySelectorAll('[data-schedule-telemed]').forEach((button) => {
-                button.addEventListener('click', () => {
-                    telemedRequestId = button.dataset.scheduleTelemed;
-                    const patientName = button.dataset.patientName || '';
-                    if (telemedPatientLabel) {
-                        telemedPatientLabel.textContent = 'Scheduling telemed consultation for: ' + patientName;
+                const form = modalRoot.querySelector('form');
+                const serviceField = modalRoot.querySelector('[data-schedule-field="service"]');
+                const dateField = modalRoot.querySelector('[data-schedule-field="date"]');
+                const timeField = modalRoot.querySelector('[data-schedule-field="time"]');
+                const ageField = modalRoot.querySelector('[data-schedule-field="age"]');
+                const genderField = modalRoot.querySelector('[data-schedule-field="gender"]');
+                const complaintField = modalRoot.querySelector('[data-schedule-field="complaint"]');
+                const errorBox = modalRoot.querySelector('[data-schedule-error]');
+                const patientLabel = modalRoot.querySelector('[data-schedule-patient-label]');
+                const scheduleSection = modalRoot.querySelector('[data-schedule-section]');
+                const calendarGrid = modalRoot.querySelector('[data-schedule-calendar]');
+                const monthLabel = modalRoot.querySelector('[data-schedule-month-label]');
+                const prevMonth = modalRoot.querySelector('[data-schedule-prev]');
+                const nextMonth = modalRoot.querySelector('[data-schedule-next]');
+                const slotsGrid = modalRoot.querySelector('[data-schedule-slots]');
+                const selectedDateLabel = modalRoot.querySelector('[data-schedule-selected-date]');
+                let requestId = null;
+
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const maxMonth = new Date(today.getFullYear(), today.getMonth() + 12, 1);
+                const state = {
+                    viewDate: new Date(today.getFullYear(), today.getMonth(), 1),
+                    selectedDate: '',
+                    selectedTime: '',
+                    days: new Map(),
+                    calendarRequest: 0,
+                    slotsRequest: 0,
+                };
+
+                const padDigit = (value) => String(value).padStart(2, '0');
+                const toLocalDateKey = (date) => `${date.getFullYear()}-${padDigit(date.getMonth() + 1)}-${padDigit(date.getDate())}`;
+                const toMonthKey = (date) => `${date.getFullYear()}-${padDigit(date.getMonth() + 1)}`;
+
+                const showError = (message) => {
+                    if (!errorBox) return;
+                    errorBox.textContent = message;
+                    errorBox.hidden = false;
+                };
+
+                const clearError = () => {
+                    if (!errorBox) return;
+                    errorBox.textContent = '';
+                    errorBox.hidden = true;
+                };
+
+                const renderSlotsMessage = (message) => {
+                    if (!slotsGrid) return;
+                    slotsGrid.innerHTML = `<p class="triager-book-slots-empty">${message}</p>`;
+                };
+
+                const setSelectedDateLabel = () => {
+                    if (!selectedDateLabel) return;
+
+                    if (!state.selectedDate) {
+                        selectedDateLabel.textContent = 'Select an available date';
+                        return;
                     }
-                    if (telemedError) telemedError.hidden = true;
-                    const modal = new bootstrap.Modal(telemedModal);
-                    modal.show();
-                });
-            });
 
-            if (telemedService && telemedDate && telemedTimeSlot) {
-                const loadTelemedSlots = async () => {
-                    if (!telemedService.value || !telemedDate.value) return;
-                    telemedTimeSlot.innerHTML = '<option value="">Loading...</option>';
-                    try {
-                        const response = await fetch('/triager/timeslots/telemed?service_id=' + telemedService.value + '&date=' + telemedDate.value);
-                        const slots = await response.json();
-                        telemedTimeSlot.innerHTML = '<option value="">Select a time slot</option>';
-                        slots.forEach((slot) => {
-                            const option = document.createElement('option');
-                            option.value = slot.time_slot;
-                            option.textContent = slot.time_slot + ' (' + slot.remaining + ' slots left)';
-                            if (slot.blocked) {
-                                option.disabled = true;
-                                option.textContent += ' — Unavailable';
+                    const date = new Date(`${state.selectedDate}T00:00:00`);
+                    selectedDateLabel.textContent = date.toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric',
+                    });
+                };
+
+                const renderCalendar = () => {
+                    if (!calendarGrid) return;
+
+                    calendarGrid.replaceChildren();
+                    const year = state.viewDate.getFullYear();
+                    const month = state.viewDate.getMonth();
+                    const firstWeekday = new Date(year, month, 1).getDay();
+                    const gridStart = new Date(year, month, 1 - firstWeekday);
+                    const todayKey = toLocalDateKey(today);
+
+                    for (let index = 0; index < 42; index += 1) {
+                        const date = new Date(gridStart);
+                        date.setDate(gridStart.getDate() + index);
+
+                        const dateKey = toLocalDateKey(date);
+                        const button = document.createElement('button');
+                        const info = state.days.get(dateKey);
+                        const outsideMonth = date.getMonth() !== month;
+
+                        button.type = 'button';
+                        button.className = 'triager-book-day';
+                        button.textContent = String(date.getDate());
+
+                        if (outsideMonth) {
+                            button.classList.add('outside');
+                            button.disabled = true;
+                        } else if (info) {
+                            button.title = info.reason;
+
+                            if (dateKey === todayKey) button.classList.add('today');
+
+                            if (info.holiday) {
+                                button.classList.add('holiday');
+                                const label = document.createElement('small');
+                                label.textContent = 'Holiday';
+                                button.append(label);
+                            } else if (info.available) {
+                                button.classList.add('available');
+                                const dot = document.createElement('span');
+                                dot.className = 'triager-book-day-dot';
+                                button.append(dot);
+                            } else {
+                                button.classList.add('unavailable');
                             }
-                            telemedTimeSlot.appendChild(option);
+
+                            if (dateKey === state.selectedDate) button.classList.add('selected');
+
+                            button.dataset.date = dateKey;
+                            button.disabled = !info.available;
+                        } else {
+                            button.classList.add('unavailable');
+                            button.disabled = true;
+                        }
+
+                        calendarGrid.append(button);
+                    }
+
+                    if (monthLabel) {
+                        monthLabel.textContent = state.viewDate.toLocaleDateString('en-US', {
+                            month: 'long',
+                            year: 'numeric',
                         });
-                    } catch {
-                        telemedTimeSlot.innerHTML = '<option value="">Error loading slots</option>';
+                    }
+                    if (prevMonth) {
+                        prevMonth.disabled = state.viewDate <= new Date(today.getFullYear(), today.getMonth(), 1);
+                    }
+                    if (nextMonth) {
+                        nextMonth.disabled = state.viewDate >= maxMonth;
                     }
                 };
-                telemedService.addEventListener('change', loadTelemedSlots);
-                telemedDate.addEventListener('change', loadTelemedSlots);
-            }
 
-            if (telemedForm) {
-                telemedForm.addEventListener('submit', (event) => {
-                    event.preventDefault();
-                    if (!telemedRequestId) return;
-                    telemedForm.action = '{{ route('triager.requests.schedule.telemed', ['appointment' => '__ID__']) }}'.replace('__ID__', telemedRequestId);
-                    telemedForm.submit();
-                });
-            }
+                const loadCalendar = async () => {
+                    if (!calendarGrid || !serviceField || !serviceField.value) return;
 
-            // Face-to-face schedule modal
-            const faceModal = document.getElementById('faceScheduleModal');
-            const faceForm = document.getElementById('faceScheduleForm');
-            const faceService = document.getElementById('faceService');
-            const faceDate = document.getElementById('faceDate');
-            const faceTimeSlot = document.getElementById('faceTimeSlot');
-            const faceError = document.querySelector('[data-face-error]');
-            const facePatientLabel = document.querySelector('[data-face-patient-label]');
-            let faceRequestId = null;
+                    const requestSeq = ++state.calendarRequest;
+                    clearError();
+                    calendarGrid.innerHTML = '<p class="triager-book-slots-empty"><span class="spinner-border spinner-border-sm"></span> Loading availability...</p>';
 
-            document.querySelectorAll('[data-schedule-face]').forEach((button) => {
-                button.addEventListener('click', () => {
-                    faceRequestId = button.dataset.scheduleFace;
-                    const patientName = button.dataset.patientName || '';
-                    if (facePatientLabel) {
-                        facePatientLabel.textContent = 'Scheduling face-to-face consultation for: ' + patientName;
-                    }
-                    if (faceError) faceError.hidden = true;
-                    const modal = new bootstrap.Modal(faceModal);
-                    modal.show();
-                });
-            });
-
-            if (faceService && faceDate && faceTimeSlot) {
-                const loadFaceSlots = async () => {
-                    if (!faceService.value || !faceDate.value) return;
-                    faceTimeSlot.innerHTML = '<option value="">Loading...</option>';
                     try {
-                        const response = await fetch('/triager/timeslots/face?service_id=' + faceService.value + '&date=' + faceDate.value);
-                        const slots = await response.json();
-                        faceTimeSlot.innerHTML = '<option value="">Select a time slot</option>';
-                        slots.forEach((slot) => {
-                            const option = document.createElement('option');
-                            option.value = slot.time_slot;
-                            option.textContent = slot.time_slot + ' (' + slot.remaining + ' slots left)';
-                            if (slot.blocked) {
-                                option.disabled = true;
-                                option.textContent += ' — Unavailable';
-                            }
-                            faceTimeSlot.appendChild(option);
+                        const response = await fetch(`${calendarUrl}?service_id=${encodeURIComponent(serviceField.value)}&month=${toMonthKey(state.viewDate)}`, {
+                            headers: { Accept: 'application/json' },
                         });
-                    } catch {
-                        faceTimeSlot.innerHTML = '<option value="">Error loading slots</option>';
+                        const payload = await response.json();
+
+                        if (!response.ok) throw new Error(payload.message || 'Unable to load the calendar.');
+                        if (requestSeq !== state.calendarRequest) return;
+
+                        state.days = new Map(payload.days.map((day) => [day.date, day]));
+                        renderCalendar();
+                    } catch (error) {
+                        if (requestSeq !== state.calendarRequest) return;
+                        calendarGrid.innerHTML = '<p class="triager-book-slots-empty">Calendar could not be loaded. Please try again.</p>';
+                        showError(error.message);
                     }
                 };
-                faceService.addEventListener('change', loadFaceSlots);
-                faceDate.addEventListener('change', loadFaceSlots);
-            }
 
-            if (faceForm) {
-                faceForm.addEventListener('submit', (event) => {
-                    event.preventDefault();
-                    if (!faceRequestId) return;
-                    faceForm.action = '{{ route('triager.requests.schedule.face', ['appointment' => '__ID__']) }}'.replace('__ID__', faceRequestId);
-                    faceForm.submit();
+                const loadTimeSlots = async (date) => {
+                    if (!slotsGrid || !serviceField || !serviceField.value || !date) return;
+
+                    const requestSeq = ++state.slotsRequest;
+                    renderSlotsMessage('<span class="spinner-border spinner-border-sm"></span> Checking time slots...');
+
+                    try {
+                        const response = await fetch(`${timeslotsUrl}?service_id=${encodeURIComponent(serviceField.value)}&date=${encodeURIComponent(date)}`, {
+                            headers: { Accept: 'application/json' },
+                        });
+                        const slots = await response.json();
+
+                        if (!response.ok) throw new Error(slots.error || 'Unable to load time slots.');
+                        if (requestSeq !== state.slotsRequest) return;
+
+                        slotsGrid.replaceChildren();
+
+                        if (!Array.isArray(slots) || slots.length === 0) {
+                            renderSlotsMessage('No time slots are configured for this date.');
+                            return;
+                        }
+
+                        slots.forEach((slot) => {
+                            const button = document.createElement('button');
+                            const remaining = Number(slot.remaining);
+                            const unavailable = Boolean(slot.blocked) || remaining <= 0;
+
+                            button.type = 'button';
+                            button.className = 'triager-book-slot';
+                            button.textContent = slot.time_slot;
+                            button.title = slot.blocked
+                                ? (slot.reason || 'Unavailable')
+                                : (remaining > 0 ? `${remaining} slot${remaining === 1 ? '' : 's'} left` : 'No slots remaining');
+
+                            if (slot.blocked) {
+                                button.classList.add('blocked');
+                                const icon = document.createElement('i');
+                                icon.className = 'bi bi-slash-circle';
+                                button.prepend(icon);
+                            } else if (unavailable) {
+                                button.classList.add('full');
+                            }
+
+                            if (unavailable) {
+                                button.disabled = true;
+                            } else if (state.selectedTime === slot.time_slot) {
+                                button.classList.add('selected');
+                            }
+
+                            button.addEventListener('click', () => {
+                                state.selectedTime = slot.time_slot;
+                                if (timeField) timeField.value = slot.time_slot;
+                                clearError();
+                                slotsGrid.querySelectorAll('.triager-book-slot').forEach((option) => {
+                                    option.classList.toggle('selected', option === button);
+                                });
+                            });
+
+                            slotsGrid.append(button);
+                        });
+                    } catch (error) {
+                        if (requestSeq !== state.slotsRequest) return;
+                        renderSlotsMessage('Time slots could not be loaded. Please try again.');
+                        showError(error.message);
+                    }
+                };
+
+                const resetSchedule = () => {
+                    state.viewDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                    state.selectedDate = '';
+                    state.selectedTime = '';
+                    state.days = new Map();
+
+                    if (serviceField) serviceField.value = '';
+                    if (dateField) dateField.value = '';
+                    if (timeField) timeField.value = '';
+                    if (scheduleSection) scheduleSection.hidden = true;
+                    if (calendarGrid) calendarGrid.replaceChildren();
+                    if (monthLabel) monthLabel.textContent = '—';
+                    setSelectedDateLabel();
+                    renderSlotsMessage('Select an available date to view time slots.');
+                    clearError();
+                };
+
+                document.querySelectorAll(`[${requestAttr}]`).forEach((button) => {
+                    button.addEventListener('click', () => {
+                        requestId = button.getAttribute(requestAttr);
+                        const patientName = button.dataset.patientName || '';
+                        resetSchedule();
+
+                        if (patientLabel) {
+                            patientLabel.textContent = 'Scheduling consultation for: ' + patientName;
+                        }
+                        if (ageField) ageField.value = button.dataset.patientAge || '—';
+                        if (complaintField) complaintField.value = button.dataset.patientComplaint || '—';
+                        if (genderField) {
+                            const gender = button.dataset.patientGender || '';
+                            const option = document.createElement('option');
+                            option.value = gender;
+                            option.textContent = gender || '—';
+                            genderField.replaceChildren(option);
+                        }
+
+                        bootstrap.Modal.getOrCreateInstance(modalRoot).show();
+                    });
                 });
-            }
+
+                if (serviceField) {
+                    serviceField.addEventListener('change', () => {
+                        state.selectedDate = '';
+                        state.selectedTime = '';
+                        state.days = new Map();
+                        if (dateField) dateField.value = '';
+                        if (timeField) timeField.value = '';
+                        setSelectedDateLabel();
+                        renderSlotsMessage('Select an available date to view time slots.');
+                        clearError();
+
+                        if (scheduleSection) scheduleSection.hidden = !serviceField.value;
+
+                        if (serviceField.value) {
+                            loadCalendar();
+                        }
+                    });
+                }
+
+                if (calendarGrid) {
+                    calendarGrid.addEventListener('click', (event) => {
+                        const button = event.target.closest('[data-date]');
+                        if (!button || button.disabled) return;
+
+                        state.selectedDate = button.dataset.date;
+                        state.selectedTime = '';
+                        if (dateField) dateField.value = state.selectedDate;
+                        if (timeField) timeField.value = '';
+                        setSelectedDateLabel();
+                        clearError();
+                        renderCalendar();
+                        loadTimeSlots(state.selectedDate);
+                    });
+                }
+
+                const moveCalendar = (offset) => {
+                    state.viewDate = new Date(
+                        state.viewDate.getFullYear(),
+                        state.viewDate.getMonth() + offset,
+                        1,
+                    );
+                    state.selectedDate = '';
+                    state.selectedTime = '';
+                    if (dateField) dateField.value = '';
+                    if (timeField) timeField.value = '';
+                    setSelectedDateLabel();
+                    renderSlotsMessage('Select an available date to view time slots.');
+                    loadCalendar();
+                };
+
+                prevMonth?.addEventListener('click', () => moveCalendar(-1));
+                nextMonth?.addEventListener('click', () => moveCalendar(1));
+
+                if (form) {
+                    form.addEventListener('submit', (event) => {
+                        event.preventDefault();
+                        if (!requestId) return;
+
+                        if (!serviceField || !serviceField.value) {
+                            showError('Please select a service.');
+                            return;
+                        }
+                        if (!dateField || !dateField.value) {
+                            showError('Please select a date from the calendar.');
+                            return;
+                        }
+                        if (!timeField || !timeField.value) {
+                            showError('Please select a time slot.');
+                            return;
+                        }
+
+                        form.action = submitUrl.replace('__ID__', requestId);
+                        form.submit();
+                    });
+                }
+            };
+
+            initScheduleModal({
+                modalId: 'telemedScheduleModal',
+                requestAttr: 'data-schedule-telemed',
+                calendarUrl: '{{ route('triager.calendar.telemed', [], false) }}',
+                timeslotsUrl: '{{ route('triager.timeslots.telemed', [], false) }}',
+                submitUrl: '{{ route('triager.requests.schedule.telemed', ['appointment' => '__ID__']) }}',
+            });
+            initScheduleModal({
+                modalId: 'faceScheduleModal',
+                requestAttr: 'data-schedule-face',
+                calendarUrl: '{{ route('triager.calendar.face', [], false) }}',
+                timeslotsUrl: '{{ route('triager.timeslots.face', [], false) }}',
+                submitUrl: '{{ route('triager.requests.schedule.face', ['appointment' => '__ID__']) }}',
+            });
         });
     </script>
 @endpush

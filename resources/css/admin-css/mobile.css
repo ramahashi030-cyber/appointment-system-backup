@@ -1,0 +1,258 @@
+/* QMMC Admin: cross-device layer. Imported LAST in admin/admin.css so it wins on equal specificity.
+   Covers phones, tablets, laptops and large desktops. Table stacking relies on the
+   `.admin-table-stack` class + `data-label` attributes added by #admin-responsive-tables in layouts/admin.blade.php. */
+
+/* ---------- Global ---------- */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+.admin-dashboard-body img,
+.admin-dashboard-body svg,
+.admin-dashboard-body video { max-width: 100%; }
+
+.admin-shell,
+.admin-page { min-height: 100vh; min-height: 100dvh; }
+
+/* iPhone notch / landscape safe areas (the viewport meta uses viewport-fit=cover) */
+.admin-page {
+    padding-right: env(safe-area-inset-right, 0px);
+}
+.admin-header { padding-top: env(safe-area-inset-top, 0px); }
+.admin-mobile-menu {
+    --bs-offcanvas-width: min(280px, 86vw);
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (max-width: 991.98px) {
+    .admin-page { padding-left: env(safe-area-inset-left, 0px); }
+}
+
+/* Short laptop screens: the fixed sidebar must scroll instead of cutting links off */
+.admin-sidebar-nav {
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, .25) transparent;
+}
+.admin-sidebar-footer { flex-shrink: 0; }
+
+/* Toasts built by page scripts (inline min-width: 300px) must fit a 320px phone */
+.admin-toast {
+    max-width: calc(100vw - 2rem);
+    min-width: min(300px, calc(100vw - 2rem)) !important;
+    top: max(1rem, env(safe-area-inset-top, 0px)) !important;
+}
+
+/* ---------- Touch devices ---------- */
+@media (hover: none) {
+    .admin-doctor-table tbody tr:hover { opacity: 1; }
+    .admin-sidebar-link:hover,
+    .admin-sidebar-sublink:hover,
+    .admin-quick-link:hover,
+    .triager-dashboard-content .triager-stat-card:hover { transform: none; }
+}
+
+@media (pointer: coarse) {
+    .admin-doctor-actions a,
+    .admin-doctor-actions button { display: inline-flex; align-items: center; min-height: 40px; }
+    .admin-secondary-button,
+    .admin-primary-button,
+    .admin-doctor-add-button { min-height: 44px; }
+    .admin-doctor-page-button,
+    .admin-doctor-page-current { min-width: 40px; height: 40px; }
+    .admin-menu-toggle { width: 44px; height: 44px; }
+}
+
+/* ---------- Laptops / tablets (<= 1199px) ---------- */
+@media (max-width: 1199.98px) {
+    /* Filter bars were a single non-wrapping row: search + selects + date overflowed */
+    .admin-main .admin-doctor-filters { flex-wrap: wrap; }
+    .admin-main .admin-doctor-search { flex: 1 1 240px; min-width: 0; }
+}
+
+/* Wide tables scroll sideways inside their own panel instead of being clipped */
+@media (min-width: 768px) and (max-width: 1399.98px) {
+    .admin-main [data-audit-table-wrap] { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+    .admin-main [data-audit-table-wrap] .admin-doctor-table { min-width: 900px !important; }
+}
+@media (min-width: 768px) and (max-width: 1199.98px) {
+    .admin-main [data-appointment-table-wrap] { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+    .admin-main [data-appointment-table-wrap] .admin-doctor-table { min-width: 820px !important; }
+}
+
+/* Timeslot form: five col-md columns are too narrow on tablets */
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .admin-timeslots-page #addTimeslotForm > [class*="col-md-"] { flex: 0 0 auto; width: 50%; }
+}
+
+/* Modal tables (profile views) keep their columns and scroll instead of being squashed */
+.admin-doctor-modal .admin-doctor-table-wrap { overflow-x: auto !important; }
+@media (max-width: 991.98px) {
+    .admin-doctor-modal .admin-doctor-table { min-width: 520px !important; }
+}
+
+/* ---------- Header on small screens ---------- */
+@media (max-width: 991.98px) {
+    .admin-logout { width: 38px; padding: 0; justify-content: center; }
+    .admin-logout button { width: 100%; justify-content: center; }
+}
+@media (max-width: 575.98px) {
+    .admin-header-inner { padding: 0 12px; gap: 8px; }
+    .admin-header-actions { gap: 8px; padding: 6px 8px; }
+}
+
+/* ---------- Phones (<= 767px) ---------- */
+@media (max-width: 767.98px) {
+    .admin-main { padding: 0 0 24px; }
+    .admin-main > .alert { margin: 12px 15px 0; }
+    .admin-footer { margin-bottom: max(20px, env(safe-area-inset-bottom, 0px)); }
+
+    /* iOS Safari zooms the page when a focused control is below 16px */
+    .admin-dashboard-body input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+    .admin-dashboard-body select,
+    .admin-dashboard-body textarea { font-size: 16px !important; }
+
+    /* Page headings (module, form, profile, doctor sub-pages) */
+    .admin-page-heading,
+    .admin-doctor-heading { flex-direction: column; align-items: stretch; gap: 12px; }
+    .admin-page-heading p { max-width: none; }
+    .admin-heading-actions { flex-wrap: wrap; }
+
+    /* Banners: fixed heights clip text; unify to a compact row */
+    .admin-main .admin-telemedicine-banner { height: auto; min-height: 0; padding: 0; margin-bottom: 14px; }
+    .admin-main .admin-telemedicine-content {
+        height: auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 14px;
+        padding: 16px;
+        text-align: left;
+    }
+    .admin-main .admin-telemedicine-mark { width: 54px; height: 54px; flex-basis: 54px; transform: none; }
+    .admin-main .admin-telemedicine-mark > i { font-size: 24px; transform: none; }
+    .admin-main .admin-telemedicine-copy { flex: 1 1 200px; }
+    .admin-main .admin-telemedicine-copy h1 { font-size: 21px; }
+    .admin-main .admin-telemedicine-welcome { font-size: 14px; }
+    .admin-main .admin-telemedicine-description { font-size: 12px; }
+    .admin-main .admin-telemedicine-trust { flex-wrap: wrap; row-gap: 4px; padding: 4px 10px; }
+
+    /* Filters: stacked, full width (search wrapper had flex-basis 280px which became its HEIGHT in a column) */
+    .admin-main .admin-doctor-filters { flex-direction: column; align-items: stretch; flex-wrap: nowrap; padding: 12px 14px; }
+    .admin-main .admin-doctor-filters > * {
+        width: 100% !important;
+        min-width: 0;
+        flex: 0 0 auto;
+        margin-left: 0 !important;
+    }
+    .admin-main .admin-doctor-filters [hidden] { display: none !important; }
+    .admin-main .admin-doctor-filters .admin-clear-filter { justify-content: center; min-height: 38px; }
+    .admin-main .admin-doctor-pagination { flex-wrap: wrap; justify-content: center; padding: 12px 14px; }
+
+    /* Panel headers */
+    .admin-main .admin-panel-header { flex-wrap: wrap; padding-top: 8px; padding-bottom: 8px; }
+
+    /* ---- Tables become cards ---- */
+    .admin-main .admin-doctor-table-wrap { overflow-x: visible; }
+    .admin-main .admin-table-stack,
+    .admin-main .admin-table-stack tbody { display: block; width: 100%; min-width: 0 !important; }
+    .admin-main .admin-table-stack thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+    }
+    .admin-main .admin-table-stack tbody { padding: 10px; background: #f4f8ff; }
+    .admin-main .admin-table-stack tbody tr {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 10px;
+        padding: 14px;
+        border: 1px solid #d7e6f7;
+        border-radius: 12px;
+        background: #fff;
+        opacity: 1;
+    }
+    .admin-main .admin-table-stack tbody tr:last-child { margin-bottom: 0; }
+    .admin-main .admin-table-stack tbody tr:hover { background: #fff; opacity: 1; }
+    .admin-main .admin-table-stack tbody td {
+        display: block;
+        min-width: 0;
+        padding: 0;
+        border: 0;
+        text-align: left;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+    .admin-main .admin-table-stack tbody td[data-label]::before {
+        display: block;
+        margin-bottom: 3px;
+        color: #6a83a4;
+        content: attr(data-label);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+    }
+    /* The identity cell acts as the card title, so it needs no label */
+    .admin-main .admin-table-stack tbody td:first-child:has(.admin-doctor-person, .admin-doctor-appointment-patient)::before { display: none; }
+    .admin-main .admin-table-stack .admin-doctor-person strong,
+    .admin-main .admin-table-stack .admin-doctor-appointment-patient strong { white-space: normal; }
+
+    /* Actions: wrapped row of tap targets */
+    .admin-main .admin-table-stack tbody td:has(> .admin-doctor-actions) { padding-top: 12px; border-top: 1px solid #e4edf7; }
+    .admin-main .admin-table-stack .admin-doctor-actions { justify-content: flex-start; gap: 8px; }
+    .admin-main .admin-table-stack .admin-doctor-actions a,
+    .admin-main .admin-table-stack .admin-doctor-actions button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40px;
+        padding: 0 12px;
+        border: 1px solid #d5e4f5;
+        background: #fff;
+    }
+    .admin-main .admin-table-stack .admin-doctor-actions form { display: contents; }
+
+    /* ---- Modals ---- */
+    .admin-doctor-modal .modal-dialog { margin-bottom: max(8px, env(safe-area-inset-bottom, 0px)); }
+    .admin-doctor-modal .admin-doctor-modal-header { min-height: 0; }
+    .admin-doctor-modal .admin-doctor-modal-header .modal-title { font-size: 20px; }
+    .admin-doctor-modal .admin-doctor-modal-header .admin-telemedicine-description { font-size: 13px; }
+    .admin-doctor-modal .admin-doctor-profile-footer-grid { grid-template-columns: 1fr; }
+
+    #addTriagerModal .admin-doctor-form { grid-template-columns: 1fr; }
+    #addTriagerModal .admin-doctor-form,
+    #editTriagerModal .admin-doctor-form,
+    #addAppointmentModal .admin-doctor-form,
+    #addRecordModal .admin-doctor-form { padding-left: 12px; padding-right: 12px; }
+    #viewAppointmentModal .admin-doctor-form,
+    #viewRecordModal .admin-doctor-form { padding-left: 12px; padding-right: 12px; }
+    .admin-doctor-modal .admin-doctor-form-actions { flex-wrap: wrap; }
+    .admin-doctor-modal .admin-doctor-form-actions > * { flex: 1 1 140px; justify-content: center; }
+
+    /* ---- Triager dashboard ---- */
+    .triager-dashboard-content .admin-telemedicine-banner { height: auto; min-height: 0; }
+    .triager-dashboard-content .admin-telemedicine-mark { width: 56px; height: 56px; flex-basis: 56px; }
+    .triager-dashboard-content .admin-telemedicine-mark > i { font-size: 24px; }
+    .triager-dashboard-content .admin-telemedicine-copy h1 { font-size: 22px; }
+    .triager-dashboard-content .admin-telemedicine-welcome { font-size: 15px; }
+    .triager-card-grid { padding: 12px; gap: 12px; }
+    .triager-dashboard-content .admin-doctor-stat-card strong { font-size: 22px; }
+}
+
+/* Very small phones */
+@media (max-width: 380px) {
+    .admin-dashboard-content { padding-left: 10px; padding-right: 10px; }
+    .admin-main .admin-telemedicine-content { padding: 14px; }
+    .admin-main .admin-table-stack tbody { padding: 8px; }
+}
+
+/* Large desktops: let content use the extra room */
+@media (min-width: 1800px) {
+    .admin-dashboard-content { max-width: 1880px; }
+}

@@ -51,6 +51,7 @@
             ],
         ],
         ['route' => 'admin.audit-logs', 'label' => 'Audit Logs', 'icon' => 'bi-journal-text'],
+        ['route' => 'admin.sms', 'label' => 'SMS Module', 'icon' => 'bi-phone-fill'],
     ];
 @endphp
 

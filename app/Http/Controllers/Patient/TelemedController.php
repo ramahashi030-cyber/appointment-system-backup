@@ -14,6 +14,7 @@ use App\Models\UnavailableTimeslotTele;
 use App\Support\AppointmentJitsiRoom;
 use App\Support\AppointmentQrCode;
 use App\Support\AppointmentSchema;
+use App\Support\ScheduleCalendar;
 use App\Support\Telemed;
 use App\Symptom;
 use Illuminate\Contracts\View\View;
@@ -724,96 +725,16 @@ class TelemedController extends Controller
         ]);
 
         $service = ServiceTele::findOrFail($validated['service_id']);
-        $month = Carbon::createFromFormat('Y-m', $validated['month'])->startOfMonth();
-        $monthEnd = $month->copy()->endOfMonth();
-        $availableWeekdays = Telemed::codesToFull($service->availability_day);
-        $holidays = Telemed::holidaysMap();
-        $slots = ServiceTimeslotTele::query()
-            ->where('service_id', $service->id)
-            ->orderBy('time_slot')
-            ->get()
-            ->keyBy('time_slot');
 
-        $booked = Appointment::query()
-            ->where('mode', 'TELE')
-            ->whereIn('status', Appointment::ACTIVE_STATUSES)
-            ->where('service_id', $service->id)
-            ->whereBetween('date', [$month->toDateString(), $monthEnd->toDateString()])
-            ->get(['date', 'time_slot'])
-            ->groupBy(fn (Appointment $appointment) => $appointment->date->format('Y-m-d').'|'.$appointment->time_slot)
-            ->map(fn ($appointments) => $appointments->count());
-
-        $blocked = UnavailableTimeslotTele::query()
-            ->where('service_id', $service->id)
-            ->whereBetween('date', [$month->toDateString(), $monthEnd->toDateString()])
-            ->get()
-            ->mapWithKeys(fn (UnavailableTimeslotTele $slot) => [
-                $slot->date->format('Y-m-d').'|'.$slot->time_slot => $slot->reason ?: 'Unavailable',
-            ]);
-
-        $days = [];
-        $date = $month->copy();
-
-        while ($date->lessThanOrEqualTo($monthEnd)) {
-            $dateKey = $date->toDateString();
-            $remainingSlots = 0;
-
-            foreach ($slots as $timeSlot => $slot) {
-                $slotKey = $dateKey.'|'.$timeSlot;
-
-                if (! $blocked->has($slotKey)) {
-                    $remainingSlots += max(
-                        0,
-                        (int) $slot->slots - (int) $booked->get($slotKey, 0)
-                    );
-                }
-            }
-
-            $isPast = $date->isBefore(Carbon::today()->startOfDay());
-            $isClosedToday = $date->isSameDay(Carbon::today()) && now()->hour >= 18;
-            $isServiceDay = in_array($date->format('l'), $availableWeekdays, true);
-            $holiday = $holidays[$dateKey] ?? null;
-            $isAvailable = ! $isPast
-                && ! $isClosedToday
-                && $isServiceDay
-                && $holiday === null
-                && $remainingSlots > 0;
-            $isFullyBooked = ! $isPast
-                && ! $isClosedToday
-                && $isServiceDay
-                && $holiday === null
-                && $remainingSlots === 0;
-
-            $reason = match (true) {
-                $isPast => 'Date has passed',
-                $isClosedToday => 'Booking is closed for today',
-                $holiday !== null => $holiday,
-                ! $isServiceDay => 'Service is not available on this day',
-                $isFullyBooked => 'Fully booked',
-                default => $remainingSlots.' slot'.($remainingSlots === 1 ? '' : 's').' remaining',
-            };
-
-            $days[] = [
-                'date' => $dateKey,
-                'day' => (int) $date->format('j'),
-                'available' => $isAvailable,
-                'fully_booked' => $isFullyBooked,
-                'remaining_slots' => $remainingSlots,
-                'reason' => $reason,
-            ];
-
-            $date->addDay();
-        }
-
-        return response()->json([
-            'service' => [
-                'id' => $service->id,
-                'name' => $service->service_name,
+        return response()->json(array_merge(
+            [
+                'service' => [
+                    'id' => $service->id,
+                    'name' => $service->service_name,
+                ],
             ],
-            'month' => $month->format('Y-m'),
-            'month_label' => $month->format('F Y'),
-            'days' => $days,
-        ]);
+            ScheduleCalendar::month('TELE', $service->id, $service->availability_day, $validated['month']),
+        ));
     }
 
     /**

@@ -434,3 +434,472 @@
     .triager-card-grid { grid-template-columns: 1fr; }
     .triager-dashboard-content .admin-telemedicine-banner { height: auto; min-height: 180px; }
 }
+
+/* Schedule modals (telemed + face-to-face) — Create Appointment Module (Image 2 layout) */
+.triager-book-modal {
+    border: none;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, .28);
+}
+
+/* The form wraps modal-body + modal-footer, so it must join the
+   modal-content flex column. Otherwise the body never gets a bounded
+   height, Bootstrap clips the overflow, and the modal cannot be
+   scrolled — most noticeable on mobile. */
+.triager-book-modal > form {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+}
+.triager-book-modal .modal-body {
+    min-height: 0;
+    -webkit-overflow-scrolling: touch;
+}
+
+.triager-book-header {
+    padding: 16px 22px;
+    border-bottom: 1px solid #e8eef7;
+    background: #fff;
+}
+.triager-book-header .modal-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #101828;
+    font-size: 17px;
+    font-weight: 700;
+}
+.triager-book-header .modal-title i {
+    color: #1a73e8;
+    font-size: 21px;
+}
+.triager-book-body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 20px 22px 6px;
+    background: #fff;
+}
+
+/* Blue patient banner */
+.triager-book-banner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    border: 1px solid #d6e6fb;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #e9f2fe 0%, #eef5ff 100%);
+}
+.triager-book-banner-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    border-radius: 50%;
+    background: #fff;
+    color: #1a73e8;
+    font-size: 21px;
+    box-shadow: 0 4px 12px rgba(26, 115, 232, .18);
+}
+.triager-book-banner-copy h6 {
+    margin: 0 0 2px;
+    color: #1a4fa0;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+}
+.triager-book-banner-copy p {
+    margin: 0;
+    color: #334155;
+    font-size: 13.5px;
+    font-weight: 500;
+}
+
+/* Sections */
+.triager-book-step {
+    margin: 0 0 10px;
+    color: #0f172a;
+    font-size: 15.5px;
+    font-weight: 700;
+}
+.triager-book-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, .05);
+}
+.triager-book-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+}
+.triager-book-grid-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.triager-book-label {
+    display: block;
+    margin-bottom: 6px;
+    color: #64748b;
+    font-size: 11.5px;
+    font-weight: 600;
+}
+.triager-book-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+    border: 1px solid #d9e1ec;
+    border-radius: 10px;
+    background: #fff;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+.triager-book-field > i {
+    color: #94a3b8;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+.triager-book-field:focus-within {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, .22);
+}
+.triager-book-field-accent {
+    border-color: #cfe2fb;
+    background: #eaf2fe;
+}
+.triager-book-field-accent > i { color: #1a73e8; }
+.triager-book-control {
+    width: 100%;
+    padding: 10px 0;
+    border: none;
+    background: transparent;
+    color: #1f2937;
+    font-family: inherit;
+    font-size: 13.5px;
+    outline: none;
+}
+.triager-book-control[readonly] { color: #334155; }
+.triager-book-select {
+    appearance: auto;
+    cursor: pointer;
+}
+.triager-book-select:disabled {
+    cursor: default;
+    opacity: 1;
+    color: #1a73e8;
+    font-weight: 600;
+}
+.triager-book-field-accent .triager-book-control { color: #1a73e8; font-weight: 600; }
+
+/* Legend */
+.triager-book-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    margin-bottom: 12px;
+}
+.triager-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #475569;
+    font-size: 12.5px;
+    font-weight: 500;
+}
+.triager-legend-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #cbd5e1;
+}
+.triager-legend-dot.available { background: #2563eb; }
+.triager-legend-dot.unavailable { background: #cbd5e1; }
+.triager-legend-dot.holiday { background: #ef4444; }
+.triager-legend-dot.partial { background: #fca5a5; }
+
+/* Calendar + slots side by side */
+.triager-book-schedule-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 14px;
+    align-items: start;
+}
+.triager-book-calendar,
+.triager-book-slots {
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, .05);
+    overflow: hidden;
+}
+.triager-book-calendar { padding: 14px; }
+.triager-book-calendar-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+.triager-book-calendar-head strong {
+    color: #0f172a;
+    font-size: 15.5px;
+    font-weight: 700;
+}
+.triager-book-month-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid #dbe3ee;
+    border-radius: 9px;
+    background: #fff;
+    color: #334155;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background .15s ease, border-color .15s ease;
+}
+.triager-book-month-btn:hover:not(:disabled) {
+    border-color: #93c5fd;
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+.triager-book-month-btn:disabled {
+    color: #cbd5e1;
+    cursor: not-allowed;
+}
+.triager-book-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+    margin-bottom: 6px;
+}
+.triager-book-weekdays span {
+    text-align: center;
+    color: #64748b;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+.triager-book-days {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+}
+.triager-book-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 46px;
+    padding: 4px 2px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: #fff;
+    color: #334155;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: default;
+    transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+.triager-book-day small {
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: .01em;
+}
+.triager-book-day-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #2563eb;
+}
+.triager-book-day.available {
+    background: #fff;
+    border-color: #e8eef7;
+    cursor: pointer;
+}
+.triager-book-day.available:hover {
+    border-color: #93c5fd;
+    background: #eff6ff;
+}
+.triager-book-day.today { border-color: #93c5fd; }
+.triager-book-day.holiday {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: #fff;
+}
+.triager-book-day.unavailable,
+.triager-book-day.outside {
+    background: #f8fafc;
+    border-color: #f1f5f9;
+    color: #cbd5e1;
+}
+.triager-book-day.selected,
+.triager-book-day.selected:hover {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #fff;
+}
+.triager-book-day.selected .triager-book-day-dot { background: #fff; }
+
+/* Available time slots panel */
+.triager-book-slots-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 14px;
+    border-bottom: 1px solid #e8eef7;
+    background: #f8fbff;
+}
+.triager-book-slots-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    border-radius: 10px;
+    background: #e3eefe;
+    color: #1a73e8;
+    font-size: 16px;
+}
+.triager-book-slots-title strong {
+    display: block;
+    color: #1e40af;
+    font-size: 14px;
+    font-weight: 700;
+}
+.triager-book-slots-title small {
+    display: block;
+    color: #64748b;
+    font-size: 12px;
+}
+.triager-book-slot-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    padding: 14px;
+}
+.triager-book-slot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 9px 6px;
+    border: 1.5px solid #2563eb;
+    border-radius: 9px;
+    background: #fff;
+    color: #1a73e8;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+.triager-book-slot:hover:not(:disabled):not(.selected) {
+    background: #eff6ff;
+}
+.triager-book-slot.selected {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #fff;
+}
+.triager-book-slot.blocked {
+    border-color: #fca5a5;
+    background: #fff5f5;
+    color: #ef4444;
+}
+.triager-book-slot.full {
+    border-color: #e2e8f0;
+    background: #f1f5f9;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+.triager-book-slot:disabled { cursor: not-allowed; }
+.triager-book-slots-empty {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 22px 12px;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 12.5px;
+}
+
+/* Full-width confirm button */
+.triager-book-footer {
+    justify-content: stretch;
+    padding: 8px 22px 20px;
+    border-top: none;
+    background: #fff;
+}
+.triager-book-confirm {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 13px 16px;
+    border: none;
+    border-radius: 11px;
+    background: linear-gradient(180deg, #2579ea 0%, #1663d4 100%);
+    color: #fff;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(22, 99, 212, .32);
+    transition: filter .15s ease, transform .15s ease;
+}
+.triager-book-confirm:hover { filter: brightness(1.06); transform: translateY(-1px); }
+.triager-book-confirm:active { transform: translateY(0); }
+
+@media (max-width: 1199.98px) {
+    .triager-book-schedule-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 767.98px) {
+    .triager-book-grid-three { grid-template-columns: minmax(0, 1fr); }
+    .triager-book-slot-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .triager-book-modal { border-radius: 14px; }
+    .triager-book-header { padding: 13px 14px; }
+    .triager-book-header .modal-title { gap: 8px; font-size: 15px; }
+    .triager-book-header .modal-title i { font-size: 18px; }
+    .triager-book-body { gap: 14px; padding: 14px 14px 4px; }
+    .triager-book-banner { gap: 11px; padding: 13px; }
+    .triager-book-banner-icon {
+        width: 42px;
+        height: 42px;
+        flex: 0 0 42px;
+        font-size: 18px;
+    }
+    .triager-book-banner-copy h6 { font-size: 16.5px; }
+    .triager-book-banner-copy p { font-size: 12.5px; }
+    .triager-book-card { gap: 12px; padding: 13px; }
+    .triager-book-legend { gap: 6px 12px; }
+    .triager-legend-item { font-size: 11.5px; }
+    .triager-book-calendar { padding: 10px; }
+    .triager-book-calendar-head { margin-bottom: 10px; }
+    .triager-book-calendar-head strong { font-size: 14px; }
+    .triager-book-days,
+    .triager-book-weekdays { gap: 4px; }
+    .triager-book-day { min-height: 40px; font-size: 12.5px; }
+    .triager-book-month-btn { width: 36px; height: 36px; }
+    .triager-book-slots-head { padding: 11px 12px; }
+    .triager-book-slot-grid { gap: 7px; padding: 11px; }
+    .triager-book-slot { padding: 8px 5px; font-size: 12px; }
+    .triager-book-footer { padding: 6px 14px 16px; }
+    .triager-book-confirm { padding: 12px; font-size: 14.5px; }
+
+    /* iOS Safari zooms the page when a focused control renders below 16px. */
+    .triager-book-control { font-size: 16px; }
+}

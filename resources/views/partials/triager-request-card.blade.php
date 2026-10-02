@@ -112,6 +112,9 @@
                         class="triager-schedule-btn telemed {{ $canSchedule ? '' : 'disabled' }}"
                         data-schedule-telemed="{{ $reqId }}"
                         data-patient-name="{{ $request['patient_name'] }}"
+                        data-patient-age="{{ $request['age'] ?? '' }}"
+                        data-patient-gender="{{ $request['gender'] ?? '' }}"
+                        data-patient-complaint="{{ $request['complaint_text'] ?? '' }}"
                         @disabled(! $canSchedule)
                     >
                         <i class="bi bi-camera-video" aria-hidden="true"></i>
@@ -124,6 +127,9 @@
                         class="triager-schedule-btn face {{ $canSchedule ? '' : 'disabled' }}"
                         data-schedule-face="{{ $reqId }}"
                         data-patient-name="{{ $request['patient_name'] }}"
+                        data-patient-age="{{ $request['age'] ?? '' }}"
+                        data-patient-gender="{{ $request['gender'] ?? '' }}"
+                        data-patient-complaint="{{ $request['complaint_text'] ?? '' }}"
                         @disabled(! $canSchedule)
                     >
                         <i class="bi bi-hospital" aria-hidden="true"></i>
