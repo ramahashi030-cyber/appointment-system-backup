@@ -22,9 +22,14 @@
         // controller query, filters, and search are left untouched.
         $smsPerPage = 20;
         $smsCurrentPage = \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPage();
+        // The Booked Patients table only renders results once a filter/search is
+        // applied; an unfiltered first load shows an empty table. The full
+        // collection is still used below to resolve SMS-history patient names.
+        $bookedResults = $hasFilters ? $appointments : collect();
+
         $appointmentsPage = new \Illuminate\Pagination\LengthAwarePaginator(
-            $appointments->forPage($smsCurrentPage, $smsPerPage)->values(),
-            $appointments->count(),
+            $bookedResults->forPage($smsCurrentPage, $smsPerPage)->values(),
+            $bookedResults->count(),
             $smsPerPage,
             $smsCurrentPage,
             ['path' => request()->url(), 'query' => request()->query()],
@@ -78,7 +83,7 @@
                     <i class="bi bi-people-fill" aria-hidden="true"></i>
                     <h2 id="smsRosterTitle">Booked Patients</h2>
                 </div>
-                <span class="admin-muted-text">{{ $appointments->count() }} booked patient{{ $appointments->count() === 1 ? '' : 's' }}</span>
+                <span class="admin-muted-text">{{ $appointmentsPage->total() }} booked patient{{ $appointmentsPage->total() === 1 ? '' : 's' }}</span>
             </header>
 
             <div class="admin-sms-toolbar">
@@ -183,8 +188,13 @@
                                     <td colspan="7">
                                         <div class="admin-doctor-empty">
                                             <i class="bi bi-chat-dots" aria-hidden="true"></i>
-                                            <strong>No booked patients found</strong>
-                                            <span>Adjust the filters or search, or wait for a patient to book an appointment.</span>
+                                            @if ($hasFilters)
+                                                <strong>No booked patients found</strong>
+                                                <span>Adjust the filters or search, or wait for a patient to book an appointment.</span>
+                                            @else
+                                                <strong>No patients found</strong>
+                                                <span>Please apply a filter to view booked patients.</span>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
