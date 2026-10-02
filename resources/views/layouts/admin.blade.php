@@ -111,9 +111,19 @@
             }
 
             /*
-             * A dropdown parent stays highlighted, and stays revealed, while one
-             * of its sub-pages is the current page. Driven through the Bootstrap
-             * Collapse API so its internal state does not drift from the DOM.
+             * A dropdown parent stays highlighted while one of its sub-pages is
+             * the current page, and that group is revealed.
+             *
+             * Groups that do NOT own the current page are left untouched, so they
+             * only open and close when the person clicks them.
+             *
+             * IMPORTANT: getOrCreateInstance(panel) with no options makes
+             * Bootstrap's Collapse toggle (open) the panel as soon as the
+             * instance is created, which opened every group on each navigation.
+             * Passing { toggle: false } prevents that.
+             *
+             * aria-expanded is not set manually here; Bootstrap maintains it on
+             * show/hide, and the chevron rotation in sidebar.css depends on it.
              */
             function syncSidebarGroups() {
                 $('.admin-sidebar-group').each(function () {
@@ -123,7 +133,6 @@
                     const groupActive = group.find('.admin-sidebar-sublink.active').length > 0;
 
                     group.toggleClass('active', groupActive);
-                    toggle.attr('aria-expanded', groupActive ? 'true' : 'false');
 
                     if (groupActive) {
                         toggle.attr('aria-current', 'page');
@@ -131,8 +140,8 @@
                         toggle.removeAttr('aria-current');
                     }
 
-                    if (panel) {
-                        bootstrap.Collapse.getOrCreateInstance(panel)[groupActive ? 'show' : 'hide']();
+                    if (groupActive && panel) {
+                        bootstrap.Collapse.getOrCreateInstance(panel, { toggle: false }).show();
                     }
                 });
             }
@@ -272,7 +281,7 @@
                     }
                 });
             }
-            
+
             $sidebarLinks.on('mouseenter focus', function () {
                 const url = this.href;
 

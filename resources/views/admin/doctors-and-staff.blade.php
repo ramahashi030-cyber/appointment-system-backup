@@ -11,6 +11,25 @@
 @endsection
 
 @section('content')
+    {{-- Remove table scrollbars: tables wrap to fit instead of scrolling --}}
+    <style>
+        .admin-doctor-table-wrap {
+            overflow: visible !important;
+            max-height: none !important;
+        }
+
+        .admin-doctor-table {
+            width: 100%;
+            min-width: 0 !important;
+            table-layout: auto;
+        }
+
+        .admin-doctor-table th,
+        .admin-doctor-table td {
+            white-space: normal;
+            overflow-wrap: anywhere;
+        }
+    </style>
     <div class="admin-dashboard-content admin-doctor-content">
         <section class="admin-telemedicine-banner admin-doctor-banner" aria-labelledby="doctorDirectoryTitle">
             <div class="admin-telemedicine-glow" aria-hidden="true"></div>

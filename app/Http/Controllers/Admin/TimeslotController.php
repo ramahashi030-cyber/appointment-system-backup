@@ -7,10 +7,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use RuntimeException;
 
 /**
  * Admin: manage unavailable timeslots for Face to Face and Telemedicine.
@@ -22,10 +20,11 @@ use RuntimeException;
  * Confirmed from the database:
  *   services / services_tele                    id, service_name, availability_day, created_at, homis_code
  *   service_timeslots / service_timeslots_tele  id, service_id, time_slot ("08:00 - 10:00"), slots
+ *   unavailable_timeslots / ..._tele            id, service_id, date, time_slot ("08:00 - 10:00"), reason
  *
- * The unavailable tables (unavailable_timeslots / unavailable_timeslots_tele)
- * have their column names detected automatically from the candidates below.
- * If detection fails, the error message lists the columns that were found.
+ * The unavailable tables store the time slot as its text label (not an id), so
+ * the page's `timeslot_id` field carries that label. The slots() endpoint
+ * returns the label as each option's value to match.
  */
 class TimeslotController extends Controller
 {
@@ -35,11 +34,6 @@ class TimeslotController extends Controller
     // service_timeslots tables
     private const SLOT_SERVICE_COLUMN = 'service_id';
     private const SLOT_LABEL_COLUMN = 'time_slot';
-
-    // Candidate column names in the unavailable tables (first match wins)
-    private const UNAVAILABLE_SLOT_CANDIDATES = ['timeslot_id', 'service_timeslot_id', 'service_timeslots_id', 'slot_id'];
-    private const UNAVAILABLE_DATE_CANDIDATES = ['unavailable_date', 'date', 'blocked_date', 'holiday_date'];
-    private const UNAVAILABLE_REASON_CANDIDATES = ['reason', 'remarks', 'description'];
 
     /**
      * Route `type` segment => page text and the tables for that type.
@@ -89,25 +83,24 @@ class TimeslotController extends Controller
     public function data(string $type): JsonResponse
     {
         $config = $this->typeConfig($type);
-        $cols = $this->unavailableColumns($config);
 
-        $timeslots = $this->baseQuery($config, $cols)
-            ->orderByDesc('u.'.$cols['date'])
-            ->orderBy('st.'.self::SLOT_LABEL_COLUMN)
+        $timeslots = DB::table($config['unavailable_table'].' as u')
+            ->leftJoin($config['services_table'].' as s', 's.id', '=', 'u.service_id')
+            ->orderByDesc('u.date')
+            ->orderBy('u.time_slot')
             ->get([
                 'u.id as id',
-                's.id as service_id',
+                'u.service_id as service_id',
                 's.'.self::SERVICE_NAME_COLUMN.' as service_name',
-                'st.id as timeslot_id',
-                'st.'.self::SLOT_LABEL_COLUMN.' as time_label',
-                'u.'.$cols['date'].' as date',
-                $cols['reason'] ? 'u.'.$cols['reason'].' as reason' : DB::raw('NULL as reason'),
+                'u.time_slot as time_label',
+                'u.date as date',
+                'u.reason as reason',
             ])
             ->map(fn ($row) => [
                 'id' => $row->id,
                 'service_id' => $row->service_id,
-                'service_name' => $row->service_name,
-                'timeslot_id' => $row->timeslot_id,
+                'service_name' => $row->service_name ?? 'Unknown service',
+                'timeslot_id' => $row->time_label,
                 'time_label' => $row->time_label,
                 'date' => Carbon::parse($row->date)->toDateString(),
                 'reason' => $row->reason,
@@ -119,6 +112,8 @@ class TimeslotController extends Controller
 
     /**
      * JSON: the time slots that belong to one service (fills the dropdown).
+     * The label is used as the option value because the unavailable tables
+     * store the time slot text.
      */
     public function slots(Request $request, string $type): JsonResponse
     {
@@ -134,8 +129,9 @@ class TimeslotController extends Controller
         $slots = DB::table($config['slots_table'])
             ->where(self::SLOT_SERVICE_COLUMN, $serviceId)
             ->orderBy(self::SLOT_LABEL_COLUMN)
-            ->get(['id', self::SLOT_LABEL_COLUMN.' as label'])
-            ->map(fn ($slot) => ['id' => $slot->id, 'label' => $slot->label])
+            ->pluck(self::SLOT_LABEL_COLUMN)
+            ->unique()
+            ->map(fn ($label) => ['id' => $label, 'label' => $label])
             ->values();
 
         return response()->json(['slots' => $slots]);
@@ -147,39 +143,30 @@ class TimeslotController extends Controller
     public function store(Request $request, string $type): JsonResponse
     {
         $config = $this->typeConfig($type);
-        $cols = $this->unavailableColumns($config);
 
         $data = $request->validate([
             'service_id' => ['required', 'integer', Rule::exists($config['services_table'], 'id')],
             'unavailable_date' => ['required', 'date'],
             'timeslot_id' => [
                 'required',
-                'integer',
-                Rule::exists($config['slots_table'], 'id')->where(self::SLOT_SERVICE_COLUMN, $request->input('service_id')),
+                'string',
+                'max:50',
+                Rule::exists($config['slots_table'], self::SLOT_LABEL_COLUMN)
+                    ->where(self::SLOT_SERVICE_COLUMN, $request->input('service_id')),
             ],
             'reason' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $this->ensureNotDuplicate($config, $cols, (int) $data['timeslot_id'], $data['unavailable_date']);
+        $date = Carbon::parse($data['unavailable_date'])->toDateString();
 
-        $row = [
-            $cols['slot'] => $data['timeslot_id'],
-            $cols['date'] => $data['unavailable_date'],
-        ];
+        $this->ensureNotDuplicate($config, (int) $data['service_id'], $data['timeslot_id'], $date);
 
-        if ($cols['reason']) {
-            $row[$cols['reason']] = $data['reason'] ?? null;
-        }
-
-        if ($cols['created_at']) {
-            $row['created_at'] = now();
-        }
-
-        if ($cols['updated_at']) {
-            $row['updated_at'] = now();
-        }
-
-        DB::table($config['unavailable_table'])->insert($row);
+        DB::table($config['unavailable_table'])->insert([
+            'service_id' => $data['service_id'],
+            'date' => $date,
+            'time_slot' => $data['timeslot_id'],
+            'reason' => $data['reason'] ?? null,
+        ]);
 
         return response()->json(['message' => 'Unavailable timeslot added.'], 201);
     }
@@ -190,11 +177,8 @@ class TimeslotController extends Controller
     public function update(Request $request, string $type, int $timeslot): JsonResponse
     {
         $config = $this->typeConfig($type);
-        $cols = $this->unavailableColumns($config);
 
-        $current = $this->baseQuery($config, $cols)
-            ->where('u.id', $timeslot)
-            ->first(['u.id as id', 'st.'.self::SLOT_SERVICE_COLUMN.' as service_id']);
+        $current = DB::table($config['unavailable_table'])->where('id', $timeslot)->first(['id', 'service_id']);
 
         abort_if($current === null, 404);
 
@@ -202,28 +186,23 @@ class TimeslotController extends Controller
             'unavailable_date' => ['required', 'date'],
             'timeslot_id' => [
                 'required',
-                'integer',
-                Rule::exists($config['slots_table'], 'id')->where(self::SLOT_SERVICE_COLUMN, $current->service_id),
+                'string',
+                'max:50',
+                Rule::exists($config['slots_table'], self::SLOT_LABEL_COLUMN)
+                    ->where(self::SLOT_SERVICE_COLUMN, $current->service_id),
             ],
             'reason' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $this->ensureNotDuplicate($config, $cols, (int) $data['timeslot_id'], $data['unavailable_date'], $timeslot);
+        $date = Carbon::parse($data['unavailable_date'])->toDateString();
 
-        $row = [
-            $cols['slot'] => $data['timeslot_id'],
-            $cols['date'] => $data['unavailable_date'],
-        ];
+        $this->ensureNotDuplicate($config, (int) $current->service_id, $data['timeslot_id'], $date, $timeslot);
 
-        if ($cols['reason']) {
-            $row[$cols['reason']] = $data['reason'] ?? null;
-        }
-
-        if ($cols['updated_at']) {
-            $row['updated_at'] = now();
-        }
-
-        DB::table($config['unavailable_table'])->where('id', $timeslot)->update($row);
+        DB::table($config['unavailable_table'])->where('id', $timeslot)->update([
+            'date' => $date,
+            'time_slot' => $data['timeslot_id'],
+            'reason' => $data['reason'] ?? null,
+        ]);
 
         return response()->json(['message' => 'Unavailable timeslot updated.']);
     }
@@ -246,24 +225,14 @@ class TimeslotController extends Controller
     }
 
     /**
-     * Unavailable rows joined to their time slot and service, using the table
-     * set for this type so Face to Face never touches Telemedicine rows.
+     * Reject the same service time slot being blocked twice on the same date.
      */
-    private function baseQuery(array $config, array $cols)
-    {
-        return DB::table($config['unavailable_table'].' as u')
-            ->join($config['slots_table'].' as st', 'st.id', '=', 'u.'.$cols['slot'])
-            ->join($config['services_table'].' as s', 's.id', '=', 'st.'.self::SLOT_SERVICE_COLUMN);
-    }
-
-    /**
-     * Reject the same time slot being blocked twice on the same date.
-     */
-    private function ensureNotDuplicate(array $config, array $cols, int $timeslotId, string $date, ?int $ignoreId = null): void
+    private function ensureNotDuplicate(array $config, int $serviceId, string $timeSlot, string $date, ?int $ignoreId = null): void
     {
         $query = DB::table($config['unavailable_table'])
-            ->where($cols['slot'], $timeslotId)
-            ->whereDate($cols['date'], $date);
+            ->where('service_id', $serviceId)
+            ->where('time_slot', $timeSlot)
+            ->whereDate('date', $date);
 
         if ($ignoreId !== null) {
             $query->where('id', '!=', $ignoreId);
@@ -274,42 +243,6 @@ class TimeslotController extends Controller
                 'timeslot_id' => 'This time slot is already marked unavailable on that date.',
             ]);
         }
-    }
-
-    /**
-     * Work out which columns the unavailable table actually uses.
-     *
-     * @return array{slot: string, date: string, reason: ?string, created_at: bool, updated_at: bool}
-     */
-    private function unavailableColumns(array $config): array
-    {
-        $table = $config['unavailable_table'];
-        $existing = Schema::getColumnListing($table);
-
-        $pick = function (array $candidates, string $what, bool $required) use ($existing, $table): ?string {
-            foreach ($candidates as $candidate) {
-                if (in_array($candidate, $existing, true)) {
-                    return $candidate;
-                }
-            }
-
-            if ($required) {
-                throw new RuntimeException(
-                    "Table `{$table}` has no {$what} column. Columns found: ".implode(', ', $existing)
-                    .'. Expected one of: '.implode(', ', $candidates).'.'
-                );
-            }
-
-            return null;
-        };
-
-        return [
-            'slot' => $pick(self::UNAVAILABLE_SLOT_CANDIDATES, 'time slot reference', true),
-            'date' => $pick(self::UNAVAILABLE_DATE_CANDIDATES, 'date', true),
-            'reason' => $pick(self::UNAVAILABLE_REASON_CANDIDATES, 'reason', false),
-            'created_at' => in_array('created_at', $existing, true),
-            'updated_at' => in_array('updated_at', $existing, true),
-        ];
     }
 
     private function typeConfig(string $type): array

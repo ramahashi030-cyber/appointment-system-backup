@@ -1,3 +1,17 @@
+@once
+    <style>
+        /* Equal font size for every sidebar item: links, group toggles, and sub-links */
+        .admin-sidebar-nav .admin-sidebar-link,
+        .admin-sidebar-nav .admin-sidebar-group-toggle,
+        .admin-sidebar-nav .admin-sidebar-sublink {
+            font-family: inherit !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            line-height: 1.3 !important;
+        }
+    </style>
+@endonce
+
 @php
     $adminLinks = [
         ['route' => 'admin.dashboard', 'label' => 'Dashboard', 'icon' => 'bi-grid-fill'],
@@ -20,7 +34,7 @@
             ],
         ],
         [
-            'label' => 'Timeslots',
+            'label' => 'Unavailable timeslots',
             'icon' => 'bi-clock-fill',
             'children' => [
                 ['route' => 'admin.timeslots.face-to-face', 'label' => 'Face to Face', 'icon' => 'bi-people-fill'],
@@ -37,9 +51,6 @@
             ],
         ],
         ['route' => 'admin.audit-logs', 'label' => 'Audit Logs', 'icon' => 'bi-journal-text'],
-        ['route' => 'admin.records', 'label' => 'Records', 'icon' => 'bi-file-earmark-medical-fill'],
-        ['route' => 'admin.reports', 'label' => 'Reports', 'icon' => 'bi-bar-chart-fill'],
-        ['route' => 'admin.settings', 'label' => 'Settings', 'icon' => 'bi-gear-fill'],
     ];
 @endphp
 
@@ -50,11 +61,17 @@
     A link is active when its own route matches, and a group is active when any
     of its children is, so a service sub-page still highlights its parent.
 
-    `$instance` keeps the collapse element ids unique, since this partial is
-    rendered twice per page and collapse targets elements by id.
+    `$instance` MUST be unique per include (e.g. 'desktop' and 'mobile'). It
+    keeps the collapse element ids unique, since this partial is rendered twice
+    per page and Bootstrap collapse targets elements by id. If both includes
+    share an id, clicking one group toggles the matching group in both lists.
+
+    Each group is also wired to the <nav> via data-bs-parent, so opening one
+    group closes the others (accordion behavior).
 --}}
 @php
     $instance = $instance ?? 'primary';
+    $navId = 'admin-nav-'.$instance;
 
     $isActiveRoute = function (?string $route): bool {
         if ($route === null) {
@@ -73,7 +90,7 @@
         ->contains(fn (array $child): bool => $isActiveRoute($child['route']));
 @endphp
 
-<nav class="admin-sidebar-nav" aria-label="Admin sections">
+<nav class="admin-sidebar-nav" id="{{ $navId }}" aria-label="Admin sections">
     @foreach ($adminLinks as $link)
         @if (empty($link['children']))
             @php $isActive = $isActiveRoute($link['route']); @endphp
@@ -87,12 +104,14 @@
         @else
             @php
                 $groupActive = $hasActiveChild($link);
-                $groupId = 'admin-nav-group-'.$instance.'-'.str($link['label'])->slug();
+                // Index-based id: unique per group even when two labels match
+                // (there are two "Reports" entries), and unique per include.
+                $groupId = "admin-nav-group-{$instance}-{$loop->index}";
             @endphp
 
             <div class="admin-sidebar-group {{ $groupActive ? 'active' : '' }}">
                 <button type="button"
-                        class="admin-sidebar-link admin-sidebar-group-toggle"
+                        class="admin-sidebar-link admin-sidebar-group-toggle {{ $groupActive ? '' : 'collapsed' }}"
                         data-bs-toggle="collapse"
                         data-bs-target="#{{ $groupId }}"
                         aria-expanded="{{ $groupActive ? 'true' : 'false' }}"
@@ -103,7 +122,9 @@
                     <i class="bi bi-chevron-down admin-sidebar-group-chevron" aria-hidden="true"></i>
                 </button>
 
-                <div class="collapse {{ $groupActive ? 'show' : '' }}" id="{{ $groupId }}">
+                <div class="collapse {{ $groupActive ? 'show' : '' }}"
+                     id="{{ $groupId }}"
+                     data-bs-parent="#{{ $navId }}">
                     <div class="admin-sidebar-subnav">
                         @foreach ($link['children'] as $child)
                             @php $childActive = $isActiveRoute($child['route']); @endphp

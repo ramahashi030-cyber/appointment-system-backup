@@ -50,9 +50,9 @@
                         <p class="dashboard-hero-description">Book a virtual visit with a QMMC doctor from home.</p>
                         <div class="dashboard-trust-list" aria-label="Service benefits">
                             <span><i class="bi bi-camera-video-fill" aria-hidden="true"></i> Safe</span>
-                            <b aria-hidden="true">â€¢</b>
+                            
                             <span>Convenient</span>
-                            <b aria-hidden="true">â€¢</b>
+                    
                             <span>Quality Care</span>
                         </div>
                     </div>

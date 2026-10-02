@@ -10,22 +10,13 @@
    and per CSS Overflow a `visible` axis combined with a non-visible one is
    computed to `auto` — which silently turned the wrapper into a scroll
    container. Pin both axes (and drop any height cap) so the panel grows with
-   the page instead. Narrow viewports get a swipeable table instead. */
+   the page instead. On phones the rows become cards (see the mobile block at
+   the bottom of this section), so no horizontal scrolling is needed. */
 .admin-patients-page .admin-doctor-table-wrap {
     max-height: none;
     height: auto;
     overflow-x: hidden;
     overflow-y: hidden;
-}
-
-@media (max-width: 767px) {
-    .admin-patients-page .admin-doctor-table-wrap {
-        overflow-x: auto;
-    }
-
-    .admin-patients-page .admin-patient-table {
-        min-width: 620px;
-    }
 }
 
 /* Panel header: count + primary action stay grouped and never wrap */
@@ -272,7 +263,7 @@
     font-weight: 600;
 }
 
-/* Narrow viewports: stack the filters and let the table be swiped sideways */
+/* Narrow viewports: stack the filters */
 @media (max-width: 767px) {
     .admin-patients-page .admin-patient-roster-actions {
         gap: 8px;
@@ -303,6 +294,207 @@
 
     .admin-patients-page .admin-patient-pagination > nav {
         justify-content: center;
+    }
+}
+
+/* ============================================================
+   Mobile (<= 767px): banner, stats and table rows become cards
+   ============================================================ */
+@media (max-width: 767px) {
+    /* Banner: the base height is fixed at 190px, so let it grow and keep text readable */
+    .admin-patients-page .admin-telemedicine-banner {
+        height: auto;
+        min-height: 0;
+        background:
+            linear-gradient(180deg, rgba(235, 247, 255, .97) 0%, rgba(231, 245, 255, .92) 100%),
+            url('/images/qmmc-telemedicine-banner.jpg') center / cover no-repeat;
+    }
+
+    .admin-patients-page .admin-telemedicine-content {
+        height: auto;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 16px;
+    }
+
+    .admin-patients-page .admin-telemedicine-mark {
+        width: 56px;
+        height: 56px;
+        flex-basis: 56px;
+        transform: none;
+    }
+
+    .admin-patients-page .admin-telemedicine-mark > i { font-size: 24px; }
+
+    .admin-patients-page .admin-telemedicine-mark > span {
+        width: 24px;
+        height: 24px;
+        font-size: 11px;
+    }
+
+    .admin-patients-page .admin-telemedicine-copy h1 { font-size: 20px; }
+    .admin-patients-page .admin-telemedicine-welcome { font-size: 14px; }
+    .admin-patients-page .admin-telemedicine-description { font-size: 12px; }
+
+    .admin-patients-page .admin-telemedicine-trust {
+        flex-wrap: wrap;
+        padding: 4px 10px;
+        gap: 6px;
+        font-size: 11px;
+    }
+
+    /* Stat cards: compact, icon above the number */
+    .admin-patients-page .admin-doctor-stat-grid { gap: 8px; }
+
+    .admin-patients-page .admin-doctor-stat-card {
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 6px;
+        text-align: center;
+    }
+
+    /* Roster header */
+    .admin-patients-page .admin-doctor-roster-header {
+        padding: 10px 14px;
+        gap: 8px;
+    }
+
+    .admin-patients-page .admin-patient-roster-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .admin-patients-page .admin-patient-roster-actions .btn {
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    .admin-patients-page .admin-patient-filters { padding: 12px 14px; }
+
+    /* ---- Table -> cards ---- */
+    .admin-patients-page .admin-doctor-table-wrap {
+        overflow: visible;
+    }
+
+    .admin-patients-page .admin-patient-table,
+    .admin-patients-page .admin-patient-table tbody {
+        display: block;
+        width: 100%;
+        min-width: 0;
+    }
+
+    /* Hide the header row visually but keep it for screen readers */
+    .admin-patients-page .admin-patient-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+    }
+
+    .admin-patients-page .admin-patient-table tbody tr {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px 14px;
+        padding: 14px;
+        border-bottom: 1px solid #dbe8f7;
+        height: auto;
+    }
+
+    .admin-patients-page .admin-patient-table tbody td {
+        display: block;
+        min-width: 0;
+        padding: 0;
+        border: 0;
+        text-align: left;
+        white-space: normal;
+    }
+
+    /* Patient, contact and actions span the full card width */
+    .admin-patients-page .admin-patient-table tbody td:nth-child(1),
+    .admin-patients-page .admin-patient-table tbody td:nth-child(2),
+    .admin-patients-page .admin-patient-table tbody td:last-child {
+        grid-column: 1 / -1;
+    }
+
+    .admin-patients-page .admin-patient-table tbody td:nth-child(3),
+    .admin-patients-page .admin-patient-table tbody td:nth-child(4) {
+        white-space: normal;
+    }
+
+    /* Field labels (the header row is hidden on mobile) */
+    .admin-patients-page .admin-patient-table tbody td[data-label]::before {
+        display: block;
+        margin-bottom: 3px;
+        color: #6a83a4;
+        content: attr(data-label);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+    }
+
+    /* Long names / emails wrap instead of stretching the card */
+    .admin-patients-page .admin-patient-table .admin-doctor-person strong,
+    .admin-patients-page .admin-patient-table .admin-doctor-secondary-text {
+        overflow-wrap: anywhere;
+    }
+
+    .admin-patients-page .admin-patient-table .admin-doctor-secondary-text {
+        display: block;
+    }
+
+    .admin-patients-page .admin-patient-table .admin-doctor-person small {
+        white-space: normal;
+    }
+
+    /* Actions: three equal tap targets */
+    .admin-patients-page .admin-patient-table tbody td:last-child {
+        padding-top: 12px;
+        border-top: 1px solid #e4edf7;
+    }
+
+    .admin-patients-page .admin-patient-table .admin-doctor-actions {
+        display: flex;
+        width: 100%;
+        gap: 8px;
+    }
+
+    .admin-patients-page .admin-patient-table .admin-doctor-actions a,
+    .admin-patients-page .admin-patient-table .admin-doctor-actions button[data-patient-toggle] {
+        flex: 1 1 0;
+        justify-content: center;
+        min-height: 38px;
+        padding: 0 8px;
+        border: 1px solid #d5e4f5;
+        border-radius: 8px;
+        background: #fff;
+        font-size: 12px;
+    }
+
+    .admin-patients-page .admin-patient-table .admin-doctor-actions button[data-patient-toggle] {
+        border-color: currentcolor;
+    }
+
+    /* Empty state */
+    .admin-patients-page .admin-patient-table tbody td[colspan] {
+        grid-column: 1 / -1;
+    }
+
+    .admin-patients-page .admin-patient-pagination { padding: 12px 14px; }
+}
+
+/* Very small phones: stack the two half-width fields */
+@media (max-width: 400px) {
+    .admin-patients-page .admin-patient-table tbody tr {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-patients-page .admin-patient-table tbody td:nth-child(3),
+    .admin-patients-page .admin-patient-table tbody td:nth-child(4) {
+        grid-column: 1 / -1;
     }
 }
 

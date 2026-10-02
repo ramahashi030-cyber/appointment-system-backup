@@ -99,7 +99,8 @@
                 @endif
             </form>
 
-            {{-- Paginated at 20 rows, so the table is never given its own scrollbar; see pages/patients.css. --}}
+            {{-- Paginated at 20 rows, so the table is never given its own scrollbar; see pages/patients.css.
+                 On phones (<= 767px) each row is rendered as a card using the data-label attributes below. --}}
             <div class="admin-doctor-table-wrap" data-patient-table-wrap>
                 <table class="admin-doctor-table admin-patient-table">
                     <caption class="visually-hidden">Registered patients</caption>
@@ -135,28 +136,28 @@
                                         </span>
                                     </div>
                                 </td>
-                                <td>
+                                <td data-label="Contact">
                                     <span class="admin-doctor-primary-text">{{ $patient->contact_number ?: '—' }}</span>
                                     <small class="admin-doctor-secondary-text">{{ $patient->email ?: 'No email' }}</small>
                                 </td>
-                                <td>
+                                <td data-label="Hospital no.">
                                     @if ($patient->hospital_number)
                                         <span class="admin-patient-code">{{ $patient->hospital_number }}</span>
                                     @else
                                         <span class="admin-patient-empty-value">—</span>
                                     @endif
                                 </td>
-                                <td>
+                                <td data-label="Registered">
                                     @if ($registeredAt)
                                         <time datetime="{{ $registeredAt->toDateString() }}">{{ $registeredAt->format('M j, Y') }}</time>
                                     @else
                                         <span class="admin-patient-empty-value">—</span>
                                     @endif
                                 </td>
-                                <td>
+                                <td data-label="Status">
                                     <span class="admin-status-pill {{ strtolower((string) $patient->status) }}">{{ $patient->status ?: 'Unknown' }}</span>
                                 </td>
-                                <td>
+                                <td class="admin-patient-actions-cell">
                                     <div class="admin-doctor-actions">
                                         <a href="{{ route('admin.patients', ['view' => $patient->id]) }}" data-patient-modal="view" aria-label="View {{ $patientName ?: 'patient' }}">
                                             <i class="bi bi-eye" aria-hidden="true"></i><span>View</span>

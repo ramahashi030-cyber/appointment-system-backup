@@ -11,6 +11,25 @@
 @endsection
 
 @section('content')
+    {{-- Remove table scrollbars: tables wrap to fit instead of scrolling --}}
+    <style>
+        .admin-doctor-table-wrap {
+            overflow: visible !important;
+            max-height: none !important;
+        }
+
+        .admin-doctor-table {
+            width: 100%;
+            min-width: 0 !important;
+            table-layout: auto;
+        }
+
+        .admin-doctor-table th,
+        .admin-doctor-table td {
+            white-space: normal;
+            overflow-wrap: anywhere;
+        }
+    </style>
     {{-- Page-scoped fixes: even spacing between panels, and light surfaces to match the patients page. --}}
     <style>
         .admin-dashboard-content.admin-holidays-page {
