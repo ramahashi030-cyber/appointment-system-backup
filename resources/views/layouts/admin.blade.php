@@ -17,7 +17,9 @@
         'resources/css/app.css',
         'resources/css/admin/admin.css',
         'resources/css/admin-layout-append.css',
+        'resources/css/notifications.css',
         'resources/js/app.js',
+        'resources/js/notifications.js',
     ])
 
     @stack('head')

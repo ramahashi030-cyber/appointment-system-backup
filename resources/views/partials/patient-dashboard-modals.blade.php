@@ -362,62 +362,13 @@
     </div>
 </div>
 
-<div class="modal fade dashboard-modal" id="notificationsModal" tabindex="-1" aria-labelledby="notificationsModalTitle" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content dashboard-modal-content">
-            <header class="dashboard-modal-header">
-                <div class="dashboard-modal-title-group">
-                    <span class="dashboard-modal-title-icon" aria-hidden="true"><i class="bi bi-bell-fill"></i></span>
-                    <span>
-                        <h2 id="notificationsModalTitle">Notifications</h2>
-                        <small>{{ $unreadNotificationCount }} unread update{{ $unreadNotificationCount === 1 ? '' : 's' }}</small>
-                    </span>
-                </div>
-                <button type="button" class="dashboard-modal-close" data-bs-dismiss="modal" aria-label="Close notifications modal">
-                    <i class="bi bi-x-lg" aria-hidden="true"></i>
-                </button>
-            </header>
-
-            <div class="modal-body dashboard-modal-body">
-                @if ($patient === null)
-                    <div class="modal-empty-state">
-                        <i class="bi bi-person-lock" aria-hidden="true"></i>
-                        <strong>Sign in to view notifications</strong>
-                        <span>Your appointment and health updates will appear here.</span>
-                    </div>
-                @elseif ($recentNotifications->isEmpty())
-                    <div class="modal-empty-state">
-                        <i class="bi bi-bell-slash" aria-hidden="true"></i>
-                        <strong>You are all caught up</strong>
-                        <span>New appointment and health updates will appear here.</span>
-                    </div>
-                @else
-                    <div class="notification-list">
-                        @foreach ($recentNotifications as $notification)
-                            <article class="notification-item {{ $notification->is_read ? 'read' : 'unread' }}">
-                                <span class="notification-item-icon" aria-hidden="true"><i class="bi bi-bell-fill"></i></span>
-                                <div>
-                                    <strong>{{ $notification->message }}</strong>
-                                    <span><i class="bi bi-clock" aria-hidden="true"></i> {{ $notification->created_at?->format('M d, Y h:i A') }}</span>
-                                </div>
-                                @unless ($notification->is_read)
-                                    <span class="notification-new">New</span>
-                                @endunless
-                            </article>
-                        @endforeach
-                    </div>
-                @endif
-            </div>
-
-            <footer class="dashboard-modal-footer">
-                <button type="button" class="dashboard-modal-button secondary" data-bs-dismiss="modal">Close</button>
-                @if ($patient !== null)
-                    <a class="dashboard-modal-button primary" href="{{ route('patient.notifications') }}">Open notification center</a>
-                @endif
-            </footer>
-        </div>
-    </div>
-</div>
+{{--
+    Real-time notification detail modal. Same id / close button / footer actions
+    as before, but the list is now fed by the broadcast notification system and
+    refreshes live while the modal is open. Opening it does NOT mark anything as
+    read.
+--}}
+@include('partials.notification-modal', ['rtVariant' => 'patient', 'rtModalId' => 'notificationsModal'])
 
 <div class="modal fade dashboard-modal" id="profileModal" tabindex="-1" aria-labelledby="profileModalTitle" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">

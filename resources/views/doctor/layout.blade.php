@@ -16,7 +16,9 @@
     @vite([
         'resources/css/doctor-dashboard.css',
         'resources/css/doctor-patients-append.css',
+        'resources/css/notifications.css',
         'resources/js/doctor-dashboard.js',
+        'resources/js/notifications.js',
     ])
 
     @stack('head')
@@ -94,12 +96,7 @@
                     </form>
 
                     <div class="doctor-header-actions">
-                        <a href="{{ route('doctor.notifications') }}" class="doctor-header-icon" aria-label="Notifications">
-                            <i class="bi bi-bell-fill" aria-hidden="true"></i>
-                            @if ($notificationCount > 0)
-                                <span class="doctor-notification-count">{{ min($notificationCount, 99) }}</span>
-                            @endif
-                        </a>
+                        @include('partials.notification-bell', ['rtVariant' => 'doctor', 'rtModalId' => 'realtimeNotificationsModal'])
 
                         <div class="dropdown">
                             <button class="doctor-user dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -196,6 +193,9 @@
             </div>
         </div>
     </div>
+
+    {{-- Real-time notification bell detail modal (additive). --}}
+    @include('partials.notification-modal', ['rtVariant' => 'doctor', 'rtModalId' => 'realtimeNotificationsModal'])
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')

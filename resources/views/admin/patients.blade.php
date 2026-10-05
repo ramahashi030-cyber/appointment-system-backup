@@ -204,6 +204,13 @@
                 <span class="admin-doctor-stat-icon orange"><i class="bi bi-person-exclamation" aria-hidden="true"></i></span>
                 <span><small>Deactivated</small><strong data-patient-stat="deactivated">{{ number_format($patientStats['deactivated']) }}</strong></span>
             </article>
+            {{-- Moved up from the roster header so it sits on the same row as the
+                 statistics, following the .admin-doctor-stat-grid +
+                 .admin-doctor-stat-action pattern the doctor listing already uses. --}}
+            <button class="admin-doctor-add-button admin-doctor-stat-action" type="button" data-bs-toggle="modal" data-bs-target="#createPatientModal">
+                <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                <span>Add patient</span>
+            </button>
         </div>
 
         @if (session('success'))
@@ -221,9 +228,6 @@
                 </div>
                 <div class="admin-patient-roster-actions">
                     <span class="admin-muted-text" data-patient-result-count>{{ $patients->total() }} patient{{ $patients->total() === 1 ? '' : 's' }}</span>
-                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createPatientModal">
-                        <i class="bi bi-person-plus-fill" aria-hidden="true"></i> Add patient
-                    </button>
                 </div>
             </header>
 
@@ -749,7 +753,7 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label" for="cpContact">Contact number</label>
-                            <input class="form-control" id="cpContact" name="contactno" value="{{ old('contactno') }}" placeholder="Contact number" maxlength="11" pattern="[0-9]*" inputmode="numeric" data-digits-only>
+                            <input class="form-control" id="cpContact" name="contactno" value="{{ old('contactno') }}" placeholder="Contact number" required maxlength="11" pattern="[0-9]*" inputmode="numeric" data-digits-only>
                         </div>
                         <div class="col-12">
                             <label class="form-label" for="cpAddress">Address</label>
@@ -892,7 +896,7 @@
                 {
                     selector: 'input[name="contactno"]',
                     label: 'Contact number',
-                    required: false,
+                    required: true,
                     maxlength: 11,
                     pattern: '[0-9]*',
                     inputmode: 'numeric',
@@ -936,6 +940,14 @@
                         this.patientFieldRule = rule;
                         this.setAttribute('maxlength', rule.maxlength);
                         this.setAttribute('pattern', rule.pattern);
+
+                        // Required is applied from here too, so a field that lives in the
+                        // Edit patient partial carries the same required attribute as the
+                        // one in the Add patient form. Only rules that ask for it get it,
+                        // so the optional fields are left alone.
+                        if (rule.required) {
+                            this.setAttribute('required', 'required');
+                        }
 
                         if (rule.inputmode) {
                             this.setAttribute('inputmode', rule.inputmode);

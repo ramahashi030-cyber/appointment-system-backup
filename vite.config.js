@@ -30,10 +30,14 @@ export default defineConfig({
                 'resources/css/admin/triager-processed.css',
                 'resources/css/admin-layout-append.css',
 
+                // Real-time notification bell + modal (Patient, Doctor, Admin)
+                'resources/css/notifications.css',
+
                 // Scripts
                 'resources/js/app.js',
                 'resources/js/doctor-dashboard.js',
                 'resources/js/patient-dashboard.js',
+                'resources/js/notifications.js',
             ],
             refresh: true,
         }),

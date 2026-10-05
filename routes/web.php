@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\BroadcastAuthController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,6 +23,27 @@ Route::get('/logout', [LoginController::class, 'logout'])
 
 Route::get('/reset-password', [ResetPasswordController::class, 'show'])->name('password.reset');
 Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.reset.attempt');
+
+/*
+|--------------------------------------------------------------------------
+| Real-time notifications
+|--------------------------------------------------------------------------
+| Additive to the existing workflow: the bell JSON endpoints and the private
+| channel handshake used by Laravel Echo. Nothing here changes how
+| appointments are created, triaged, scheduled or joined.
+*/
+
+Route::prefix('notifications')->name('notifications.')->group(function (): void {
+    // Private channel handshake used by Laravel Echo (Reverb).
+    // Kept under /notifications so it never collides with the framework's
+    // generic /broadcasting/auth endpoint, which assumes a single auth guard
+    // and cannot resolve this app's session-only patients and doctors.
+    Route::post('/auth', BroadcastAuthController::class)->name('auth');
+
+    Route::get('/', [NotificationController::class, 'index'])->name('index');
+    Route::post('/read-all', [NotificationController::class, 'markAllRead'])->name('read-all');
+    Route::post('/{id}/read', [NotificationController::class, 'markRead'])->name('read');
+});
 
 /*
 |--------------------------------------------------------------------------

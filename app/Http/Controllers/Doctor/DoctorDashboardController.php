@@ -9,6 +9,7 @@ use App\Models\ServiceTimeslotTele;
 use App\Models\Staff;
 use App\Support\AppointmentJitsiRoom;
 use App\Support\AppointmentSchema;
+use App\Support\Notifications\AppointmentNotifier;
 use App\Symptom;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
@@ -345,6 +346,14 @@ class DoctorDashboardController extends Controller
                 'message' => (string) $result['peer_notice'],
                 'is_read' => false,
             ]);
+        }
+
+        if ($result['created']) {
+            // Real-time alert for the patient, using the existing Jitsi room.
+            app(AppointmentNotifier::class)->roomCreated(
+                $result['appointment'],
+                AppointmentJitsiRoom::OPENED_BY_DOCTOR
+            );
         }
 
         $message = $result['created']

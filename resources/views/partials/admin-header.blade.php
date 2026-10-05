@@ -30,6 +30,8 @@
 
         <div class="admin-header-actions">
 
+            @include('partials.notification-bell', ['rtVariant' => 'admin', 'rtModalId' => 'realtimeNotificationsModal'])
+
             <div class="admin-user" title="My profile" aria-label="My profile" style="cursor: pointer;"
                  @if ($admin !== null)
                      role="button" tabindex="0" aria-haspopup="dialog"
@@ -49,6 +51,9 @@
         </div>
     </div>
 </header>
+
+{{-- Real-time notification bell detail modal (additive — see partials/notification-modal). --}}
+@include('partials.notification-modal', ['rtVariant' => 'admin', 'rtModalId' => 'realtimeNotificationsModal'])
 
 @if ($admin !== null)
     {{-- MY PROFILE MODAL (same structure as the Add patient modal on the Patients page) --}}
@@ -275,14 +280,18 @@
     {{-- LOGOUT CONFIRMATION MODAL --}}
     <div class="modal fade admin-logout-modal" id="adminLogoutModal" tabindex="-1" aria-labelledby="adminLogoutModalTitle" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 bg-white shadow-lg">
-                <div class="modal-body text-center p-4">
-                    <p class="mb-4 fw-medium">Are you sure you want to logout?</p>
-                    <div class="d-flex justify-content-center gap-3">
-                        <button type="button" class="btn btn-light border border-dark px-4" data-bs-dismiss="modal">Cancel</button>
+            <div class="modal-content">
+                <div class="modal-body admin-logout-modal-body">
+                    <div class="admin-logout-modal-icon" aria-hidden="true">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </div>
+                    <h2 class="admin-logout-modal-title" id="adminLogoutModalTitle">Logout</h2>
+                    <p class="admin-logout-modal-text">Are you sure you want to logout?</p>
+                    <div class="admin-logout-modal-actions">
+                        <button type="button" class="btn admin-logout-cancel" data-bs-dismiss="modal">Cancel</button>
                         <form action="{{ route('admin.logout') }}" method="POST">
                             @csrf
-                            <button type="submit" class="btn btn-danger border-0 px-4">Yes, I want to logout</button>
+                            <button type="submit" class="btn admin-logout-confirm">Yes, logout</button>
                         </form>
                     </div>
                 </div>

@@ -16,6 +16,7 @@ use App\Models\UnavailableTimeslot;
 use App\Models\UnavailableTimeslotTele;
 use App\Support\AppointmentJitsiRoom;
 use App\Support\AppointmentQrCode;
+use App\Support\Notifications\AppointmentNotifier;
 use App\Support\ScheduleCalendar;
 use App\Support\Telemed;
 use App\Support\TriageAuthorization;
@@ -136,6 +137,19 @@ class TriagerController extends Controller
 
         $appointment->update($updates);
 
+        // Real-time notification, fired only after the existing update succeeded.
+        $notifier = app(AppointmentNotifier::class);
+
+        if ($validated['triager_action'] === 'Approved') {
+            $notifier->approved($appointment);
+        } else {
+            $notifier->triageAction(
+                $appointment,
+                $validated['triager_action'],
+                $validated['triager_remarks'] ?? null
+            );
+        }
+
         return back()->with('success', 'Request updated.');
     }
 
@@ -221,6 +235,14 @@ class TriagerController extends Controller
                 'is_read' => false,
             ]);
         });
+
+        $notifier = app(AppointmentNotifier::class);
+
+        // The triager has now picked the actual service for this request, so the
+        // approval notification is refreshed with the real service name and the
+        // schedule is announced.
+        $notifier->approved($appointment);
+        $notifier->scheduled($appointment);
 
         return back()->with('success', 'Telemedicine schedule added. The patient and doctor can create the Jitsi room when ready.');
     }
@@ -308,6 +330,14 @@ class TriagerController extends Controller
                 'is_read' => false,
             ]);
         });
+
+        $notifier = app(AppointmentNotifier::class);
+
+        // The triager has now picked the actual service for this request, so the
+        // approval notification is refreshed with the real service name and the
+        // schedule is announced.
+        $notifier->approved($appointment);
+        $notifier->scheduled($appointment);
 
         return back()->with('success', 'Face-to-face schedule added. The patient can now view the QR code.');
     }

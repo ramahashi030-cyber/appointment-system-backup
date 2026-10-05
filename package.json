@@ -17,6 +17,8 @@
         "@laravel/multiplex": "^0.4.1"
     },
     "dependencies": {
-        "bootstrap": "^5.3.8"
+        "bootstrap": "^5.3.8",
+        "laravel-echo": "^1.8.1",
+        "pusher-js": "^8.4.0"
     }
 }

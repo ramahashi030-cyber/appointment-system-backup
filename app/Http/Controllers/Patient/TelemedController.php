@@ -14,6 +14,7 @@ use App\Models\UnavailableTimeslotTele;
 use App\Support\AppointmentJitsiRoom;
 use App\Support\AppointmentQrCode;
 use App\Support\AppointmentSchema;
+use App\Support\Notifications\AppointmentNotifier;
 use App\Support\ScheduleCalendar;
 use App\Support\Telemed;
 use App\Symptom;
@@ -629,6 +630,14 @@ class TelemedController extends Controller
         );
 
         $result = $rooms->openForPatient($appointment);
+
+        if ($result['created']) {
+            // Real-time alert for the doctor, using the existing Jitsi room.
+            app(AppointmentNotifier::class)->roomCreated(
+                $result['appointment'],
+                AppointmentJitsiRoom::OPENED_BY_PATIENT
+            );
+        }
 
         $message = $result['created']
             ? 'Jitsi room created. You may now join the consultation.'

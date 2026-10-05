@@ -47,12 +47,12 @@ every prompt ask if something is missing
 		VIEW
 		  DONE - show the whole address of the patient, adjust the registered and put under the hospital number
 		  DONE - appointment history: footer 'Showing 1 to 10 of 22 results' is not visible
-		  - appointment history: change the pagination to: << 1 >> maximum of 5 data's
+		  DONE - appointment history: change the pagination to: << 1 >> maximum of 5 data's
 		  DONE - remove 'view all' button inside appointment history
-		  - consultation history: add pagination to the footer: << 1 >> maximum of 5
+		  DONE - consultation history: add pagination to the footer: << 1 >> maximum of 5
 		  DONE - remove 'view all' button inside consultation history
 		  DONE - remove 'view records' button to medical information table 
-		  - the table arrows turning the next page of the table make the whole data table vanished after clicking it
+		  DONE - the table arrows turning the next page of the table make the whole data table vanished after clicking it
 
 	DOCTORS PAGE
 		DONE - both first last middle name should transform into capital letter when saving into database
@@ -64,3 +64,18 @@ every prompt ask if something is missing
 
 		EDIT
 		  - remove consultation type table/input field
+
+
+
+
+
+    ADMIN PANEL
+
+	SERVICES
+		FACE TO FACE and TELEMEDICINE
+			- edit and delete button modal closes when clicked outside the modal
+			- edit and delete button modals border should show a single blink danger color when clicked outside
+			- add services modal. create service and cancel button are not align
+			- add service modal. time slot can input letters and special character
+			- add service modal. service name and homis code can input special characters
+	change all the alert into flashcard modals

@@ -32,6 +32,7 @@
             <button type="button"
                     class="patient-header-icon patient-header-icon-button"
                     data-open-notifications
+                    data-rt-bell
                     aria-label="Notifications{{ $unreadNotificationCount > 0 ? ', '.$unreadNotificationCount.' unread' : '' }}">
                 <i class="bi bi-bell-fill" aria-hidden="true"></i>
                 @if ($unreadNotificationCount > 0)

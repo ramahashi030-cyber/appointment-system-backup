@@ -318,7 +318,9 @@ onDashboardReady(() => {
         });
     }
 
-    /* Live notification bell — poll for unread count every 5 seconds. */
+    /* Live notification bell — poll for unread count every 5 seconds.
+       Repointed at the shared /notifications feed so it never overwrites the
+       real-time badge written by resources/js/notifications.js. */
     const notificationBell = document.querySelector('[data-open-notifications]');
     const notificationBadge = notificationBell?.querySelector('.patient-header-badge');
 
@@ -334,7 +336,7 @@ onDashboardReady(() => {
 
     const pollNotifications = async () => {
         try {
-            const response = await fetch('/telemed/notifications/poll', {
+            const response = await fetch('/notifications?lite=1', {
                 headers: { Accept: 'application/json' },
             });
             if (!response.ok) return;

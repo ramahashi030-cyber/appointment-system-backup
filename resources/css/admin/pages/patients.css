@@ -2,7 +2,7 @@
    Scoped with .admin-patients-page (add this class to the page wrapper) so it no
    longer leaks into other .admin-doctor-content pages now that CSS is global. */
 .admin-patients-page .admin-doctor-stat-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(130px, auto);
 }
 
 /* Patient roster: the table is paginated 20 rows at a time, so it must never

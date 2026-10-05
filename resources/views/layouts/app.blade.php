@@ -20,7 +20,9 @@
         'resources/css/app.css',
         'resources/css/patient-dashboard.css',
         'resources/css/patient/pages.css',
+        'resources/css/notifications.css',
         'resources/js/app.js',
+        'resources/js/notifications.js',
     ])
 
     <style>

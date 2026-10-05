@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\NotifiesUsers;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\RoutesNotifications;
 
 /**
  * Staff and doctor data model.
@@ -14,6 +16,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  */
 class Staff extends Authenticatable
 {
+    use NotifiesUsers, RoutesNotifications;
+
     protected $table = 'staff';
 
     protected $fillable = [
