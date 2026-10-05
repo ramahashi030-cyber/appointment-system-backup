@@ -76,7 +76,7 @@ class PatientController extends Controller
             'patientStats' => [
                 'total' => Patient::count(),
                 'active' => Patient::where('status', 'Active')->count(),
-                'pending' => Patient::where('status', 'Pending')->count(),
+                'deactivated' => Patient::where('status', 'Pending')->count(),
             ],
             'filters' => [
                 'search' => $search,
@@ -174,7 +174,7 @@ class PatientController extends Controller
                 'stats' => [
                     'total' => number_format(Patient::count()),
                     'active' => number_format(Patient::where('status', 'Active')->count()),
-                    'pending' => number_format(Patient::where('status', 'Pending')->count()),
+                    'deactivated' => number_format(Patient::where('status', 'Pending')->count()),
                 ],
             ]);
         }

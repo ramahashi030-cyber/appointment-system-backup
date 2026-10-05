@@ -198,6 +198,36 @@ test('the roster filters by status and gender', function (): void {
         ->assertDontSee('ACTIVE PATIENT', false);
 });
 
+test('the roster counts deactivated patients instead of pending ones', function (): void {
+    patientManagementTables();
+    $admin = patientManagementAdmin();
+    makePatient(['first_name' => 'ACTIVE', 'middlename' => '', 'last_name' => 'PATIENT', 'username' => 'active.patient', 'status' => 'Active', 'gender' => 'Male']);
+    makePatient(['first_name' => 'OFF', 'middlename' => '', 'last_name' => 'PATIENT', 'username' => 'off.patient', 'status' => 'Pending', 'gender' => 'Female']);
+
+    $this->actingAs($admin, 'admin')
+        ->get(route('admin.patients'))
+        ->assertOk()
+        ->assertSee('<small>Deactivated</small><strong data-patient-stat="deactivated">1</strong>', false)
+        ->assertSee('<small>Active</small><strong data-patient-stat="active">1</strong>', false)
+        ->assertDontSee('data-patient-stat="pending"', false);
+});
+
+test('toggling a patient account refreshes the deactivated stat card', function (): void {
+    patientManagementTables();
+    $admin = patientManagementAdmin();
+    $patient = makePatient(['status' => 'Active']);
+
+    $this->actingAs($admin, 'admin')
+        ->patch(route('admin.patients.status', $patient), [], ['Accept' => 'application/json'])
+        ->assertOk()
+        ->assertJsonPath('stats.deactivated', '1');
+
+    $this->actingAs($admin, 'admin')
+        ->patch(route('admin.patients.status', $patient), [], ['Accept' => 'application/json'])
+        ->assertOk()
+        ->assertJsonPath('stats.deactivated', '0');
+});
+
 test('the patient roster paginates twenty patients at a time', function (): void {
     patientManagementTables();
     $admin = patientManagementAdmin();

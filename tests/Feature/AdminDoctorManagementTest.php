@@ -266,7 +266,7 @@ test('an administrator can add a doctor with a schedule', function () {
 
     $doctor = Staff::where('username', 'maria.santos')->firstOrFail();
 
-    expect($doctor->full_name)->toBe('Maria Santos')
+    expect($doctor->full_name)->toBe('MARIA SANTOS')
         ->and($doctor->email)->toBe('maria@example.com')
         ->and($doctor->consultation_type)->toBeNull()
         ->and($doctor->legacy_doctor_id)->toBeNull()
@@ -278,6 +278,194 @@ test('an administrator can add a doctor with a schedule', function () {
             'end' => '18:00',
         ])
         ->and(Hash::check('Password@123', $doctor->password))->toBeTrue();
+});
+
+test('the add doctor modal accepts a password within the new length and character rules', function (string $password): void {
+    doctorManagementTables();
+    $admin = doctorManagementAdmin();
+
+    $this->actingAs($admin, 'admin')
+        ->post(route('admin.doctors.store'), [
+            'firstname' => 'Maria',
+            'lastname' => 'Santos',
+            'username' => 'maria.santos',
+            'password' => $password,
+            'password_confirmation' => $password,
+            'email' => 'maria@example.com',
+            'contactno' => '09181234567',
+        ])
+        ->assertSessionHasNoErrors();
+
+    expect(Hash::check($password, Staff::where('username', 'maria.santos')->firstOrFail()->password))->toBeTrue();
+})->with([
+    'six characters without a symbol' => 'Pass1wd',
+    'eight characters without a symbol' => 'Passw0rd',
+    'over eight characters with a symbol' => 'Passw0rd!',
+    'fifteen characters with a symbol' => 'Passw0rd!Qmmc12',
+]);
+
+test('the add doctor modal refuses passwords outside the new rules', function (string $password): void {
+    doctorManagementTables();
+    $admin = doctorManagementAdmin();
+
+    $this->actingAs($admin, 'admin')
+        ->post(route('admin.doctors.store'), [
+            'firstname' => 'Maria',
+            'lastname' => 'Santos',
+            'username' => 'maria.santos',
+            'password' => $password,
+            'password_confirmation' => $password,
+            'email' => 'maria@example.com',
+            'contactno' => '09181234567',
+        ])
+        ->assertSessionHasErrors('password');
+
+    expect(Staff::query()->where('username', 'maria.santos')->exists())->toBeFalse();
+})->with([
+    'shorter than six characters' => 'Pw1d',
+    'longer than fifteen characters' => 'Passw0rd!Qmmc12345',
+    'no uppercase letter' => 'passw0rd',
+    'no lowercase letter' => 'PASSW0RD',
+    'no number' => 'Password!',
+    'over eight characters without a symbol' => 'Passw0rdlong',
+]);
+
+test('the add doctor modal accepts employee ID and contact number digits with separators', function (string $field, string $value): void {
+    doctorManagementTables();
+    $admin = doctorManagementAdmin();
+
+    $payload = [
+        'firstname' => 'Maria',
+        'lastname' => 'Santos',
+        'username' => 'maria.santos',
+        'password' => 'Passw0rd',
+        'password_confirmation' => 'Passw0rd',
+        'email' => 'maria@example.com',
+        'employee_id' => '123 45-6',
+        'contactno' => '09181234567',
+    ];
+    $payload[$field] = $value;
+
+    $this->actingAs($admin, 'admin')
+        ->post(route('admin.doctors.store'), $payload)
+        ->assertSessionHasNoErrors();
+
+    $doctor = Staff::where('username', 'maria.santos')->firstOrFail();
+
+    expect($doctor->contactno)->toBe($payload['contactno'])
+        ->and($doctor->employee_id)->toBe($payload['employee_id']);
+})->with([
+    'employee id with digits only' => ['employee_id', '123456'],
+    'employee id with a hyphen' => ['employee_id', '123-456'],
+    'employee id with a space' => ['employee_id', '123 456'],
+    'contact number with digits only' => ['contactno', '09181234567'],
+]);
+
+test('the add doctor modal refuses letters and special characters in employee ID and contact number', function (string $field, string $value): void {
+    doctorManagementTables();
+    $admin = doctorManagementAdmin();
+
+    $payload = [
+        'firstname' => 'Maria',
+        'lastname' => 'Santos',
+        'username' => 'maria.santos',
+        'password' => 'Passw0rd',
+        'password_confirmation' => 'Passw0rd',
+        'email' => 'maria@example.com',
+        'contactno' => '09181234567',
+    ];
+    $payload[$field] = $value;
+
+    $this->actingAs($admin, 'admin')
+        ->post(route('admin.doctors.store'), $payload)
+        ->assertSessionHasErrors([$field]);
+
+    expect(Staff::query()->where('username', 'maria.santos')->exists())->toBeFalse();
+})->with([
+    'employee id with letters' => ['employee_id', 'EMP123'],
+    'employee id with a symbol' => ['employee_id', 'EMP#123'],
+    'contact number with letters' => ['contactno', '0918ABC4567'],
+    'contact number with a symbol' => ['contactno', '0918+1234567'],
+    'contact number longer than eleven' => ['contactno', '09181234567890'],
+]);
+
+test('the add doctor modal refuses numbers and special characters in names', function (string $field, string $value): void {
+    doctorManagementTables();
+    $admin = doctorManagementAdmin();
+
+    $payload = [
+        'firstname' => 'Maria',
+        'lastname' => 'Santos',
+        'username' => 'maria.santos',
+        'password' => 'Password@123',
+        'password_confirmation' => 'Password@123',
+        'email' => 'maria@example.com',
+        'contactno' => '09181234567',
+    ];
+    $payload[$field] = $value;
+
+    $this->actingAs($admin, 'admin')
+        ->post(route('admin.doctors.store'), $payload)
+        ->assertSessionHasErrors([$field]);
+
+    expect(Staff::query()->where('username', 'maria.santos')->exists())->toBeFalse();
+})->with([
+    'first name with a number' => ['firstname', 'Maria2'],
+    'first name with a symbol' => ['firstname', 'Maria@Santos'],
+    'middle name with a number' => ['middlename', 'Reyes2'],
+    'middle name with a symbol' => ['middlename', 'Reyes!'],
+    'last name with a number' => ['lastname', 'Santos123'],
+    'last name with a symbol' => ['lastname', 'Santos_ Jr'],
+]);
+
+test('editing a provider still accepts a name with a hyphen', function () {
+    doctorManagementTables();
+    $admin = doctorManagementAdmin();
+    $doctor = Staff::create([
+        'FirstName' => 'MARIA',
+        'LastName' => 'SANTOS',
+        'username' => 'maria.santos',
+        'password' => 'Password@123',
+        'is_verified' => true,
+        'is_doctor' => true,
+    ]);
+
+    $this->actingAs($admin, 'admin')
+        ->put(route('admin.doctors.update', $doctor), [
+            'firstname' => 'Jean-Luc',
+            'lastname' => 'SANTOS',
+            'username' => 'maria.santos',
+            'email' => 'maria@example.com',
+            'contactno' => '09181234567',
+            'consultation_type' => 'Initial consultation',
+        ])
+        ->assertSessionHasNoErrors();
+
+    expect($doctor->refresh()->FirstName)->toBe('Jean-Luc');
+});
+
+test('the add doctor modal stores every name in capital letters', function () {
+    doctorManagementTables();
+    $admin = doctorManagementAdmin();
+
+    $this->actingAs($admin, 'admin')
+        ->post(route('admin.doctors.store'), [
+            'firstname' => 'juan',
+            'middlename' => 'del a cruz',
+            'lastname' => 'santos jr',
+            'username' => 'juan.santos',
+            'password' => 'Password@123',
+            'password_confirmation' => 'Password@123',
+            'email' => 'juan@example.com',
+            'contactno' => '09181234567',
+        ])
+        ->assertRedirect(route('admin.doctors'));
+
+    $doctor = Staff::where('username', 'juan.santos')->firstOrFail();
+
+    expect($doctor->FirstName)->toBe('JUAN')
+        ->and($doctor->MiddleName)->toBe('DEL A CRUZ')
+        ->and($doctor->LastName)->toBe('SANTOS JR');
 });
 
 test('an administrator cannot add consultation type through the add doctor modal', function () {

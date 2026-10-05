@@ -10,10 +10,162 @@
     @include('partials.admin-header')
 @endsection
 
+@push('styles')
+    <style>
+        /* Patient view modal. Scoped to #viewPatientModal because the profile markup is
+           rendered by this file while its base styles live in admin-css/doctor.css. */
+
+        /* Values wrap instead of being clipped. The base rule pins every
+           .admin-doctor-profile-details strong to a single line and hides the
+           overflow behind an ellipsis, which cut a long address down to a few
+           characters. Identifiers (dates, numbers, emails) are short, so nothing
+           else changes shape. */
+        #viewPatientModal .admin-doctor-profile-details strong {
+            overflow: visible;
+            text-overflow: clip;
+            white-space: normal;
+            overflow-wrap: anywhere;
+        }
+
+        /* Registered sits directly under Hospital number, which is the sixth cell
+           of the three-column identity grid. Pinning Registered to the same column
+           in the next row does that while Address keeps its slot beside it. */
+        #viewPatientModal .admin-patient-profile-address-cell {
+            grid-row: 3;
+            grid-column: 1 / 3;
+        }
+
+        #viewPatientModal .admin-patient-profile-registered-cell {
+            grid-row: 3;
+            grid-column: 3;
+        }
+
+        /* On phones the grid collapses to one column (admin-css/responsive.css),
+           where an explicit row/column would leave an empty third column, so the
+           cells fall back to the source order with Address last. */
+        @media (max-width: 767px) {
+            #viewPatientModal .admin-patient-profile-address-cell,
+            #viewPatientModal .admin-patient-profile-registered-cell {
+                grid-row: auto;
+                grid-column: auto;
+            }
+
+            #viewPatientModal .admin-patient-profile-address-cell { order: 2; }
+            #viewPatientModal .admin-patient-profile-registered-cell { order: 1; }
+        }
+
+        /* History footers: the range summary and the page controls sit on one row,
+           summary first, with the controls wrapping underneath on narrow screens. */
+        #viewPatientModal .admin-patient-view-pagination {
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        #viewPatientModal .admin-patient-view-pagination-summary {
+            margin: 0;
+            color: #6a83a4;
+            font-size: 12px;
+        }
+
+        #viewPatientModal .admin-patient-view-pagination-summary span {
+            color: #0a326c;
+            font-weight: 600;
+        }
+
+        /* Both histories show at most five records per page, so the body area is
+           reserved for five rows and a page with fewer records (the last one, or
+           any page after a filter change) keeps the same physical height instead
+           of shrinking the table.
+
+           The reservation is derived from the row box the table already uses, not
+           from a guessed constant: .admin-doctor-table td carries 14px of vertical
+           padding and a history row stacks two 15px lines inside
+           .admin-doctor-appointment-patient, so one row is 28px + 2 * 18px = 64px
+           (about the 65px a full page measures). The header row adds 24px of
+           padding plus one 13px line, so 40px + 5 * 64px = 360px covers the header
+           and a full page of records.
+
+           No filler rows are added. The space below the last record is genuinely
+           empty, so it is not counted in the result total, announced by a screen
+           reader, focusable or clickable. The background matches the row
+           background so the reserved area reads as a continuation of the body. An
+           empty dataset is left out: it shows its own empty state instead. */
+        #viewPatientModal .admin-patient-view-table-wrap:not(.is-empty) {
+            min-height: calc(40px + (5 * 64px));
+            background: #fff;
+        }
+
+        /* Vertical separation between the two history sections.
+
+           Appointment history and Consultation history are the only children of
+           .admin-doctor-activity-grid in this modal, and the grid collapses to a
+           single column here, so the two panels stack and the grid's row gap is the
+           only thing separating them. That gap arrives from the shared
+           .admin-doctor-activity-grid rule, which is written for the two-column
+           doctor listings rather than for one panel above the other, so this modal
+           states the value it actually wants instead of inheriting it.
+
+           The gap sits on the grid, between the panels, and on no panel at all: no
+           margin is added to either section, no padding is added to the modal, and
+           no table, row, header, footer, control or result count is touched. Because
+           both tables reserve their body area for five rows, a page holding 1, 2, 3,
+           4 or 5 records leaves this gap at exactly the same 12px. */
+        #viewPatientModal .admin-doctor-activity-grid {
+            row-gap: 12px;
+        }
+
+        /* Same 12px separation below Medical information as the gap between
+           Appointment history and Consultation history. It is set on this one
+           panel, so the profile panel and the records panel are unaffected. */
+        #viewPatientModal .admin-patient-medical-panel {
+            margin-bottom: 12px;
+        }
+
+        /* Compact controls (last page, one page back, current page, one page
+           forward). The buttons reuse .admin-doctor-page-button /
+           .admin-doctor-page-current from admin-css/doctor.css, the same pair the
+           other admin listings use; only the row layout lives here. */
+        #viewPatientModal .admin-patient-view-pagination-controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 7px;
+            margin: 0;
+        }
+
+        /* The controls are real buttons so they cannot navigate, but the browser
+           would give them their own padding, font and cursor on top of the shared
+           .admin-doctor-page-button styling. This keeps them looking exactly like
+           the anchors they replaced. */
+        #viewPatientModal .admin-patient-view-pagination-controls .admin-doctor-page-button {
+            padding: 0;
+            font-family: inherit;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        /* A control with nothing left to show is muted instead of merely inert,
+           matching .admin-doctor-page-button.is-disabled from admin-css/doctor.css. */
+        #viewPatientModal .admin-patient-view-pagination-controls .admin-doctor-page-button:disabled,
+        #viewPatientModal .admin-patient-view-pagination-controls .admin-doctor-page-button:disabled:hover {
+            border-color: #e4edf7;
+            background: #f7faff;
+            color: #b1c3d8;
+            cursor: default;
+        }
+    </style>
+@endpush
+
 @section('content')
     @php
         // The roster loop below reuses $patient; keep the requested patient for the View/Edit modals.
         $selectedPatient = $patient ?? null;
+
+        // Mirrors the admin profile name rule (partials/admin-header.blade.php):
+        // letters only, with single spaces allowed between them ("dela cruz").
+        $namePattern = '[A-Za-z]+( +[A-Za-z]+)*';
     @endphp
 
     <div class="admin-dashboard-content admin-doctor-content admin-patients-page">
@@ -50,7 +202,7 @@
             </article>
             <article class="admin-doctor-stat-card">
                 <span class="admin-doctor-stat-icon orange"><i class="bi bi-person-exclamation" aria-hidden="true"></i></span>
-                <span><small>Pending</small><strong data-patient-stat="pending">{{ number_format($patientStats['pending']) }}</strong></span>
+                <span><small>Deactivated</small><strong data-patient-stat="deactivated">{{ number_format($patientStats['deactivated']) }}</strong></span>
             </article>
         </div>
 
@@ -222,7 +374,283 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </header>
                     <div class="modal-body">
-                        @include('admin.patients._profile', ['patient' => $selectedPatient])
+                        @php
+                            // The profile body used to come from admin.patients._profile, but every
+                            // panel here needed markup changes (full address, Registered under the
+                            // hospital number, 5-row pagination, no "View all" / "View records" links)
+                            // and that partial is outside this task's file scope, so it is rendered
+                            // here instead. The rows are still shared: both tables keep using their
+                            // own partials.
+                            $profileName = trim(implode(' ', array_filter([
+                                $selectedPatient->first_name,
+                                $selectedPatient->middlename,
+                                $selectedPatient->last_name,
+                            ])));
+                            $profileInitials = strtoupper(substr((string) ($selectedPatient->first_name ?: 'P'), 0, 1).substr((string) ($selectedPatient->last_name ?: 'T'), 0, 1));
+                            $profileLatestAppointment = $selectedPatient->appointments()
+                                ->orderByDesc('date')
+                                ->orderByDesc('time_slot')
+                                ->first();
+
+                            // Both histories are loaded in full and paged in the browser.
+                            // openPatientModal() injects this modal for any patient without a
+                            // page load, so a table can never fetch its own pages: the record
+                            // set travels with the modal as JSON (see the <template> in each
+                            // panel below) and the script renders five rows at a time into the
+                            // existing tbody. Paging therefore only touches rows - never the
+                            // panel, the table or the request - so a table cannot disappear
+                            // while paging.
+                            $patientHistoryPerPage = 5;
+
+                            $viewAppointments = $selectedPatient->appointments()
+                                ->with(['service', 'serviceTele', 'staff'])
+                                ->orderByDesc('date')
+                                ->orderByDesc('time_slot')
+                                ->get();
+
+                            $viewHistory = $selectedPatient->appointments()
+                                ->where('status', 'Completed')
+                                ->with(['service', 'serviceTele', 'staff'])
+                                ->orderByDesc('date')
+                                ->orderByDesc('time_slot')
+                                ->get();
+
+                            // First paint of the footers. The script recomputes both from the
+                            // JSON record set on every page change, so nothing is hard coded.
+                            $appointmentTotal = $viewAppointments->count();
+                            $appointmentFirstItem = $appointmentTotal === 0 ? 0 : 1;
+                            $appointmentLastItem = min($patientHistoryPerPage, $appointmentTotal);
+                            $consultationTotal = $viewHistory->count();
+                            $consultationFirstItem = $consultationTotal === 0 ? 0 : 1;
+                            $consultationLastItem = min($patientHistoryPerPage, $consultationTotal);
+
+                            // The record shape mirrors both row partials. The third cell is
+                            // resolved here - the mode for the appointment history, the
+                            // provider for the consultation history - so a single row builder
+                            // renders either table.
+                            $patientHistoryService = static fn ($appointment) => strtoupper((string) $appointment->mode) === 'TELE'
+                                ? ($appointment->serviceTele?->service_name ?: 'General consultation')
+                                : ($appointment->service?->service_name ?: 'General consultation');
+
+                            $patientHistoryPayloads = [
+                                'appointments' => [
+                                    'records' => $viewAppointments
+                                        ->map(static function ($appointment) use ($patientHistoryService) {
+                                            $status = strtolower((string) ($appointment->status ?: 'booked'));
+
+                                            return [
+                                                'service' => $patientHistoryService($appointment),
+                                                'reason' => $appointment->consultation_reason ?: 'No consultation reason',
+                                                'date' => $appointment->date?->format('M j, Y') ?: '—',
+                                                'time' => $appointment->time_slot ?: '—',
+                                                'detail' => $appointment->mode ?: '—',
+                                                'status' => $status,
+                                                'statusLabel' => ucfirst($status),
+                                            ];
+                                        })
+                                        ->values()
+                                        ->all(),
+                                    'emptyTitle' => 'No appointments to show',
+                                    'emptyMessage' => 'Appointments booked by this patient will appear here.',
+                                ],
+                                'consultations' => [
+                                    'records' => $viewHistory
+                                        ->map(static function ($appointment) use ($patientHistoryService) {
+                                            $status = strtolower((string) ($appointment->status ?: 'completed'));
+
+                                            return [
+                                                'service' => $patientHistoryService($appointment),
+                                                'reason' => $appointment->consultation_reason ?: 'No consultation reason',
+                                                'date' => $appointment->date?->format('M j, Y') ?: '—',
+                                                'time' => $appointment->time_slot ?: '—',
+                                                'detail' => $appointment->staff
+                                                    ? trim((string) $appointment->staff->FirstName.' '.(string) $appointment->staff->LastName)
+                                                    : 'Unassigned',
+                                                'status' => $status,
+                                                'statusLabel' => ucfirst($status),
+                                            ];
+                                        })
+                                        ->values()
+                                        ->all(),
+                                    'emptyTitle' => 'No consultations to show',
+                                    'emptyMessage' => 'Completed consultations for this patient will appear here.',
+                                ],
+                            ];
+                        @endphp
+
+                        <section class="admin-panel admin-doctor-profile-panel">
+                            <div class="admin-doctor-profile-hero">
+                                <span class="admin-doctor-profile-avatar">{{ $profileInitials }}</span>
+                                <div>
+                                    <h2>{{ $profileName ?: 'Unnamed patient' }}</h2>
+                                    <p>{{ $selectedPatient->username ?: 'No username' }} · {{ $selectedPatient->hospital_number ?: 'No hospital number' }}</p>
+                                    <span class="admin-status-pill {{ strtolower((string) $selectedPatient->status) }}">{{ $selectedPatient->status ?: '—' }}</span>
+                                </div>
+                                <div class="admin-doctor-profile-hero-actions">
+                                    <form method="POST" action="{{ route('admin.patients.status', $selectedPatient) }}">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button class="admin-secondary-button" type="submit">
+                                            <i class="bi bi-{{ $selectedPatient->status === 'Active' ? 'pause' : 'play' }}-circle" aria-hidden="true"></i>
+                                            {{ $selectedPatient->status === 'Active' ? 'Deactivate' : 'Activate' }}
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="{{ route('admin.patients.reset-password', $selectedPatient) }}">
+                                        @csrf
+                                        <button class="admin-secondary-button" type="submit">
+                                            <i class="bi bi-key" aria-hidden="true"></i>
+                                            Reset password
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="admin-doctor-profile-details">
+                                <div><small>Username</small><strong>{{ $selectedPatient->username ?: '—' }}</strong></div>
+                                <div><small>Email</small><strong>{{ $selectedPatient->email ?: '—' }}</strong></div>
+                                <div><small>Contact number</small><strong>{{ $selectedPatient->contact_number ?: '—' }}</strong></div>
+                                <div><small>Date of birth</small><strong>{{ $selectedPatient->dob?->format('M j, Y') ?: '—' }}</strong></div>
+                                <div><small>Gender</small><strong>{{ $selectedPatient->gender ?: '—' }}</strong></div>
+                                <div><small>Hospital number</small><strong>{{ $selectedPatient->hospital_number ?: '—' }}</strong></div>
+                                {{-- Address shares the row with Registered; both cells are placed by
+                                     the .admin-patient-profile-* rules in the @push('styles') block. --}}
+                                <div class="admin-patient-profile-address-cell"><small>Address</small><strong>{{ $selectedPatient->address ?: '—' }}</strong></div>
+                                <div class="admin-patient-profile-registered-cell"><small>Registered</small><strong>{{ $selectedPatient->created_at?->format('M j, Y') ?: '—' }}</strong></div>
+                            </div>
+                        </section>
+
+                        <section class="admin-panel admin-patient-medical-panel" aria-labelledby="patientMedicalInfoTitle">
+                            <header class="admin-panel-header">
+                                <div class="admin-panel-title">
+                                    <i class="bi bi-file-earmark-medical" aria-hidden="true"></i>
+                                    <h2 id="patientMedicalInfoTitle">Medical information</h2>
+                                </div>
+                            </header>
+                            <div class="admin-doctor-profile-details">
+                                <div>
+                                    <small>Latest complaint</small>
+                                    <strong>{{ $profileLatestAppointment?->complaint ?: $profileLatestAppointment?->consultation_reason ?: '—' }}</strong>
+                                </div>
+                                <div>
+                                    <small>Latest symptoms</small>
+                                    <strong>{{ ! empty($profileLatestAppointment?->symptoms) ? implode(', ', (array) $profileLatestAppointment->symptoms) : '—' }}</strong>
+                                </div>
+                                <div>
+                                    <small>Medical records on file</small>
+                                    <strong>{{ $selectedPatient->medicalRecords()->count() }}</strong>
+                                </div>
+                            </div>
+                        </section>
+
+                        <div class="admin-doctor-activity-grid">
+                            <section class="admin-panel" id="patientAppointmentsPanel" data-patient-history="appointments" aria-labelledby="patientAppointmentsTitle">
+                                <header class="admin-panel-header">
+                                    <div class="admin-panel-title">
+                                        <i class="bi bi-calendar2-week" aria-hidden="true"></i>
+                                        <h2 id="patientAppointmentsTitle">Appointment history</h2>
+                                    </div>
+                                </header>
+                                <div class="admin-doctor-table-wrap admin-patient-view-table-wrap{{ $appointmentTotal > 0 ? '' : ' is-empty' }}">
+                                    <table class="admin-doctor-table compact">
+                                        <thead><tr><th>Service</th><th>Date</th><th>Mode</th><th>Status</th></tr></thead>
+                                        {{-- Page one is rendered here so the table is populated on the
+                                             first paint; every later page is drawn into this same
+                                             tbody by the script. --}}
+                                        <tbody data-patient-history-body>@include('admin.patients._appointment-table', ['appointments' => $viewAppointments->forPage(1, $patientHistoryPerPage)])</tbody>
+                                    </table>
+                                </div>
+                                {{-- The record set rides along inside an inert <template>, so the
+                                     script reads it without a request and without any chance of
+                                     the layout re-running it as a page script. --}}
+                                <template data-patient-history-records>@json($patientHistoryPayloads['appointments'])</template>
+                                <div class="admin-doctor-pagination admin-patient-view-pagination" data-patient-history-footer>
+                                    <p class="admin-patient-view-pagination-summary" @if ($appointmentFirstItem === 0) hidden @endif>
+                                        {{ __('Showing') }}
+                                        <span data-patient-history-from>{{ $appointmentFirstItem }}</span>
+                                        {{ __('to') }}
+                                        <span data-patient-history-to>{{ $appointmentLastItem }}</span>
+                                        {{ __('of') }}
+                                        <span data-patient-history-total>{{ $appointmentTotal }}</span>
+                                        {{ __('results') }}
+                                    </p>
+                                    {{-- Compact controls: last page, one page back, the current page,
+                                         one page forward, first page. They are buttons, not links, so
+                                         a click can neither navigate (the layout only intercepts
+                                         a[href]) nor submit anything. data-patient-history on the
+                                         section tells the script which table to page, so only that
+                                         one is touched. --}}
+                                    <nav class="admin-patient-view-pagination-controls" aria-label="Appointment history pages">
+                                        <button type="button" class="admin-doctor-page-button" data-patient-history-go="first" aria-label="First page" @disabled($appointmentTotal <= $patientHistoryPerPage)>&laquo;</button>
+                                        <button type="button" class="admin-doctor-page-button" data-patient-history-go="prev" aria-label="Previous page" @disabled($appointmentFirstItem <= 1)>&lsaquo;</button>
+                                        <span class="admin-doctor-page-current" tabindex="-1" aria-current="page" data-patient-history-current>1</span>
+                                        <button type="button" class="admin-doctor-page-button" data-patient-history-go="next" aria-label="Next page" @disabled($appointmentLastItem >= $appointmentTotal)>&rsaquo;</button>
+                                        <button type="button" class="admin-doctor-page-button" data-patient-history-go="last" aria-label="Last page" @disabled($appointmentTotal <= $patientHistoryPerPage)>&raquo;</button>
+                                    </nav>
+                                </div>
+                            </section>
+
+                            <section class="admin-panel admin-doctor-assignment-history" id="patientHistoryPanel" data-patient-history="consultations" aria-labelledby="patientHistoryTitle">
+                                <header class="admin-panel-header">
+                                    <div class="admin-panel-title">
+                                        <i class="bi bi-clock-history" aria-hidden="true"></i>
+                                        <h2 id="patientHistoryTitle">Consultation history</h2>
+                                    </div>
+                                </header>
+                                <div class="admin-doctor-table-wrap admin-patient-view-table-wrap{{ $consultationTotal > 0 ? '' : ' is-empty' }}">
+                                    <table class="admin-doctor-table compact">
+                                        <thead><tr><th>Service</th><th>Date</th><th>Provider</th><th>Status</th></tr></thead>
+                                        <tbody data-patient-history-body>@include('admin.patients._history-table', ['appointments' => $viewHistory->forPage(1, $patientHistoryPerPage)])</tbody>
+                                    </table>
+                                </div>
+                                {{-- Its own record set and its own data-patient-history key, so paging
+                                     this table cannot move the appointment history above it. --}}
+                                <template data-patient-history-records>@json($patientHistoryPayloads['consultations'])</template>
+                                <div class="admin-doctor-pagination admin-patient-view-pagination" data-patient-history-footer>
+                                    <p class="admin-patient-view-pagination-summary" @if ($consultationFirstItem === 0) hidden @endif>
+                                        {{ __('Showing') }}
+                                        <span data-patient-history-from>{{ $consultationFirstItem }}</span>
+                                        {{ __('to') }}
+                                        <span data-patient-history-to>{{ $consultationLastItem }}</span>
+                                        {{ __('of') }}
+                                        <span data-patient-history-total>{{ $consultationTotal }}</span>
+                                        {{ __('results') }}
+                                    </p>
+                                    {{-- Same compact controls as the appointment history above. --}}
+                                    <nav class="admin-patient-view-pagination-controls" aria-label="Consultation history pages">
+                                        <button type="button" class="admin-doctor-page-button" data-patient-history-go="first" aria-label="First page" @disabled($consultationTotal <= $patientHistoryPerPage)>&laquo;</button>
+                                        <button type="button" class="admin-doctor-page-button" data-patient-history-go="prev" aria-label="Previous page" @disabled($consultationFirstItem <= 1)>&lsaquo;</button>
+                                        <span class="admin-doctor-page-current" tabindex="-1" aria-current="page" data-patient-history-current>1</span>
+                                        <button type="button" class="admin-doctor-page-button" data-patient-history-go="next" aria-label="Next page" @disabled($consultationLastItem >= $consultationTotal)>&rsaquo;</button>
+                                        <button type="button" class="admin-doctor-page-button" data-patient-history-go="last" aria-label="Last page" @disabled($consultationTotal <= $patientHistoryPerPage)>&raquo;</button>
+                                    </nav>
+                                </div>
+                            </section>
+                        </div>
+
+                        @if ($medicalRecords->isNotEmpty())
+                            <section class="admin-panel" aria-labelledby="patientRecordsSummaryTitle">
+                                <header class="admin-panel-header">
+                                    <div class="admin-panel-title">
+                                        <i class="bi bi-journal-medical" aria-hidden="true"></i>
+                                        <h2 id="patientRecordsSummaryTitle">Recent medical records</h2>
+                                    </div>
+                                    <a class="admin-panel-link" href="{{ route('admin.patients.records', $selectedPatient) }}">View all</a>
+                                </header>
+                                <div class="admin-doctor-table-wrap">
+                                    <table class="admin-doctor-table compact">
+                                        <thead><tr><th>Type</th><th>Description</th><th>Date</th></tr></thead>
+                                        <tbody>
+                                            @foreach ($medicalRecords as $record)
+                                                <tr>
+                                                    <td>{{ $record->record_type ?: '—' }}</td>
+                                                    <td>{{ $record->description ?: '—' }}</td>
+                                                    <td>{{ $record->created_at?->format('M j, Y') ?: '—' }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -290,15 +718,15 @@
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label class="form-label" for="cpFirst">First name</label>
-                            <input class="form-control" id="cpFirst" name="firstname" value="{{ old('firstname') }}" placeholder="First name" required>
+                            <input class="form-control" id="cpFirst" name="firstname" value="{{ old('firstname') }}" placeholder="First name" required maxlength="100" pattern="{{ $namePattern }}" data-letters-only>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label" for="cpMiddle">Middle name</label>
-                            <input class="form-control" id="cpMiddle" name="middlename" value="{{ old('middlename') }}" placeholder="Middle name">
+                            <input class="form-control" id="cpMiddle" name="middlename" value="{{ old('middlename') }}" placeholder="Middle name" maxlength="100" pattern="{{ $namePattern }}" data-letters-only>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label" for="cpLast">Last name</label>
-                            <input class="form-control" id="cpLast" name="lastname" value="{{ old('lastname') }}" placeholder="Last name" required>
+                            <input class="form-control" id="cpLast" name="lastname" value="{{ old('lastname') }}" placeholder="Last name" required maxlength="100" pattern="{{ $namePattern }}" data-letters-only>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="cpUsername">Username</label>
@@ -321,15 +749,15 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label" for="cpContact">Contact number</label>
-                            <input class="form-control" id="cpContact" name="contactno" value="{{ old('contactno') }}" placeholder="Contact number">
+                            <input class="form-control" id="cpContact" name="contactno" value="{{ old('contactno') }}" placeholder="Contact number" maxlength="11" pattern="[0-9]*" inputmode="numeric" data-digits-only>
                         </div>
                         <div class="col-12">
                             <label class="form-label" for="cpAddress">Address</label>
-                            <input class="form-control" id="cpAddress" name="address" value="{{ old('address') }}" placeholder="Address">
+                            <input class="form-control" id="cpAddress" name="address" value="{{ old('address') }}" placeholder="Address" maxlength="500" pattern="[A-Za-z0-9 ]*" data-address-only>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="cpHospital">Hospital no.</label>
-                            <input class="form-control" id="cpHospital" name="hospital_number" value="{{ old('hospital_number') }}" placeholder="Hospital no.">
+                            <input class="form-control" id="cpHospital" name="hospital_number" value="{{ old('hospital_number') }}" placeholder="Hospital no." maxlength="6" pattern="[0-9]*" inputmode="numeric" data-digits-only>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="cpStatus">Status</label>
@@ -411,6 +839,443 @@
             @if ($errors->createPatient->any())
                 bootstrap.Modal.getOrCreateInstance(document.getElementById('createPatientModal')).show();
             @endif
+
+            // The Add patient and Edit patient forms share the same input rules:
+            // names accept letters (and single spaces) only and are upper-cased,
+            // the contact and hospital numbers accept digits only within a fixed
+            // length, and the address accepts letters, numbers and spaces only.
+            // Invalid characters are dropped while typing, pasting or on submit,
+            // so only valid values are ever sent to the server.
+            const cleanPatientName = (value) => value
+                .replace(/[^A-Za-z ]+/g, '')
+                .replace(/ {2,}/g, ' ')
+                .replace(/^ +| +$/g, '')
+                .toUpperCase();
+
+            const cleanPatientDigits = (maxLength) => (value) => value
+                .replace(/[^0-9]/g, '')
+                .slice(0, maxLength);
+
+            const cleanPatientAddress = (value) => value
+                .replace(/[^A-Za-z0-9 ]+/g, '')
+                .replace(/ {2,}/g, ' ')
+                .replace(/^ +| +$/g, '');
+
+            const patientFieldRules = [
+                {
+                    selector: 'input[name="firstname"]',
+                    label: 'First name',
+                    required: true,
+                    maxlength: 100,
+                    pattern: @json($namePattern),
+                    clean: cleanPatientName,
+                    message: 'First name may only contain letters and spaces.',
+                },
+                {
+                    selector: 'input[name="middlename"]',
+                    label: 'Middle name',
+                    required: false,
+                    maxlength: 100,
+                    pattern: @json($namePattern),
+                    clean: cleanPatientName,
+                    message: 'Middle name may only contain letters and spaces.',
+                },
+                {
+                    selector: 'input[name="lastname"]',
+                    label: 'Last name',
+                    required: true,
+                    maxlength: 100,
+                    pattern: @json($namePattern),
+                    clean: cleanPatientName,
+                    message: 'Last name may only contain letters and spaces.',
+                },
+                {
+                    selector: 'input[name="contactno"]',
+                    label: 'Contact number',
+                    required: false,
+                    maxlength: 11,
+                    pattern: '[0-9]*',
+                    inputmode: 'numeric',
+                    clean: cleanPatientDigits(11),
+                    exactLength: 11,
+                    message: 'Contact number must be 11 digits (numbers only).',
+                },
+                {
+                    selector: 'input[name="hospital_number"]',
+                    label: 'Hospital number',
+                    required: false,
+                    maxlength: 6,
+                    pattern: '[0-9]*',
+                    inputmode: 'numeric',
+                    clean: cleanPatientDigits(6),
+                    message: 'Hospital number may only contain up to 6 digits (numbers only).',
+                },
+                {
+                    selector: 'input[name="address"], textarea[name="address"]',
+                    label: 'Address',
+                    required: false,
+                    maxlength: 500,
+                    pattern: '[A-Za-z0-9 ]*',
+                    clean: cleanPatientAddress,
+                    message: 'Address may only contain letters, numbers and spaces.',
+                },
+            ];
+
+            const patientFieldSelector = patientFieldRules.map((rule) => rule.selector).join(', ');
+
+            // The profile modal in the header shares a few of these field names,
+            // so only the fields inside the patient modals are ever touched.
+            const isPatientField = (input) => $(input).closest('#createPatientModal, #editPatientModal').length > 0;
+
+            // The Edit patient form is rendered from a partial that cannot be
+            // annotated here, so the attributes are applied to whichever fields
+            // the scope contains (the page itself and every injected edit modal).
+            const applyPatientFieldRules = ($scope) => {
+                patientFieldRules.forEach((rule) => {
+                    $(rule.selector, $scope).each(function () {
+                        this.patientFieldRule = rule;
+                        this.setAttribute('maxlength', rule.maxlength);
+                        this.setAttribute('pattern', rule.pattern);
+
+                        if (rule.inputmode) {
+                            this.setAttribute('inputmode', rule.inputmode);
+                        }
+                    });
+                });
+            };
+
+            const cleanPatientField = (input) => {
+                const cleaned = input.patientFieldRule.clean(input.value);
+
+                if (cleaned === input.value) {
+                    return;
+                }
+
+                const caretStart = input.selectionStart;
+                const caretEnd = input.selectionEnd;
+
+                input.value = cleaned;
+
+                if (caretStart !== null && typeof input.setSelectionRange === 'function') {
+                    input.setSelectionRange(caretStart, caretEnd);
+                }
+            };
+
+            const patientFieldMessage = (input) => {
+                const rule = input.patientFieldRule;
+                const value = input.value;
+
+                if (rule.required && value.trim() === '') {
+                    return rule.label + ' is required.';
+                }
+
+                if (value !== '' && rule.exactLength && value.length !== rule.exactLength) {
+                    return rule.message;
+                }
+
+                return rule.clean(value) === value ? '' : rule.message;
+            };
+
+            const showPatientFieldError = (input, message) => {
+                const $input = $(input);
+                const $feedback = $input.siblings('.patient-field-error');
+
+                input.patientInvalid = true;
+                $input.addClass('is-invalid');
+
+                if ($feedback.length) {
+                    $feedback.text(message);
+                } else {
+                    $('<div class="patient-field-error invalid-feedback d-block"></div>')
+                        .text(message)
+                        .insertAfter($input);
+                }
+            };
+
+            const clearPatientFieldError = (input) => {
+                if (!input.patientInvalid) {
+                    return;
+                }
+
+                delete input.patientInvalid;
+                $(input).removeClass('is-invalid').siblings('.patient-field-error').remove();
+            };
+
+            $(document).off('.patientFields');
+            applyPatientFieldRules($('#createPatientModal, #editPatientModal'));
+
+            $(document).on('input.patientFields', patientFieldSelector, function () {
+                if (!isPatientField(this)) {
+                    return;
+                }
+
+                cleanPatientField(this);
+
+                if (this.patientInvalid && patientFieldMessage(this) === '') {
+                    clearPatientFieldError(this);
+                }
+            });
+
+            $(document).on('submit.patientFields', '#createPatientModal form, #editPatientModal form', function (event) {
+                let firstInvalid = null;
+
+                applyPatientFieldRules($(this));
+
+                $(patientFieldSelector, this).each(function () {
+                    cleanPatientField(this);
+
+                    const message = patientFieldMessage(this);
+
+                    if (message === '') {
+                        clearPatientFieldError(this);
+
+                        return;
+                    }
+
+                    showPatientFieldError(this, message);
+                    firstInvalid = firstInvalid || this;
+                });
+
+                if (!firstInvalid) {
+                    return;
+                }
+
+                event.preventDefault();
+                firstInvalid.focus();
+            });
+
+            // Appointment and consultation history paging happens inside the view modal.
+            // The previous version fetched a whole re-rendered page and swapped the
+            // clicked <section> into the DOM, so the table's survival depended on a
+            // network round trip: if the panel was missing from the response, the
+            // request failed or was aborted, the handler fell back to
+            // window.location.href and the shell replaced .admin-main - which closed
+            // the modal and took the table with it.
+            //
+            // Both tables are now paged in the browser. Each section carries its own
+            // record set as JSON in a <template> and its own page number, so a click
+            // re-renders the rows of that one tbody and nothing else: no request, no
+            // navigation, no panel replacement, and the table, its header, footer and
+            // controls stay on screen. The controls are buttons, so the layout's
+            // a[href] shell handler never sees them and nothing can be submitted.
+            const PATIENT_HISTORY_PER_PAGE = 5;
+
+            // Reads (and caches) the record set of one panel. The state is stored on
+            // the section element itself, so two panels never share a page number and
+            // a modal injected later for another patient starts from its own data.
+            const readPatientHistoryState = ($panel) => {
+                const element = $panel[0];
+
+                if (!element) {
+                    return null;
+                }
+
+                if (element.patientHistory) {
+                    return element.patientHistory;
+                }
+
+                const template = $panel.find('template[data-patient-history-records]')[0];
+                let payload = null;
+
+                if (template) {
+                    try {
+                        payload = JSON.parse(template.content.textContent);
+                    } catch (error) {
+                        payload = null;
+                    }
+                }
+
+                element.patientHistory = {
+                    records: Array.isArray(payload?.records) ? payload.records : [],
+                    emptyTitle: payload?.emptyTitle || 'Nothing to show',
+                    emptyMessage: payload?.emptyMessage || '',
+                    currentPage: 1,
+                };
+
+                return element.patientHistory;
+            };
+
+            // At least one page always exists, so a click can never land outside it.
+            const patientHistoryPageCount = (total) => Math.max(1, Math.ceil(total / PATIENT_HISTORY_PER_PAGE));
+
+            // Clamps anything unexpected (undefined, NaN, 0, a page past the end)
+            // back into the 1..pageCount range before it is used as an index.
+            const patientHistoryClampPage = (page, pageCount) => {
+                const wanted = parseInt(page, 10);
+                const safePage = Number.isFinite(wanted) ? wanted : 1;
+
+                return Math.min(Math.max(safePage, 1), pageCount);
+            };
+
+            const buildPatientHistoryRow = (record) => $('<tr>')
+                .append($('<td>').append(
+                    $('<div class="admin-doctor-appointment-patient">').append(
+                        $('<strong>').text(record.service ?? '—'),
+                        $('<small>').text(record.reason ?? '—'),
+                    ),
+                ))
+                .append($('<td>').append(
+                    $('<strong>').text(record.date ?? '—'),
+                    $('<small>').text(record.time ?? '—'),
+                ))
+                .append($('<td>').text(record.detail ?? '—'))
+                .append($('<td>').append(
+                    $('<span>')
+                        .addClass('admin-status-pill ' + (record.status || ''))
+                        .text(record.statusLabel ?? record.status ?? '—'),
+                ));
+
+            // Only reached when the dataset itself is empty, and it matches the empty
+            // state the row partials render, so the table is never left bare.
+            const buildPatientHistoryEmptyRow = (state, columnCount) => $('<tr>')
+                .append($('<td>').attr('colspan', columnCount).append(
+                    $('<div class="admin-doctor-empty compact">').append(
+                        $('<i>').addClass('bi bi-calendar2-x').attr('aria-hidden', 'true'),
+                        $('<strong>').text(state.emptyTitle),
+                        $('<span>').text(state.emptyMessage),
+                    ),
+                ));
+
+            const renderPatientHistoryPage = ($panel, state, requestedPage) => {
+                const $tbody = $panel.find('[data-patient-history-body]');
+
+                if (!$tbody.length) {
+                    return state.currentPage;
+                }
+
+                const pageCount = patientHistoryPageCount(state.records.length);
+                const currentPage = patientHistoryClampPage(requestedPage, pageCount);
+
+                // Page 1 is records 0-4, page 2 is 5-9, and so on; the last page
+                // simply stops at the end of the dataset, so a short final page is
+                // shown rather than skipped.
+                const startIndex = (currentPage - 1) * PATIENT_HISTORY_PER_PAGE;
+                const pageRecords = state.records.slice(startIndex, startIndex + PATIENT_HISTORY_PER_PAGE);
+                const columnCount = Math.max(1, $panel.find('table thead th').length);
+                const $rows = $(document.createDocumentFragment());
+
+                pageRecords.forEach((record) => $rows.append(buildPatientHistoryRow(record)));
+
+                if (!pageRecords.length) {
+                    $rows.append(buildPatientHistoryEmptyRow(state, columnCount));
+                }
+
+                // Rows only: the table element, its head, its footer and its controls
+                // are never emptied, which is what keeps the table on screen.
+                $tbody.empty().append($rows);
+
+                state.currentPage = currentPage;
+
+                return currentPage;
+            };
+
+            // The range line and the control states are derived from the dataset every
+            // time, so the counts stay correct on every page including a partial last one.
+            const updatePatientHistoryPagination = ($panel, state) => {
+                const $footer = $panel.find('[data-patient-history-footer]');
+
+                if (!$footer.length) {
+                    return;
+                }
+
+                const total = state.records.length;
+                const pageCount = patientHistoryPageCount(total);
+                const currentPage = patientHistoryClampPage(state.currentPage, pageCount);
+                const firstItem = total === 0 ? 0 : (currentPage - 1) * PATIENT_HISTORY_PER_PAGE + 1;
+                const lastItem = total === 0 ? 0 : Math.min(currentPage * PATIENT_HISTORY_PER_PAGE, total);
+                const $summary = $footer.find('.admin-patient-view-pagination-summary');
+
+                $summary.prop('hidden', total === 0);
+                $summary.find('[data-patient-history-from]').text(firstItem);
+                $summary.find('[data-patient-history-to]').text(lastItem);
+                $summary.find('[data-patient-history-total]').text(total);
+                $footer.find('[data-patient-history-current]').text(currentPage);
+
+                $footer.find('[data-patient-history-go]').each(function () {
+                    const direction = $(this).attr('data-patient-history-go');
+                    // With a single page there is nothing to step to and nothing to
+                    // jump to, so every control is disabled. Otherwise the two step
+                    // controls go disabled at the edges and « / » stay available as
+                    // jumps to the last and the first page.
+                    const targetPage = {
+                        first: 1,
+                        last: pageCount,
+                        prev: currentPage - 1,
+                        next: currentPage + 1,
+                    }[direction];
+                    const staysInRange = direction === 'first' || direction === 'last'
+                        ? pageCount > 1
+                        : targetPage >= 1 && targetPage <= pageCount;
+
+                    $(this).prop('disabled', !staysInRange);
+                });
+            };
+
+            const goToPatientHistoryPage = ($panel, requestedPage) => {
+                const state = readPatientHistoryState($panel);
+
+                if (!state) {
+                    return;
+                }
+
+                renderPatientHistoryPage($panel, state, requestedPage);
+                updatePatientHistoryPagination($panel, state);
+
+                // Keyboard focus follows the page number; preventScroll leaves the
+                // modal exactly where it is instead of jumping the scroll position.
+                const $current = $panel.find('[data-patient-history-current]')[0];
+
+                if ($current) {
+                    $current.focus({ preventScroll: true });
+                }
+            };
+
+            // Delegated on document so the modals injected by openPatientModal() are
+            // covered, and namespaced + re-bound so a soft navigation cannot leave two
+            // handlers behind and serve a click twice.
+            $(document).off('click.patientHistory')
+                .on('click.patientHistory', '[data-patient-history-go]', function (event) {
+                    // The controls are buttons, so this only guards against a stray
+                    // click on a disabled control, not against navigation.
+                    event.preventDefault();
+
+                    const $button = $(this);
+
+                    if ($button.prop('disabled')) {
+                        return;
+                    }
+
+                    const $panel = $button.closest('[data-patient-history]');
+                    const state = readPatientHistoryState($panel);
+
+                    if (!state) {
+                        return;
+                    }
+
+                    const pageCount = patientHistoryPageCount(state.records.length);
+                    const currentPage = patientHistoryClampPage(state.currentPage, pageCount);
+                    const targetPage = {
+                        first: 1,
+                        last: pageCount,
+                        prev: currentPage - 1,
+                        next: currentPage + 1,
+                    }[$button.attr('data-patient-history-go')];
+
+                    if (targetPage < 1 || targetPage > pageCount) {
+                        return;
+                    }
+
+                    goToPatientHistoryPage($panel, targetPage);
+                });
+
+            // Keep the controls in step with the data the server rendered first.
+            $('.admin-doctor-activity-grid [data-patient-history]').each(function () {
+                const state = readPatientHistoryState($(this));
+
+                if (state) {
+                    updatePatientHistoryPagination($(this), state);
+                }
+            });
 
             const $form = $('[data-patient-filters]');
 
@@ -625,6 +1490,8 @@
                         const patientId = new URL(href, window.location.origin).searchParams.get(type);
                         $incoming.appendTo($modalHost);
                         const element = $incoming[0];
+
+                        applyPatientFieldRules($incoming);
 
                         element.addEventListener('show.bs.modal', () => {
                             const url = new URL(window.location.href);

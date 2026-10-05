@@ -6,6 +6,16 @@
     // The middle name field only shows when the `admin` table has that column.
     $hasMiddleName = $admin !== null && array_key_exists('middlename', $admin->getAttributes());
     $nameColumn = $hasMiddleName ? 'col-md-4' : 'col-md-6';
+    // Mirrors Admin\ProfileController::NAME_PATTERN (letters and the spaces
+    // between them) so the browser and the server agree on what a name is.
+    $namePattern = '[A-Za-z]+( +[A-Za-z]+)*';
+    // Mirrors the password rules in Admin\ProfileController.
+    $passwordMinLength = \App\Http\Controllers\Admin\ProfileController::PASSWORD_MIN;
+    $passwordMaxLength = \App\Http\Controllers\Admin\ProfileController::PASSWORD_MAX;
+    $passwordSymbolThreshold = \App\Http\Controllers\Admin\ProfileController::PASSWORD_SYMBOL_THRESHOLD;
+    $passwordHint = $passwordMinLength.' to '.$passwordMaxLength
+        .' characters, with uppercase and lowercase letters and a number'
+        .' (over '.$passwordSymbolThreshold.' characters also needs a special character).';
 @endphp
 
 <header class="admin-header">
@@ -32,13 +42,10 @@
                 </span>
             </div>
 
-            <form class="admin-logout" action="{{ route('admin.logout') }}" method="POST">
-                @csrf
-                <button type="submit">
+            <button type="button" class="admin-logout-btn" data-bs-toggle="modal" data-bs-target="#adminLogoutModal">
                     <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
                     <span>Logout</span>
                 </button>
-            </form>
         </div>
     </div>
 </header>
@@ -78,7 +85,8 @@
                         <div class="row g-3">
                             <div class="{{ $nameColumn }}">
                                 <label class="form-label" for="adminProfileFirstname">First name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="adminProfileFirstname" name="firstname" value="{{ $admin->firstname }}" placeholder="First name" required maxlength="100" autocomplete="given-name">
+                                <input type="text" class="form-control" id="adminProfileFirstname" name="firstname" value="{{ $admin->firstname }}" placeholder="First name" required maxlength="100" pattern="{{ $namePattern }}" data-letters-only autocomplete="given-name">
+                                <div class="form-text">Letters and spaces only</div>
                             </div>
                             @if ($hasMiddleName)
                                 <div class="{{ $nameColumn }}">
@@ -88,7 +96,8 @@
                             @endif
                             <div class="{{ $nameColumn }}">
                                 <label class="form-label" for="adminProfileLastname">Last name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="adminProfileLastname" name="lastname" value="{{ $admin->lastname }}" placeholder="Last name" required maxlength="100" autocomplete="family-name">
+                                <input type="text" class="form-control" id="adminProfileLastname" name="lastname" value="{{ $admin->lastname }}" placeholder="Last name" required maxlength="100" pattern="{{ $namePattern }}" data-letters-only autocomplete="family-name">
+                                <div class="form-text">Letters and spaces only</div>
                             </div>
                         </div>
 
@@ -118,12 +127,12 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label" for="adminProfileNewPassword">New password <span class="text-danger">*</span></label>
-                                <input type="password" class="form-control" id="adminProfileNewPassword" name="password" placeholder="New password" required minlength="8" maxlength="100" autocomplete="new-password">
-                                <div class="form-text">Minimum 8 characters</div>
+                                <input type="password" class="form-control" id="adminProfileNewPassword" name="password" placeholder="New password" required minlength="{{ $passwordMinLength }}" maxlength="{{ $passwordMaxLength }}" autocomplete="new-password">
+                                <div class="form-text">{{ $passwordHint }}</div>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label" for="adminProfileConfirmPassword">Confirm new password <span class="text-danger">*</span></label>
-                                <input type="password" class="form-control" id="adminProfileConfirmPassword" name="password_confirmation" placeholder="Confirm new password" required minlength="8" maxlength="100" autocomplete="new-password">
+                                <input type="password" class="form-control" id="adminProfileConfirmPassword" name="password_confirmation" placeholder="Confirm new password" required minlength="{{ $passwordMinLength }}" maxlength="{{ $passwordMaxLength }}" autocomplete="new-password">
                             </div>
                         </div>
 
@@ -193,6 +202,15 @@
 
         $modal.on('hidden.bs.modal.adminProfile', resetModal);
 
+        // First and last name are letters only. Anything else is dropped as it
+        // is typed or pasted, and surrounding spaces are trimmed, so the value
+        // that reaches the server already matches the expected name format.
+        $modal.on('input.adminProfile', '[data-letters-only]', function () {
+            this.value = this.value
+                .replace(/[^A-Za-z ]+/g, '')
+                .replace(/^ +| +$/g, '');
+        });
+
         $(document).on('keydown.adminProfile', '[data-admin-profile-trigger]', function (event) {
             if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault();
@@ -250,6 +268,41 @@
                 $submit.prop('disabled', false).html(originalHtml);
             });
         });
+    });
+    </script>
+    @endpush
+
+    {{-- LOGOUT CONFIRMATION MODAL --}}
+    <div class="modal fade admin-logout-modal" id="adminLogoutModal" tabindex="-1" aria-labelledby="adminLogoutModalTitle" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 bg-white shadow-lg">
+                <div class="modal-body text-center p-4">
+                    <p class="mb-4 fw-medium">Are you sure you want to logout?</p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <button type="button" class="btn btn-light border border-dark px-4" data-bs-dismiss="modal">Cancel</button>
+                        <form action="{{ route('admin.logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn btn-danger border-0 px-4">Yes, I want to logout</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var logoutModal = document.getElementById('adminLogoutModal');
+        if (logoutModal) {
+            // Ensure modal backdrop doesn't close on click (already set via data-bs-backdrop="static")
+            // But also prevent keyboard dismissal
+            logoutModal.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                }
+            });
+        }
     });
     </script>
     @endpush

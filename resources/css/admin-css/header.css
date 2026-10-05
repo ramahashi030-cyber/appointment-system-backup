@@ -115,7 +115,24 @@
     transition: background-color .16s ease, border-color .16s ease, color .16s ease;
 }
 
-.admin-logout button {
+.admin-logout-btn {
+    display: inline-flex;
+    height: 34px;
+    align-items: center;
+    gap: 5px;
+    padding: 0 12px;
+    border: 1px solid #fff;
+    border-radius: 999px;
+    background: #fff;
+    color: #0877ed;
+    font-size: 11px;
+    text-decoration: none;
+    transition: background-color .16s ease, border-color .16s ease, color .16s ease;
+    cursor: pointer;
+}
+
+.admin-logout button,
+.admin-logout-btn {
     display: inline-flex;
     height: 100%;
     align-items: center;
@@ -128,12 +145,15 @@
     cursor: pointer;
 }
 
-.admin-logout i {
+.admin-logout i,
+.admin-logout-btn i {
     color: inherit;
 }
 
 .admin-logout:hover,
-.admin-logout:focus-visible {
+.admin-logout:focus-visible,
+.admin-logout-btn:hover,
+.admin-logout-btn:focus-visible {
     border-color: #dc3545;
     background: #dc3545;
     color: #fff;

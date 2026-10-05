@@ -92,9 +92,19 @@ class DoctorController extends Controller
 
     public function store(DoctorRequest $request): RedirectResponse
     {
-        Staff::create(array_merge($this->doctorData($request), [
+        $data = array_merge($this->doctorData($request), [
             'is_verified' => true,
-        ]));
+        ]);
+
+        // New providers are always recorded in capital letters so the roster,
+        // search results and exports all read the same way.
+        foreach (['FirstName', 'MiddleName', 'LastName'] as $nameField) {
+            if (isset($data[$nameField])) {
+                $data[$nameField] = mb_strtoupper((string) $data[$nameField]);
+            }
+        }
+
+        Staff::create($data);
 
         return redirect()
             ->route('admin.doctors')

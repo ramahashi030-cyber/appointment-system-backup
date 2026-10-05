@@ -278,6 +278,28 @@
             const currentSearch = new URLSearchParams(window.location.search);
             const initialModalState = modalStates.find(({ parameter }) => currentSearch.has(parameter));
 
+            // Names in the add doctor modal are letters only. Anything else is
+            // dropped as it is typed or pasted, and surrounding spaces are
+            // trimmed, so the value that reaches the server already matches.
+            document.querySelectorAll('[data-letters-only]').forEach((input) => {
+                input.addEventListener('input', () => {
+                    input.value = input.value
+                        .replace(/[^A-Za-z ]+/g, '')
+                        .replace(/^ +| +$/g, '');
+                });
+            });
+
+            // Employee ID and contact number take digits with optional space
+            // or hyphen separators, so anything else is dropped as it is typed
+            // or pasted.
+            document.querySelectorAll('[data-digits-only]').forEach((input) => {
+                input.addEventListener('input', () => {
+                    input.value = input.value
+                        .replace(/[^0-9 -]/g, '')
+                        .replace(/^[^0-9]+|[^0-9]+$/g, '');
+                });
+            });
+
             modalStates.forEach(({ element, parameter }) => {
                 const modal = bootstrap.Modal.getOrCreateInstance(element, {
                     backdrop: 'static',
