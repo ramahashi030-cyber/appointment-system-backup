@@ -22,3 +22,4 @@
 
 /* Cross-device layer: keep LAST so it overrides the files above */
 @import '../admin-css/mobile.css';
+@import './pages/unavailable-timeslots.css';

@@ -1,0 +1,174 @@
+/* Timeslot form: five col-md columns are too narrow on tablets */
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .admin-timeslots-page #addTimeslotForm > [class*="col-md-"] { flex: 0 0 auto; width: 50%; }
+}
+
+/* Page-scoped fixes: even spacing between panels, and light surfaces to match the patients page. */
+.admin-dashboard-content.admin-timeslots-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.admin-dashboard-content.admin-timeslots-page > * {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.admin-dashboard-content.admin-timeslots-page .admin-panel {
+    background: #fff;
+}
+
+.admin-dashboard-content.admin-timeslots-page .admin-doctor-form {
+    background: #fff;
+    padding: 1.25rem;
+}
+
+.admin-dashboard-content.admin-timeslots-page .admin-doctor-form .form-label {
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.admin-dashboard-content.admin-timeslots-page #addTimeslotBtn {
+    min-height: 38px;
+}
+
+.admin-dashboard-content.admin-timeslots-page .admin-doctor-table-wrap {
+    background: #fff;
+}
+
+.admin-dashboard-content.admin-timeslots-page .admin-doctor-table tbody td {
+    background: transparent;
+    color: #1e293b;
+}
+
+.admin-dashboard-content.admin-timeslots-page .admin-doctor-empty {
+    background: #fff;
+    color: #64748b;
+}
+
+.admin-dashboard-content.admin-timeslots-page .admin-doctor-empty strong {
+    color: #334155;
+}
+
+/* Table behavior: desktop keeps natural width, tablets get horizontal scroll (mobile.css),
+   phones become stacked cards (layout script + mobile.css). */
+@media (min-width: 768px) {
+    .admin-dashboard-content.admin-timeslots-page .admin-doctor-table-wrap {
+        overflow: visible !important;
+        max-height: none !important;
+    }
+
+    .admin-dashboard-content.admin-timeslots-page .admin-doctor-table {
+        width: 100%;
+        min-width: 0 !important;
+        table-layout: auto;
+    }
+
+    .admin-dashboard-content.admin-timeslots-page .admin-doctor-table th,
+    .admin-dashboard-content.admin-timeslots-page .admin-doctor-table td {
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+}
+
+/* editTimeslotModal: plain Bootstrap modal without admin-doctor-modal class;
+   ensure it fits mobile viewport */
+@media (max-width: 575.98px) {
+    #editTimeslotModal .modal-dialog {
+        width: calc(100% - 16px);
+        margin: 8px auto;
+    }
+}
+
+#deleteTimeslotModal .modal-content {
+    border: 2px solid transparent;
+    border-radius: 12px;
+    font-family: inherit;
+}
+
+#deleteTimeslotModal .modal-header {
+    border-bottom: 1px solid #f1f5f9;
+    padding: 1rem 1.25rem 0.75rem;
+}
+
+#deleteTimeslotModal .modal-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+#deleteTimeslotModal .modal-body {
+    padding: 1rem 1.25rem 0.5rem;
+    color: #1f2937;
+    line-height: 1.5;
+}
+
+#deleteTimeslotModal .modal-footer {
+    border-top: 1px solid #f1f5f9;
+    padding: 0.75rem 1.25rem 1rem;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+#deleteTimeslotModal .btn-danger {
+    background: #dc3545;
+    border-color: #dc3545;
+    color: #fff;
+}
+
+#deleteTimeslotModal .btn-danger:hover,
+#deleteTimeslotModal .btn-danger:focus-visible {
+    background: #bb2d3b;
+    border-color: #bb2d3b;
+}
+
+#deleteTimeslotModal .btn-light {
+    background: #fff;
+    color: #000;
+    border: 1px solid #000;
+}
+
+#deleteTimeslotModal .btn-light:hover,
+#deleteTimeslotModal .btn-light:focus-visible {
+    background: #f5f5f5;
+}
+
+#deleteTimeslotModal.modal-static .modal-dialog {
+    transform: none;
+}
+
+@keyframes deleteTimeslotBlink {
+    0% {
+        border-color: transparent;
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+    }
+    25% {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.25);
+    }
+    100% {
+        border-color: transparent;
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+    }
+}
+
+#deleteTimeslotModal .delete-modal-blink {
+    animation: deleteTimeslotBlink 0.6s ease-out;
+}
+
+@media (max-width: 575.98px) {
+    #deleteTimeslotModal .modal-dialog {
+        width: calc(100% - 16px);
+        margin: 8px auto;
+    }
+}
+
+.admin-dashboard-content.admin-timeslots-page .delete-timeslot-btn,
+.admin-dashboard-content.admin-timeslots-page .delete-timeslot-btn:hover,
+.admin-dashboard-content.admin-timeslots-page .delete-timeslot-btn:focus-visible,
+.admin-dashboard-content.admin-timeslots-page .delete-timeslot-btn i {
+    color: #dc3545;
+}

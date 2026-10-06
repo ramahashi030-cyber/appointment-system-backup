@@ -245,7 +245,19 @@
                                                     @endif
                                                     @if (($visit['mode'] ?? '') === 'FACE' && !empty($visit['qr_code_url']))
                                                         <div class="dashboard-qr-section">
-                                                            <img src="{{ $visit['qr_code_url'] }}" alt="Appointment QR Code" class="dashboard-qr-image">
+                                                            <button
+                                                                type="button"
+                                                                class="dashboard-qr-image-button"
+                                                                data-qr-expand="#appointmentQrEnlargeModal"
+                                                                data-qr-src="{{ $visit['qr_code_url'] }}"
+                                                                data-qr-alt="Appointment QR code for {{ $visitService }} on {{ $visitDate }}"
+                                                                aria-label="Enlarge appointment QR code"
+                                                            >
+                                                                <img src="{{ $visit['qr_code_url'] }}" alt="Appointment QR Code" class="dashboard-qr-image">
+                                                            </button>
+                                                            <small class="dashboard-qr-hint">
+                                                                <i class="bi bi-zoom-in" aria-hidden="true"></i>Tap the QR code to enlarge
+                                                            </small>
                                                             <small>Show this QR code at the kiosk</small>
                                                         </div>
                                                     @endif
@@ -327,6 +339,7 @@
         </footer>
 
         @include('partials.patient-dashboard-modals')
+        @include('partials.qr-enlarge-modal')
     </div>
 @endsection
 

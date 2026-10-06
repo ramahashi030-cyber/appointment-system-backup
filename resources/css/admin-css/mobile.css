@@ -81,11 +81,6 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
     .admin-main [data-appointment-table-wrap] .admin-doctor-table { min-width: 820px !important; }
 }
 
-/* Timeslot form: five col-md columns are too narrow on tablets */
-@media (min-width: 768px) and (max-width: 991.98px) {
-    .admin-timeslots-page #addTimeslotForm > [class*="col-md-"] { flex: 0 0 auto; width: 50%; }
-}
-
 /* Modal tables (profile views) keep their columns and scroll instead of being squashed */
 .admin-doctor-modal .admin-doctor-table-wrap { overflow-x: auto !important; }
 @media (max-width: 991.98px) {

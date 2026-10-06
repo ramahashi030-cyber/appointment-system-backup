@@ -11,85 +11,6 @@
 @endsection
 
 @section('content')
-    {{-- Page-scoped fixes: even spacing between panels, and light surfaces to match the patients page. --}}
-    <style>
-        .admin-dashboard-content.admin-timeslots-page {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .admin-dashboard-content.admin-timeslots-page > * {
-            margin-top: 0;
-            margin-bottom: 0;
-        }
-
-        .admin-dashboard-content.admin-timeslots-page .admin-panel {
-            background: #fff;
-        }
-
-        .admin-dashboard-content.admin-timeslots-page .admin-doctor-form {
-            background: #fff;
-            padding: 1.25rem;
-        }
-
-        .admin-dashboard-content.admin-timeslots-page .admin-doctor-form .form-label {
-            color: #1e293b;
-            font-weight: 600;
-        }
-
-        .admin-dashboard-content.admin-timeslots-page #addTimeslotBtn {
-            min-height: 38px;
-        }
-
-        .admin-dashboard-content.admin-timeslots-page .admin-doctor-table-wrap {
-            background: #fff;
-        }
-
-        .admin-dashboard-content.admin-timeslots-page .admin-doctor-table tbody td {
-            background: transparent;
-            color: #1e293b;
-        }
-
-        .admin-dashboard-content.admin-timeslots-page .admin-doctor-empty {
-            background: #fff;
-            color: #64748b;
-        }
-
-        .admin-dashboard-content.admin-timeslots-page .admin-doctor-empty strong {
-            color: #334155;
-        }
-
-        /* Table behavior: desktop keeps natural width, tablets get horizontal scroll (mobile.css),
-           phones become stacked cards (layout script + mobile.css). */
-        @media (min-width: 768px) {
-            .admin-dashboard-content.admin-timeslots-page .admin-doctor-table-wrap {
-                overflow: visible !important;
-                max-height: none !important;
-            }
-
-            .admin-dashboard-content.admin-timeslots-page .admin-doctor-table {
-                width: 100%;
-                min-width: 0 !important;
-                table-layout: auto;
-            }
-
-            .admin-dashboard-content.admin-timeslots-page .admin-doctor-table th,
-            .admin-dashboard-content.admin-timeslots-page .admin-doctor-table td {
-                white-space: normal;
-                overflow-wrap: anywhere;
-            }
-        }
-
-        /* editTimeslotModal: plain Bootstrap modal without admin-doctor-modal class;
-           ensure it fits mobile viewport */
-        @media (max-width: 575.98px) {
-            #editTimeslotModal .modal-dialog {
-                width: calc(100% - 16px);
-                margin: 8px auto;
-            }
-        }
-    </style>
 
     <div class="admin-dashboard-content admin-doctor-content admin-timeslots-page"
          data-timeslots-page
@@ -246,6 +167,28 @@
                         <button type="submit" class="btn btn-primary" id="editTimeslotSave">Save</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- Delete confirmation modal --}}
+    <div class="modal fade" id="deleteTimeslotModal" tabindex="-1" aria-labelledby="deleteTimeslotModalTitle" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="deleteTimeslotModalTitle">
+                        <i class="bi bi-trash3 text-danger" aria-hidden="true"></i>
+                        Delete timeslot?
+                    </h2>
+                </div>
+                <div class="modal-body">
+                    Delete the unavailable timeslot for <strong id="deleteTimeslotService"></strong> on <strong id="deleteTimeslotDate"></strong> (<span id="deleteTimeslotTime"></span>)?
+                    <div class="text-muted small mt-2">This action cannot be undone.</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="deleteTimeslotConfirm">Yes, I want to delete</button>
+                </div>
             </div>
         </div>
     </div>
@@ -437,6 +380,34 @@
             });
 
             const editModal = bootstrap.Modal.getOrCreateInstance(editModalEl);
+            const deleteModalEl = document.getElementById('deleteTimeslotModal');
+            const deleteModal = deleteModalEl ? bootstrap.Modal.getOrCreateInstance(deleteModalEl) : null;
+            const deleteTimeslotService = document.getElementById('deleteTimeslotService');
+            const deleteTimeslotDate = document.getElementById('deleteTimeslotDate');
+            const deleteTimeslotTime = document.getElementById('deleteTimeslotTime');
+            const deleteTimeslotConfirm = document.getElementById('deleteTimeslotConfirm');
+            let pendingDeleteId = null;
+            let isDeleting = false;
+
+            if (deleteModalEl && deleteTimeslotConfirm) {
+                deleteTimeslotConfirm.addEventListener('click', () => {
+                    if (!pendingDeleteId || isDeleting) {
+                        return;
+                    }
+                    handleDeleteConfirmed(pendingDeleteId);
+                });
+
+                deleteModalEl.addEventListener('hidePrevented.bs.modal', () => {
+                    const content = deleteModalEl.querySelector('.modal-content');
+                    if (!content) return;
+                    content.classList.remove('delete-modal-blink');
+                    void content.offsetWidth;
+                    content.classList.add('delete-modal-blink');
+                    content.addEventListener('animationend', () => {
+                        content.classList.remove('delete-modal-blink');
+                    }, { once: true });
+                });
+            }
 
             async function openEditModal(id) {
                 const item = rowsById[id];
@@ -492,16 +463,24 @@
 
             async function handleDelete(btn) {
                 const item = rowsById[btn.dataset.timeslotId];
-                if (!item) return;
+                if (!item || !deleteModal) return;
 
-                if (!confirm(`Delete the unavailable timeslot for "${item.service_name}" on ${item.date} (${item.time_label})?`)) {
-                    return;
+                pendingDeleteId = item.id;
+                if (deleteTimeslotService) deleteTimeslotService.textContent = item.service_name || '';
+                if (deleteTimeslotDate) deleteTimeslotDate.textContent = item.date || '';
+                if (deleteTimeslotTime) deleteTimeslotTime.textContent = item.time_label || '';
+                deleteModal.show();
+            }
+
+            async function handleDeleteConfirmed(id) {
+                const item = rowsById[id];
+                const destroyUrl = destroyUrlTemplate.replace('__ID__', id);
+
+                isDeleting = true;
+                if (deleteTimeslotConfirm) {
+                    deleteTimeslotConfirm.disabled = true;
+                    deleteTimeslotConfirm.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...';
                 }
-
-                const destroyUrl = destroyUrlTemplate.replace('__ID__', item.id);
-
-                btn.disabled = true;
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
 
                 try {
                     const response = await fetch(destroyUrl, {
@@ -515,12 +494,19 @@
                         throw data;
                     }
 
+                    if (deleteModal) deleteModal.hide();
                     showToast('success', data.message);
                     loadTimeslots();
                 } catch (error) {
+                    if (deleteModal) deleteModal.hide();
                     showToast('error', error.message || 'Failed to delete timeslot.');
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="bi bi-trash3" aria-hidden="true"></i><span>Delete</span>';
+                } finally {
+                    isDeleting = false;
+                    pendingDeleteId = null;
+                    if (deleteTimeslotConfirm) {
+                        deleteTimeslotConfirm.disabled = false;
+                        deleteTimeslotConfirm.innerHTML = 'Yes, I want to delete';
+                    }
                 }
             }
 

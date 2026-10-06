@@ -516,6 +516,18 @@
                 margin-bottom: 14px;
             }
 
+            /* Mobile: "All types of service" is cut off inside the service dropdown.
+               The control keeps its fixed 38px height while mobile forces a 16px font
+               (mobile.css), but app.css still gives .form-select 11.2px of vertical
+               padding -- leaving a 13.6px content box for a 22.4px line box, so the
+               label overflows and is clipped. Only the vertical padding is reduced;
+               height, border, border-radius, background, arrow, width, position and
+               the spacing fixed above are all left exactly as they were. */
+            .admin-sms-page .admin-sms-toolbar .admin-doctor-filters > .form-select {
+                padding-top: 4px;
+                padding-bottom: 4px;
+            }
+
             .admin-sms-page .admin-sms-actions .admin-primary-button {
                 width: 100%;
                 justify-content: center;

@@ -100,6 +100,9 @@
                                         >
                                             <i class="bi bi-qr-code me-1" aria-hidden="true"></i>QR Code
                                         </button>
+                                        <small class="appointment-qr-hint">
+                                            <i class="bi bi-zoom-in" aria-hidden="true"></i>Tap the QR code to enlarge
+                                        </small>
                                     </div>
                                 @endif
                             </div>
@@ -216,18 +219,23 @@
                                 @endif
                             </div>
 
-                            <div class="d-flex flex-column flex-sm-row gap-2 no-print">
+                            <div class="d-flex flex-column flex-sm-row gap-2 no-print appointment-qr-actions">
                                 @if ($aGroup === 'upcoming')
                                     @if ($aQrUrl)
-                                        <button
-                                            type="button"
-                                            class="btn btn-outline-dark btn-pill appointment-qr-button"
-                                            data-qr-expand="#appointmentQrEnlargeModal"
-                                            data-qr-src="{{ $aQrUrl }}"
-                                            data-qr-alt="Appointment QR code for {{ $aService }} on {{ $aDate }}"
-                                        >
-                                            <i class="bi bi-qr-code me-1" aria-hidden="true"></i>QR Code
-                                        </button>
+                                        <div class="appointment-qr-field">
+                                            <button
+                                                type="button"
+                                                class="btn btn-outline-dark btn-pill appointment-qr-button"
+                                                data-qr-expand="#appointmentQrEnlargeModal"
+                                                data-qr-src="{{ $aQrUrl }}"
+                                                data-qr-alt="Appointment QR code for {{ $aService }} on {{ $aDate }}"
+                                            >
+                                                <i class="bi bi-qr-code me-1" aria-hidden="true"></i>QR Code
+                                            </button>
+                                            <small class="appointment-qr-hint">
+                                                <i class="bi bi-zoom-in" aria-hidden="true"></i>Tap the QR code to enlarge
+                                            </small>
+                                        </div>
                                     @endif
 
                                     @if ($aMode === 'TELE' && ($appt['can_create_room'] ?? false))
@@ -274,24 +282,7 @@
 
     @include('partials.appointment-cancel-modal')
 
-    <div class="modal fade qr-enlarge-modal" id="appointmentQrEnlargeModal" tabindex="-1" aria-labelledby="appointmentQrEnlargeTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <header class="qr-enlarge-header">
-                    <div>
-                        <h2 id="appointmentQrEnlargeTitle">Appointment QR code</h2>
-                        <span>Click close when you are ready to return to your appointments.</span>
-                    </div>
-                    <button type="button" class="qr-enlarge-close" data-bs-dismiss="modal" aria-label="Close enlarged QR code">
-                        <i class="bi bi-x-lg" aria-hidden="true"></i>
-                    </button>
-                </header>
-                <div class="modal-body qr-enlarge-body">
-                    <img data-qr-enlarged-image alt="Enlarged appointment QR code" src="">
-                </div>
-            </div>
-        </div>
-    </div>
+    @include('partials.qr-enlarge-modal')
 @endsection
 
 @push('scripts')

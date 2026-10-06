@@ -46,6 +46,23 @@
             .admin-main [data-appointment-table-wrap] .admin-doctor-table > tbody > tr:nth-child(n+4) {
                 display: none !important;
             }
+
+            {{-- Filter dropdowns: doctor.css pins each .form-select to a 38px box and
+                 app.css adds .7rem (11.2px) top/bottom padding, so once the two 1px
+                 borders are taken out only a 13.6px content box is left. The
+                 inherited 1.5 line-height needs 24px for the 16px mobile font, so the
+                 line box no longer fits: the browser clamps it to the top of that
+                 box and cuts the glyphs off at the box bottom, which is why only the
+                 upper part of every label was showing. 0.85 x 16px = 13.6px makes the
+                 line box fit the very same box, so the text is centred again and the
+                 whole label renders. Nothing else changes - height, padding, font
+                 size, colour, arrow, spacing and box size all stay exactly as they
+                 were - and desktop and tablet never enter this query, so the Face to
+                 Face and Telemedicine pages (which share this template) get the one
+                 identical fix. --}}
+            .admin-doctor-filters > .form-select {
+                line-height: 0.85;
+            }
         }
     </style>
     <div class="admin-dashboard-content admin-doctor-content">
