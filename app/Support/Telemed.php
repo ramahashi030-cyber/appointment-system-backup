@@ -214,7 +214,7 @@ class Telemed
             ->orderByDesc('created_at')
             ->first();
 
-        if ($row === null) {
+        if ($row === null || AppointmentWindow::hasEnded($row)) {
             return null;
         }
 
@@ -229,7 +229,7 @@ class Telemed
             'service_name' => $service?->service_name
                 ?? ConsultationReason::tryFrom((string) $row->consultation_reason)?->label()
                 ?? 'Telemedicine',
-            'is_expired' => $row->date?->lt(Carbon::today()) ?? false,
+            'is_expired' => AppointmentWindow::hasEnded($row),
         ];
     }
 

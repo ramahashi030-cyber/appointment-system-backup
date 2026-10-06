@@ -160,7 +160,11 @@
                     $aComplaintDetails = $appt['complaint_details'] ?? null;
                 @endphp
 
-                <div class="card visit-card" data-group="{{ $aGroup }}">
+                <div class="card visit-card"
+                     data-group="{{ $aGroup }}"
+                     data-patient-visit-row
+                     data-appointment-id="{{ $appt['id'] ?? 0 }}"
+                     data-room-status-url="{{ $appt['room_status_url'] ?? '' }}">
                     <div class="card-body p-0 d-flex flex-column flex-md-row">
 
                         <div class="visit-date">
@@ -199,9 +203,9 @@
                                 @endif
 
                                 @if ($aExpired)
-                                    <span class="badge bg-warning text-dark">Expired</span>
+                                    <span class="badge bg-warning text-dark" data-patient-status-badge>Expired</span>
                                 @else
-                                    <span class="badge rounded-pill {{ $aIsActive ? 'bg-primary' : 'bg-secondary' }}">
+                                    <span class="badge rounded-pill {{ $aIsActive ? 'bg-primary' : 'bg-secondary' }}" data-patient-status-badge>
                                         {{ $aStatus }}
                                     </span>
                                 @endif
@@ -225,16 +229,16 @@
                                         <form method="POST" action="{{ $appt['open_room_url'] ?? '#' }}" class="d-inline" data-patient-create-room-form>
                                             @csrf
                                             <button type="submit" class="btn btn-primary btn-pill" data-patient-room-action="create">
-                                                <i class="bi bi-camera-video me-1"></i>Create Jitsi Room
+                                                <i class="bi bi-camera-video me-1"></i>Create a Room
                                             </button>
                                         </form>
                                     @elseif ($aMode === 'TELE' && ($appt['can_join'] ?? false))
                                         <a href="{{ $aLink }}" target="_blank" rel="noopener"
                                            class="btn btn-success btn-pill" data-patient-room-action="join">
-                                            <i class="bi bi-camera-video me-1"></i>Join Jitsi
+                                            <i class="bi bi-camera-video me-1"></i>Join the Room
                                         </a>
                                     @elseif ($aMode === 'TELE')
-                                        <span class="btn btn-outline-secondary btn-pill disabled">
+                                        <span class="btn btn-outline-secondary btn-pill disabled" data-patient-room-action="pending">
                                             <i class="bi bi-hourglass-split me-1"></i>Room not ready
                                         </span>
                                     @endif
@@ -286,6 +290,31 @@
 @endsection
 
 @push('scripts')
+    @php
+        // This page renders no notification modal, so it carries its own copy
+        // of the realtime settings (same private channel, same Reverb socket)
+        // for the shared connection in resources/js/realtime.js.
+        $roomActor = \App\Support\Notifications\NotificationActor::current();
+        $roomReverb = config('broadcasting.default') === 'reverb'
+            && filled(config('broadcasting.connections.reverb.key'));
+        $roomConfig = [
+            'channel' => $roomActor !== null
+                ? sprintf('user.%s.%s', $roomActor['type'], $roomActor['id'])
+                : null,
+            'broadcast' => $roomReverb ? [
+                'key' => config('broadcasting.connections.reverb.key'),
+                'host' => config('broadcasting.connections.reverb.options.host'),
+                'port' => config('broadcasting.connections.reverb.options.port'),
+                'forceTLS' => config('broadcasting.connections.reverb.options.use_tls'),
+                'authEndpoint' => route('notifications.auth'),
+            ] : null,
+            'csrf' => csrf_token(),
+        ];
+    @endphp
+    <script>
+        window.QMMC_TELEMED_ROOMS = @json($roomConfig);
+    </script>
+
     <script>
         /* Upcoming / Past / All filter */
         document.querySelectorAll('[data-filter]').forEach(btn => {

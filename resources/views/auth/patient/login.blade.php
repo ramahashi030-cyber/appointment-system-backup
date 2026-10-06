@@ -93,6 +93,42 @@
 
 @endsection
 
+@push('styles')
+    {{-- auth.css wraps this stack in a <style> tag, so only raw CSS is pushed here.
+
+         Mobile login: centre the form in the available height and keep the
+         copyright on the page footer instead of under the form.
+
+         Below 992px auth.css sets .auth-pane-form to justify-content:flex-start,
+         which is what leaves the form stuck against the top of the screen, and it
+         drops .auth-foot to position:static so the copyright collapses underneath
+         the form. Both are corrected for the login page only. Desktop is left
+         alone because these rules sit inside the same max-width query, so the
+         >991.98px layout still uses the original auth.css values.
+
+         The footer is absolutely positioned exactly as it already is on desktop,
+         and the pane reserves a matching bottom padding band, so the two can
+         never collide: when the form is taller than the viewport the pane grows
+         (min-height, not a fixed height) and carries the footer down with it.
+         Nothing here uses fixed offsets, so short and landscape viewports simply
+         scroll instead of overlapping. --}}
+    @media (max-width: 991.98px) {
+        .auth-login-page .auth-pane-form {
+            justify-content: center;
+            padding-bottom: 104px;
+        }
+
+        .auth-login-page .auth-foot {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 30px;
+            margin-top: 0;
+            padding: 0 18px;
+        }
+    }
+@endpush
+
 @push('scripts')
 <script>
     (function () {

@@ -29,14 +29,6 @@
     .admin-header-inner {
         padding: 0 18px;
     }
-
-    .admin-user-copy {
-        display: none;
-    }
-
-    .admin-logout span {
-        display: none;
-    }
 }
 
 @media (max-width: 767px) {

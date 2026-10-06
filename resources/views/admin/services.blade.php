@@ -10,6 +10,58 @@
     @include('partials.admin-header')
 @endsection
 
+@push('styles')
+    <style>
+        /*
+         * Add Service action row.
+         *
+         * `.admin-primary-button` carries a `margin-top: 8px` because it is
+         * normally stacked on its own line, and it has no `gap`, while
+         * `.admin-secondary-button` has neither. Inside the flex action row
+         * that dropped Create service 8px below Cancel and let its tick icon
+         * touch the label. Both declarations are scoped to this one modal, so
+         * the shared buttons and the Edit / Delete rows are untouched.
+         */
+        #addServiceModal .admin-service-form-actions {
+            align-items: center;
+        }
+
+        #addServiceModal .admin-service-form-actions .admin-primary-button {
+            margin-top: 0;
+            gap: 7px;
+        }
+
+        /* Table behavior: desktop keeps natural width, tablets get horizontal scroll (mobile.css),
+           phones become stacked cards (layout script + mobile.css). */
+        @media (min-width: 768px) {
+            .admin-doctor-table-wrap {
+                overflow: visible !important;
+                max-height: none !important;
+            }
+
+            .admin-doctor-table {
+                width: 100%;
+                min-width: 0 !important;
+                table-layout: auto;
+            }
+
+            .admin-doctor-table th,
+            .admin-doctor-table td {
+                white-space: normal;
+                overflow-wrap: anywhere;
+            }
+        }
+
+        /* modal-wide / narrow on mobile: fit viewport without horizontal overflow */
+        @media (max-width: 575.98px) {
+            .admin-service-modal .modal-dialog {
+                width: calc(100% - 16px);
+                margin: 8px auto;
+            }
+        }
+    </style>
+@endpush
+
 @php
     /*
      * Real rows for the edit modal, keyed by service id. Rendered from the
@@ -293,9 +345,13 @@
         </div>
     </div>
 
-    {{-- EDIT SERVICE MODAL --}}
+    {{-- EDIT SERVICE MODAL
+         Dismissible backdrop (stated rather than left to the Bootstrap
+         default): a click on the dimmed area outside the dialog closes it,
+         while a click inside the dialog does not. The script flashes the
+         danger colour once on that same outside click. --}}
     <div class="modal fade admin-doctor-modal admin-service-modal" id="editServiceModal" tabindex="-1"
-         aria-labelledby="editServiceModalTitle" aria-hidden="true">
+         aria-labelledby="editServiceModalTitle" aria-hidden="true" data-bs-backdrop="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <header class="modal-header admin-doctor-modal-header">
@@ -338,9 +394,11 @@
         </div>
     </div>
 
-    {{-- DELETE SERVICE MODAL --}}
+    {{-- DELETE SERVICE MODAL
+         Same dismissible backdrop as the Edit modal: outside click closes it
+         and flashes the danger colour once, inside click does neither. --}}
     <div class="modal fade admin-doctor-modal admin-service-modal admin-service-modal-narrow" id="deleteServiceModal" tabindex="-1"
-         aria-labelledby="deleteServiceModalTitle" aria-hidden="true">
+         aria-labelledby="deleteServiceModalTitle" aria-hidden="true" data-bs-backdrop="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <header class="modal-header admin-doctor-modal-header">
@@ -472,6 +530,10 @@
                     inputs[0].value = slot && slot.time_slot != null ? slot.time_slot : '';
                     inputs[1].value = slot && slot.slots != null ? slot.slots : '';
 
+                    /* A row built here is never server-rendered, so the time slot
+                       rules are applied here as well as on the initial pass. */
+                    applyServiceFieldRules(row);
+
                     return row;
                 }
 
@@ -574,6 +636,57 @@
                 addModal.hide();
             });
 
+            /* ------------------------------------- outside click: edit / delete */
+
+            /*
+             * Bootstrap decides an outside click with one test: the `mousedown`
+             * and the `click` both have to land on the `.modal` element itself.
+             * (`.modal-dialog` is pointer-events: none and `.modal-content` is
+             * auto, so every click outside the dialog resolves to `.modal`, and
+             * a click inside it never does.) The blink below is armed by exactly
+             * the same pair, so it fires once per outside click, never for a
+             * click inside the dialog, and never for a drag that starts inside
+             * and ends outside.
+             *
+             * It reuses the existing `admin-service-modal-blocked` class and its
+             * `adminServiceModalBlocked` keyframes rather than adding a second
+             * animation: one 0.5s run that flashes the services danger colour
+             * #d9534f and returns to the modal's own border, dropped again on
+             * `animationend` so it cannot loop. The forced reflow is what lets a
+             * second outside click flash again instead of being ignored.
+             */
+            function blinkServiceModal(element) {
+                const content = element.querySelector('.modal-content');
+
+                content.classList.remove('admin-service-modal-blocked');
+                void content.offsetWidth;
+                content.classList.add('admin-service-modal-blocked');
+            }
+
+            [editEl, deleteEl].forEach(function (element) {
+                const content = element.querySelector('.modal-content');
+
+                content.addEventListener('animationend', function (event) {
+                    if (event.animationName === 'adminServiceModalBlocked') {
+                        content.classList.remove('admin-service-modal-blocked');
+                    }
+                });
+
+                element.addEventListener('mousedown', function (event) {
+                    if (event.target !== element) {
+                        return;
+                    }
+
+                    element.addEventListener('click', function (clickEvent) {
+                        if (clickEvent.target !== element) {
+                            return;
+                        }
+
+                        blinkServiceModal(element);
+                    }, { once: true });
+                });
+            });
+
             /* ------------------------------------------------ edit modal */
 
             root.querySelectorAll('[data-service-edit]').forEach(function (button) {
@@ -613,6 +726,200 @@
                     deleteConfirm.disabled = count > 0;
 
                     deleteModal.show();
+                });
+            });
+
+            /* ------------------------------------------- service field rules */
+
+            /*
+             * Service name, HOMIS code and Time slot live in the shared
+             * admin.services._form partial, so the rules are declared once here
+             * and applied to whichever form is in scope — the same approach the
+             * patient page uses. Sanitising on `input` also covers paste, autofill
+             * and drag-drop, because all of them raise `input`; the submit pass
+             * is the backstop for a value that never came through `input` (a
+             * stored row filled in by fillEdit, for instance) and is what refuses
+             * the submission.
+             *
+             * Deliberately no `pattern` attribute: HTML constraint validation
+             * runs *before* the submit event, so a stored value that predates
+             * these rules would raise an opaque native bubble the admin cannot
+             * act on. Without it the submit pass always gets its turn, corrects
+             * the field, and reports the field and the reason on the flashcard —
+             * which is also what keeps stored service names from being rewritten
+             * behind the admin's back.
+             *
+             * The cleaners only remove characters the field does not accept.
+             * Leading and trailing spaces are deliberately NOT trimmed there:
+             * stripping them on every keystroke eats the space the user is about
+             * to type after "Family", which would weld the next word onto it.
+             * They are trimmed once, by `finish`, on submit.
+             *
+             * Time slot keeps the stored "08:00 - 10:00" shape (Service::
+             * syncTimeslots matches rows on that label), so digits, colons,
+             * spaces and the range dash stay and letters do not.
+             */
+            const cleanServiceName = (value) => value
+                .replace(/[^A-Za-z0-9 ]+/g, '')
+                .replace(/ {2,}/g, ' ')
+                .slice(0, 100);
+
+            const cleanServiceHomis = (value) => value
+                .replace(/[^A-Za-z0-9]+/g, '')
+                .slice(0, 50);
+
+            const cleanServiceTimeSlot = (value) => value
+                .replace(/[^0-9:\- ]+/g, '')
+                .replace(/ {2,}/g, ' ')
+                .slice(0, 50);
+
+            const finishServiceText = (value) => value.trim();
+
+            const serviceFieldRules = [
+                {
+                    selector: 'input[name="service_name"]',
+                    label: 'Service name',
+                    maxlength: 100,
+                    clean: cleanServiceName,
+                    finish: finishServiceText,
+                    message: 'Service name may only contain letters, numbers and spaces.',
+                },
+                {
+                    selector: 'input[name="homis_code"]',
+                    label: 'HOMIS code',
+                    maxlength: 50,
+                    clean: cleanServiceHomis,
+                    finish: finishServiceText,
+                    message: 'HOMIS code may only contain letters and numbers.',
+                },
+                {
+                    selector: 'input[name$="[time_slot]"]',
+                    label: 'Time slot',
+                    maxlength: 50,
+                    clean: cleanServiceTimeSlot,
+                    finish: finishServiceText,
+                    message: 'Time slot may only contain digits, colons and the range dash, as in 08:00 - 10:00.',
+                },
+            ];
+
+            function serviceRuleFor(input) {
+                return serviceFieldRules.find(function (rule) {
+                    return input.matches(rule.selector);
+                });
+            }
+
+            function applyServiceFieldRules(scope) {
+                serviceFieldRules.forEach(function (rule) {
+                    scope.querySelectorAll(rule.selector).forEach(function (input) {
+                        input.setAttribute('maxlength', rule.maxlength);
+                    });
+                });
+            }
+
+            /* Returns true when the field actually had to be corrected. */
+            function sanitizeServiceField(input, rule) {
+                const cleaned = rule.clean(input.value);
+
+                if (cleaned === input.value) {
+                    return false;
+                }
+
+                input.value = cleaned;
+
+                return true;
+            }
+
+            function serviceFields(scope) {
+                return Array.prototype.slice.call(scope.querySelectorAll('input')).filter(function (input) {
+                    return serviceRuleFor(input) !== undefined;
+                });
+            }
+
+            /* ---------------------------------------- flashcard notices */
+
+            /*
+             * The established admin toast (see admin/timeslots.blade.php and
+             * admin/holidays — same `.admin-toast` markup and the same
+             * holidays.css styling, already loaded for this page). It replaces a
+             * browser alert with a dismissible flashcard that carries the same
+             * message, clears any earlier one instead of stacking, and removes
+             * itself after three seconds so it never blocks the page.
+             */
+            function showToast(type, message) {
+                document.querySelectorAll('.admin-toast').forEach(function (card) {
+                    card.remove();
+                });
+
+                const toast = document.createElement('div');
+                toast.className = 'admin-toast alert alert-' + (type === 'success' ? 'success' : 'danger')
+                    + ' alert-dismissible fade show position-fixed';
+                toast.style.cssText = 'top: 1rem; right: 1rem; z-index: 9999; min-width: 300px;';
+                toast.setAttribute('role', 'alert');
+
+                const text = document.createElement('span');
+                text.textContent = message;
+                toast.appendChild(text);
+
+                const close = document.createElement('button');
+                close.type = 'button';
+                close.className = 'btn-close';
+                close.setAttribute('data-bs-dismiss', 'alert');
+                close.setAttribute('aria-label', 'Close');
+                toast.appendChild(close);
+
+                document.body.appendChild(toast);
+
+                setTimeout(function () {
+                    toast.classList.remove('show');
+                    setTimeout(function () {
+                        toast.remove();
+                    }, 150);
+                }, 3000);
+            }
+
+            /* Server-rendered rows exist only in the add form; makeRow covers the
+               rest, so both entry points are attributed. */
+            applyServiceFieldRules(addForm);
+            applyServiceFieldRules(editForm);
+
+            [addForm, editForm].forEach(function (form) {
+                /* Delegated, so a timeslot row added after load is covered too. */
+                form.addEventListener('input', function (event) {
+                    const rule = serviceRuleFor(event.target);
+
+                    if (rule) {
+                        sanitizeServiceField(event.target, rule);
+                    }
+                });
+
+                form.addEventListener('submit', function (event) {
+                    const invalid = serviceFields(form).filter(function (input) {
+                        const rule = serviceRuleFor(input);
+                        const cleaned = rule.finish(rule.clean(input.value));
+
+                        if (cleaned === input.value) {
+                            return false;
+                        }
+
+                        input.value = cleaned;
+
+                        return true;
+                    });
+
+                    if (invalid.length === 0) {
+                        return;
+                    }
+
+                    event.preventDefault();
+
+                    showToast('error', invalid.length === 1
+                        ? serviceRuleFor(invalid[0]).message
+                        : invalid.length + ' fields contain characters they do not accept: '
+                            + invalid.map(function (input) {
+                                return serviceRuleFor(input).label;
+                            }).join(', ') + '.');
+
+                    invalid[0].focus();
                 });
             });
 

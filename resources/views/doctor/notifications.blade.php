@@ -48,7 +48,7 @@
                             <td>{{ $appointment['service_name'] }}</td>
                             <td>{{ $appointment['date_display'] }}</td>
                             <td>{{ $appointment['time_display'] }}</td>
-                            <td><span class="doctor-status {{ $appointment['status_class'] }}">{{ $appointment['status_label'] }}</span></td>
+                            <td><span class="doctor-status {{ $appointment['status_class'] }}" data-doctor-status>{{ $appointment['status_label'] }}</span></td>
                             <td>
                                 @if ($appointment['can_join'])
                                     <a href="{{ $appointment['meeting_link'] }}" target="_blank" rel="noopener" class="doctor-action-button primary"><i class="bi bi-camera-video-fill" aria-hidden="true"></i>Start</a>

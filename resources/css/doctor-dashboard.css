@@ -418,6 +418,40 @@
     display: inline;
 }
 
+/*
+ * Doctor logout button is styled to match the patient dashboard's
+ * `.patient-logout-button`: 40px white pill, light border, black label,
+ * blue fill on hover. Scoped to the logout form so the other
+ * .doctor-action-button uses (save / cancel actions) keep their own look.
+ */
+.doctor-logout-form .doctor-action-button {
+    display: inline-flex;
+    height: 40px;
+    min-height: 40px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 16px;
+    border: 1px solid #d5e4f5;
+    border-radius: 999px;
+    background: #fff;
+    color: #000;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.doctor-logout-form .doctor-action-button i {
+    color: inherit;
+}
+
+.doctor-logout-form .doctor-action-button:hover,
+.doctor-logout-form .doctor-action-button:focus-visible {
+    background: #0d67d4;
+    color: #fff;
+}
+
 .doctor-main {
     min-width: 0;
     flex: 1;

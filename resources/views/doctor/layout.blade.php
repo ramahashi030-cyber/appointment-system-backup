@@ -19,6 +19,7 @@
         'resources/css/notifications.css',
         'resources/js/doctor-dashboard.js',
         'resources/js/notifications.js',
+        'resources/js/telemed-rooms.js',
     ])
 
     @stack('head')
@@ -189,6 +190,31 @@
                     <a href="#" target="_blank" rel="noopener" class="doctor-action-button primary" data-doctor-modal-start>
                         <i class="bi bi-camera-video-fill" aria-hidden="true"></i>Start consultation
                     </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Confirmation shown before a doctor creates the consultation room. --}}
+    <div class="modal fade" id="doctorCreateRoomModal" tabindex="-1" aria-labelledby="doctorCreateRoomModalTitle" aria-hidden="true" data-doctor-create-room-modal>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="doctorCreateRoomModalTitle">Create Consultation Room?</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">
+                        Creating the room will mark this appointment as <strong>Booked</strong>.
+                        The patient will then be able to join the consultation room.
+                    </p>
+                    <div class="alert alert-danger mt-3 mb-0" data-doctor-create-room-error hidden></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="doctor-action-button" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="doctor-action-button primary" data-doctor-create-room-confirm>
+                        <i class="bi bi-camera-video-fill" aria-hidden="true"></i>Create Room
+                    </button>
                 </div>
             </div>
         </div>

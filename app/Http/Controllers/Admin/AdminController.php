@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
+use App\Models\AuditLog;
 use App\Models\Patient;
 use App\Models\PatientRequest;
 use App\Models\Service;
@@ -29,7 +30,7 @@ class AdminController extends Controller
 
         return view('admin.dashboard', [
             'statCards' => $this->statCards($stats),
-            'pendingRequests' => $this->pendingRequests(),
+            'staffActivity' => $this->staffActivity(),
             'quickLinks' => $this->quickLinks(),
         ]);
     }
@@ -244,6 +245,38 @@ class AdminController extends Controller
             ['route' => 'admin.appointments', 'label' => 'Appointments', 'description' => 'Review and approve requests', 'icon' => 'bi-calendar2-week-fill', 'tone' => 'green'],
             ['route' => 'admin.records', 'label' => 'Records', 'description' => 'Prescriptions & results', 'icon' => 'bi-file-earmark-medical-fill', 'tone' => 'orange'],
         ];
+    }
+
+    /**
+     * Fetch the most recent staff activity audit logs for the dashboard.
+     *
+     * @return array<int, array{id: int, created_at: Carbon, username: string, user_role: string, action: string, module: string, record_id: int|null, patient_name: string|null}>
+     */
+    private function staffActivity(): array
+    {
+        if (! Schema::hasTable('audit_logs')) {
+            return [];
+        }
+
+        return AuditLog::query()
+            ->where('user_role', '!=', 'Patient')
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->limit(8)
+            ->get(['id', 'created_at', 'username', 'user_role', 'action', 'module', 'record_id'])
+            ->map(function (AuditLog $log): array {
+                return [
+                    'id' => $log->id,
+                    'created_at' => $log->created_at,
+                    'username' => $log->username,
+                    'user_role' => $log->user_role,
+                    'action' => $log->action,
+                    'module' => $log->module,
+                    'record_id' => $log->record_id,
+                    'patient_name' => null,
+                ];
+            })
+            ->all();
     }
 
     private function modulePage(string $title, string $description, string $icon): View

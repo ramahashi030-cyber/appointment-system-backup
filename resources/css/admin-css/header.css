@@ -1,18 +1,20 @@
-/* QMMC Admin Header */
+/* QMMC Admin Header - Unified Design (Mobile-First, Applied to All Screen Sizes) */
 .admin-header {
     position: sticky;
     top: 0;
     z-index: 1025;
     min-height: 74px;
     margin-top: 10px;
+    background: var(--admin-blue);
+    border-radius: 0;
 }
 
 .admin-header-inner {
     display: flex;
     min-height: 74px;
     align-items: center;
-    gap: 18px;
-    padding: 0 30px;
+    gap: 12px;
+    padding: 0 20px;
 }
 
 .admin-menu-toggle {
@@ -28,46 +30,52 @@
     font-size: 25px;
 }
 
+/* Notification Bell - Consistent across all screen sizes */
+.admin-header-actions .rtm-bell--admin {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.admin-header-actions .rtm-bell--admin i {
+    color: #fff;
+    font-size: 20px;
+}
+.admin-header-actions .rtm-bell--admin:hover,
+.admin-header-actions .rtm-bell--admin:focus-visible {
+    background: rgba(255, 255, 255, .15);
+    color: #fff;
+    box-shadow: none;
+    transform: none;
+}
+
+/* Header Actions Container - Transparent, no blue background */
 .admin-header-actions {
     display: flex;
     min-width: 0;
     align-items: center;
-    gap: 20px;
+    gap: 8px;
     margin-left: auto;
-    padding: 10px;
-    border: 1px solid #0877ed;
-    border-radius: 50px;
-    background: #0877ed;
-}
-
-.admin-header-icon {
-    position: relative;
-    display: inline-flex;
-    width: 34px;
-    height: 40px;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 20px;
-    text-decoration: none;
-    transition: color .16s ease, filter .16s ease;
-}
-
-.admin-header-icon:hover,
-.admin-header-icon:focus-visible {
-    color: #dbeaff;
-    filter: drop-shadow(0 2px 4px rgba(13, 28, 52, .35));
+    padding: 6px 8px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
 }
 
 .admin-user {
     display: flex;
     min-width: 0;
     align-items: center;
-    gap: 9px;
+    gap: 8px;
 }
 
 .admin-user-avatar {
     display: inline-flex;
+    flex-shrink: 0;
     width: 40px;
     height: 40px;
     align-items: center;
@@ -100,63 +108,73 @@
     font-size: 10px;
 }
 
+/* Logout Button - Danger/Red Style Consistent Across All Sizes */
+.admin-logout-btn {
+    display: inline-flex;
+    height: 40px;
+    align-items: center;
+    gap: 6px;
+    padding: 0 14px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: transparent;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color .16s ease, border-color .16s ease, color .16s ease, box-shadow .16s ease;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.admin-logout-btn i {
+    color: #fff;
+    font-size: 16px;
+}
+
+.admin-logout-btn:hover,
+.admin-logout-btn:focus-visible {
+    background: #dc3545;
+    color: #fff;
+    border-color: #dc3545;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, .35);
+}
+
+.admin-logout-btn:hover i,
+.admin-logout-btn:hover span,
+.admin-logout-btn:focus-visible i,
+.admin-logout-btn:focus-visible span {
+    color: #fff;
+}
+
+/* Legacy .admin-logout anchor (if used elsewhere) - match button style */
 .admin-logout {
     display: inline-flex;
-    height: 34px;
+    height: 40px;
     align-items: center;
-    gap: 5px;
-    padding: 0 12px;
-    border: 1px solid #fff;
+    gap: 6px;
+    padding: 0 14px;
+    border: 1px solid transparent;
     border-radius: 999px;
-    background: #fff;
-    color: #0877ed;
-    font-size: 11px;
-    text-decoration: none;
-    transition: background-color .16s ease, border-color .16s ease, color .16s ease;
-}
-
-.admin-logout-btn {
-    display: inline-flex;
-    height: 34px;
-    align-items: center;
-    gap: 5px;
-    padding: 0 12px;
-    border: 1px solid #fff;
-    border-radius: 999px;
-    background: #fff;
-    color: #0877ed;
-    font-size: 11px;
-    text-decoration: none;
-    transition: background-color .16s ease, border-color .16s ease, color .16s ease;
-    cursor: pointer;
-}
-
-.admin-logout button,
-.admin-logout-btn {
-    display: inline-flex;
-    height: 100%;
-    align-items: center;
-    gap: 5px;
-    padding: 0;
-    border: 0;
     background: transparent;
-    color: inherit;
-    font: inherit;
-    cursor: pointer;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color .16s ease, border-color .16s ease, color .16s ease, box-shadow .16s ease;
 }
 
-.admin-logout i,
-.admin-logout-btn i {
-    color: inherit;
+.admin-logout i {
+    color: #fff;
+    font-size: 16px;
 }
 
 .admin-logout:hover,
-.admin-logout:focus-visible,
-.admin-logout-btn:hover,
-.admin-logout-btn:focus-visible {
-    border-color: #dc3545;
+.admin-logout:focus-visible {
     background: #dc3545;
     color: #fff;
+    border-color: #dc3545;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, .35);
 }
 
 /* ---------------------------------------------------------- logout modal ---

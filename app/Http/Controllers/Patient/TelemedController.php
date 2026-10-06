@@ -14,6 +14,7 @@ use App\Models\UnavailableTimeslotTele;
 use App\Support\AppointmentJitsiRoom;
 use App\Support\AppointmentQrCode;
 use App\Support\AppointmentSchema;
+use App\Support\AppointmentWindow;
 use App\Support\Notifications\AppointmentNotifier;
 use App\Support\ScheduleCalendar;
 use App\Support\Telemed;
@@ -44,6 +45,12 @@ class TelemedController extends Controller
     {
         $patient = Telemed::currentPatient();
         $patientId = $patient?->id;
+
+        if ($patientId !== null) {
+            // Close whatever ran out of time first, so this dashboard and the
+            // doctor's agree on what is still current.
+            AppointmentWindow::closeExpired($patientId);
+        }
 
         $activeAppointment = Telemed::activeAppointment($patientId);
 
@@ -240,7 +247,7 @@ class TelemedController extends Controller
                 ->orderByDesc('created_at')
                 ->first();
 
-            if ($row) {
+            if ($row && ($row->mode !== 'TELE' || ! AppointmentWindow::hasEnded($row))) {
                 $activeAppointment = [
                     'id' => $row->id,
                     'date' => $row->date?->format('Y-m-d'),
@@ -594,7 +601,11 @@ class TelemedController extends Controller
     }
 
     /**
-     * GET /telemed/appointments/{appointment}/join — gated Jitsi entry for patients.
+     * GET /telemed/appointments/{appointment}/join — gated room entry for patients.
+     *
+     * Joining is what completes a telemedicine appointment: the same row feeds
+     * both dashboards, so the patient and the doctor read `Completed` right
+     * after the patient steps into the room.
      */
     public function join(Appointment $appointment): RedirectResponse
     {
@@ -604,8 +615,21 @@ class TelemedController extends Controller
             'You are not allowed to join this consultation.'
         );
         abort_unless($appointment->mode === 'TELE', 404);
-        abort_unless(Appointment::hasActiveStatus($appointment->status), 403);
-        abort_unless((bool) $appointment->room_opened, 403, 'Create the Jitsi room before joining the consultation.');
+        abort_unless(
+            Appointment::hasActiveStatus($appointment->status) || $appointment->status === 'Completed',
+            403,
+            'This appointment is no longer available.'
+        );
+        abort_if(
+            AppointmentWindow::hasEnded($appointment),
+            403,
+            'This appointment has ended, so the consultation can no longer be joined.'
+        );
+        abort_unless(
+            (bool) $appointment->room_opened,
+            403,
+            'The consultation room is not ready yet. Please wait for the doctor to create it.'
+        );
 
         $appointment->loadMissing('patient');
 
@@ -615,11 +639,21 @@ class TelemedController extends Controller
 
         abort_unless(filled($meetingLink), 404);
 
+        if ($appointment->status !== 'Completed') {
+            $appointment->update(['status' => 'Completed']);
+
+            app(AppointmentNotifier::class)->consultationJoined($appointment);
+        }
+
         return redirect()->away($meetingLink);
     }
 
     /**
-     * POST /telemed/appointments/{appointment}/open-room — patient creates the shared Jitsi room.
+     * POST /telemed/appointments/{appointment}/open-room.
+     *
+     * The doctor always creates the consultation room first, so this endpoint
+     * no longer opens one for the patient — it only reports the room the doctor
+     * already opened (the patient dashboard has no "Create a Room" action).
      */
     public function openRoom(Request $request, Appointment $appointment, AppointmentJitsiRoom $rooms): RedirectResponse|JsonResponse
     {
@@ -629,24 +663,22 @@ class TelemedController extends Controller
             'You are not allowed to open this consultation room.'
         );
 
-        $result = $rooms->openForPatient($appointment);
+        if (! (bool) $appointment->room_opened) {
+            $message = 'Your doctor creates the consultation room first. Please wait for the room to be ready.';
 
-        if ($result['created']) {
-            // Real-time alert for the doctor, using the existing Jitsi room.
-            app(AppointmentNotifier::class)->roomCreated(
-                $result['appointment'],
-                AppointmentJitsiRoom::OPENED_BY_PATIENT
-            );
+            if ($request->expectsJson()) {
+                return response()->json(['message' => $message], 403);
+            }
+
+            return back()->with('error', $message);
         }
 
-        $message = $result['created']
-            ? 'Jitsi room created. You may now join the consultation.'
-            : 'The Jitsi room is already available. You may join now.';
+        $message = 'The consultation room is already available. You may join now.';
 
         if ($request->expectsJson()) {
             return response()->json([
                 'message' => $message,
-                'room' => $rooms->presentRoomState($result['appointment']->fresh(), AppointmentJitsiRoom::OPENED_BY_PATIENT),
+                'room' => $rooms->presentRoomState($appointment->fresh(), AppointmentJitsiRoom::OPENED_BY_PATIENT),
             ]);
         }
 
@@ -654,7 +686,7 @@ class TelemedController extends Controller
     }
 
     /**
-     * GET /telemed/appointments/{appointment}/room — live Jitsi room state for polling.
+     * GET /telemed/appointments/{appointment}/room — live room state for polling.
      */
     public function roomStatus(Appointment $appointment, AppointmentJitsiRoom $rooms): JsonResponse
     {
@@ -665,8 +697,15 @@ class TelemedController extends Controller
         );
         abort_unless($appointment->mode === 'TELE', 404);
 
+        AppointmentWindow::closeExpired((int) $appointment->patient_id);
+
+        $current = $appointment->fresh() ?? $appointment;
+
         return response()->json([
-            'room' => $rooms->presentRoomState($appointment->fresh(), AppointmentJitsiRoom::OPENED_BY_PATIENT),
+            'room' => $rooms->presentRoomState($current, AppointmentJitsiRoom::OPENED_BY_PATIENT),
+            'status' => $current->status,
+            'display_status' => $this->patientDisplayStatus($current),
+            'is_expired' => AppointmentWindow::hasEnded($current),
         ]);
     }
 
@@ -711,6 +750,10 @@ class TelemedController extends Controller
         if (AppointmentSchema::hasCancellationReasonColumn()) {
             $update['cancellation_reason'] = $cancellationReason;
         }
+
+        // Tag the update so the observer's notification goes to the doctor
+        // (with this reason) instead of landing in the triage queue.
+        $appointment->cancellationInitiatedBy = 'patient';
 
         $appointment->update($update);
 
@@ -834,6 +877,10 @@ class TelemedController extends Controller
     {
         $patientId = Telemed::currentPatientId();
 
+        if ($patientId !== null) {
+            AppointmentWindow::closeExpired($patientId);
+        }
+
         $appointments = $patientId
             ? $this->presentAppointments(
                 $this->patientAppointments($patientId)
@@ -878,6 +925,12 @@ class TelemedController extends Controller
      */
     private function presentAppointments(Collection $rows): array
     {
+        // Expired telemedicine visits are closed (Completed) and drop off the
+        // active dashboards — they live in History instead.
+        $rows = $rows
+            ->filter(fn (Appointment $row): bool => $row->mode !== 'TELE' || ! AppointmentWindow::hasEnded($row))
+            ->values();
+
         return $rows->map(function (Appointment $row) {
             $symptoms = is_array($row->symptoms) ? $row->symptoms : [];
             $symptomLabels = array_values(array_filter(array_map(
@@ -924,7 +977,9 @@ class TelemedController extends Controller
                     ? route('telemed.appointment.room', $row, false)
                     : null,
                 'can_cancel' => $isActive && in_array((string) $row->mode, ['TELE', 'FACE'], true),
-                'is_expired' => $row->date ? $row->date->lt(Carbon::today()) : false,
+                'is_expired' => $row->mode === 'TELE'
+                    ? AppointmentWindow::hasEnded($row)
+                    : ($row->date ? $row->date->lt(Carbon::today()) : false),
             ];
         })->all();
     }
@@ -992,7 +1047,17 @@ class TelemedController extends Controller
             })
             ->where('a.patient_id', $patientId)
             ->whereNotNull('a.date')
-            ->whereIn('a.status', Appointment::ACTIVE_STATUSES);
+            ->where(function ($query): void {
+                // Active visits plus the telemedicine visit the patient is
+                // currently inside (Completed as soon as they joined), so both
+                // dashboards keep showing the same appointment until its
+                // scheduled end time. Expired rows are dropped afterwards.
+                $query->whereIn('a.status', Appointment::ACTIVE_STATUSES)
+                    ->orWhere(function ($query): void {
+                        $query->where('a.mode', 'TELE')
+                            ->where('a.status', 'Completed');
+                    });
+            });
     }
 
     /**
@@ -1067,6 +1132,10 @@ class TelemedController extends Controller
             return response()->json(['history' => []]);
         }
 
+        // Close what ran out of time so history shows `Completed`, not the
+        // status the visit carried while it was still current.
+        AppointmentWindow::closeExpired($patient->id);
+
         $pastAppointments = Appointment::query()
             ->from('appointments as a')
             ->select([
@@ -1080,13 +1149,13 @@ class TelemedController extends Controller
                 $join->on('a.service_id', '=', 's.id')->where('a.mode', '=', 'FACE');
             })
             ->where('a.patient_id', $patient->id)
-            ->where(function ($query): void {
-                $query->where('a.date', '<', Carbon::today()->toDateString())
-                    ->orWhereIn('a.status', ['Completed', 'Cancelled', 'No Show']);
-            })
             ->orderByDesc('a.date')
             ->orderByDesc('a.time_slot')
             ->get()
+            // Everything that is no longer current belongs to history: telemed
+            // visits once their scheduled window has passed (or they were
+            // cancelled), face-to-face visits once the day or visit is over.
+            ->filter(fn (Appointment $row): bool => $this->isHistorical($row))
             ->map(fn (Appointment $row): array => [
                 'id' => $row->id,
                 'service_name' => $this->serviceDisplayName($row),
@@ -1098,5 +1167,30 @@ class TelemedController extends Controller
             ->all();
 
         return response()->json(['history' => $pastAppointments]);
+    }
+
+    /**
+     * True when the appointment no longer belongs on the active dashboards.
+     *
+     * A telemedicine visit stays current until its scheduled end time (the
+     * consultation the patient just joined is still shown as `Completed` on
+     * both sides), and drops out the moment the window closes — anything
+     * cancelled or marked "No Show" leaves immediately instead.
+     */
+    private function isHistorical(Appointment $row): bool
+    {
+        if ($row->date === null) {
+            return false;
+        }
+
+        $leftEarly = in_array((string) $row->status, ['Cancelled', 'No Show'], true);
+
+        if ($row->mode === 'TELE') {
+            return $leftEarly || AppointmentWindow::hasEnded($row);
+        }
+
+        return $leftEarly
+            || (string) $row->status === 'Completed'
+            || $row->date->lt(Carbon::today());
     }
 }

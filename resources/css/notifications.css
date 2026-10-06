@@ -26,7 +26,9 @@
 .rtm--doctor,
 .rtm-bell--doctor {
     --rtm-accent: #0967d5;
-    --rtm-accent-strong: #1688f4;
+    /* Darkened from #1688f4: white labels only reached a 3.6:1 contrast on
+       hover, which made the action button's text look washed out. */
+    --rtm-accent-strong: #0b57b0;
     --rtm-accent-soft: #e5eef9;
 }
 
@@ -342,24 +344,79 @@
     margin-top: 10px;
 }
 
-.rtm-action {
+/*
+ * "View Appointment" action button inside a notification card.
+ *
+ * Resting: solid accent pill with a white label.
+ * Hover / focus / active: darker accent pill, still a white label.
+ *
+ * Both colours are pinned with !important and the selector is deliberately
+ * deep, because the patient dashboard ships
+ *
+ *     .patient-dashboard-body a { color: inherit; }   (specificity 0,1,1)
+ *
+ * which beats a bare `.rtm-action` (0,1,0) and repaints the label the same
+ * colour as the pill — leaving the text invisible. z-index keeps the button
+ * above its siblings so nothing can paint over the label.
+ */
+.rtm .rtm-item .rtm-item-actions a.rtm-action,
+.rtm .rtm-item .rtm-item-actions button.rtm-action,
+.rtm .rtm-item .rtm-item-actions .rtm-action {
+    position: relative;
+    z-index: 1;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
-    padding: 7px 13px;
-    border: none;
+    padding: 7px 14px;
+    border: 1px solid var(--rtm-accent);
     border-radius: 10px;
-    background: var(--rtm-accent);
-    color: #fff;
+    background-color: var(--rtm-accent) !important;
+    background-image: none !important;
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important;
+    text-shadow: none !important;
     font-size: .8rem;
     font-weight: 700;
+    line-height: 1.2;
     text-decoration: none;
-    transition: background-color .18s ease;
+    cursor: pointer;
+    transition: background-color .18s ease, color .18s ease, box-shadow .18s ease;
 }
 
-.rtm-action:hover {
-    background: var(--rtm-accent-strong);
-    color: #fff;
+.rtm .rtm-item .rtm-item-actions .rtm-action:hover,
+.rtm .rtm-item .rtm-item-actions .rtm-action:focus-visible,
+.rtm .rtm-item .rtm-item-actions .rtm-action:active {
+    background-color: var(--rtm-accent-strong) !important;
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important;
+    text-decoration: none;
+    box-shadow: 0 4px 10px rgba(6, 44, 102, .22);
+}
+
+.rtm .rtm-item .rtm-item-actions .rtm-action:focus-visible {
+    outline: 2px solid var(--rtm-accent-strong);
+    outline-offset: 2px;
+}
+
+/*
+ * Belt and braces: the card, its action row and the button must never paint a
+ * pseudo-element over the label.
+ */
+.rtm .rtm-item::before,
+.rtm .rtm-item::after,
+.rtm .rtm-item-actions::before,
+.rtm .rtm-item-actions::after,
+.rtm .rtm-action::before,
+.rtm .rtm-action::after {
+    content: none !important;
+    display: none !important;
+}
+
+/* Any icon inside the button follows the label colour. */
+.rtm .rtm-action i {
+    color: inherit;
+    -webkit-text-fill-color: currentColor;
 }
 
 /* -------------------------------------------------------------- footer --- */

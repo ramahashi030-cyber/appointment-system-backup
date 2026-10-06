@@ -124,26 +124,64 @@ final class AppointmentNotifier
     }
 
     /**
-     * An appointment was cancelled — patient, triage team and assigned doctor
-     * are all told, each with wording that fits their side of the workflow.
+     * An appointment was cancelled — the patient is told, and so is the doctor
+     * who has to drop the visit from their day.
+     *
+     * Who else is told depends on who cancelled:
+     *
+     *  - a patient cancellation goes to the doctor only (with the reason the
+     *    patient gave) — it never lands in the triage queue;
+     *  - any other cancellation keeps the existing behaviour, triage queue
+     *    included.
      */
-    public function cancelled(Appointment $appointment): void
+    public function cancelled(Appointment $appointment, ?string $initiatedBy = null): void
     {
-        $this->run(function () use ($appointment): void {
+        $this->run(function () use ($appointment, $initiatedBy): void {
+            $cancelledByPatient = $initiatedBy === 'patient';
+            $reason = filled($appointment->cancellation_reason)
+                ? trim((string) $appointment->cancellation_reason)
+                : null;
+
             if ($appointment->patient !== null) {
                 $this->deliver([$appointment->patient], new AppointmentCancelled($appointment, [
                     'message' => 'Your appointment has been cancelled.',
                 ]));
             }
 
-            $this->deliver($this->triagers(), new AppointmentCancelled($appointment, [
-                'message' => 'A patient has cancelled an appointment.',
-                'action_label' => 'Open Triage Queue',
-                'action_url' => Route::has('triager.dashboard') ? route('triager.dashboard') : null,
-            ]));
+            if (! $cancelledByPatient) {
+                $this->deliver($this->triagers(), new AppointmentCancelled($appointment, [
+                    'message' => 'A patient has cancelled an appointment.',
+                    'action_label' => 'Open Triage Queue',
+                    'action_url' => Route::has('triager.dashboard') ? route('triager.dashboard') : null,
+                ]));
+            }
 
-            $this->deliver($this->assignedDoctors($appointment), new AppointmentCancelled($appointment, [
-                'message' => 'An appointment has been cancelled.',
+            $doctorMessage = $cancelledByPatient
+                ? 'A patient has cancelled an appointment.'
+                : 'An appointment has been cancelled.';
+
+            if ($reason !== null) {
+                $doctorMessage .= ' Reason: '.$reason;
+            }
+
+            $this->deliver($this->doctorRecipients($appointment), new AppointmentCancelled($appointment, [
+                'message' => $doctorMessage,
+                'action_label' => 'View Appointments',
+                'action_url' => Route::has('doctor.appointments') ? route('doctor.appointments') : null,
+            ]));
+        });
+    }
+
+    /**
+     * The patient entered the consultation room, so the appointment is now
+     * completed on both dashboards. The assigned doctor hears it immediately
+     * instead of discovering it on the next page load.
+     */
+    public function consultationJoined(Appointment $appointment): void
+    {
+        $this->run(function () use ($appointment): void {
+            $this->deliver($this->doctorRecipients($appointment), new AppointmentUpdated($appointment, [
+                'message' => 'The patient has joined the consultation. The appointment is now completed.',
                 'action_label' => 'View Appointments',
                 'action_url' => Route::has('doctor.appointments') ? route('doctor.appointments') : null,
             ]));
@@ -177,8 +215,8 @@ final class AppointmentNotifier
                 }
 
                 $this->deliver([$patient], new TelemedRoomCreated($appointment, [
-                    'message' => 'The doctor has created a Jitsi room. You may now join the consultation.',
-                    'action_label' => 'Join Jitsi',
+                    'message' => 'The doctor has created the consultation room. You may now join the consultation.',
+                    'action_label' => 'Join the Room',
                     'action_url' => Route::has('telemed.appointment.join')
                         ? route('telemed.appointment.join', $appointment)
                         : ($appointment->meeting_link ?: null),
@@ -187,9 +225,9 @@ final class AppointmentNotifier
                 return;
             }
 
-            $this->deliver($this->roomRecipients($appointment), new TelemedRoomCreated($appointment, [
-                'message' => 'The patient has created a Jitsi room. You may now join the consultation.',
-                'action_label' => 'Join Jitsi',
+            $this->deliver($this->doctorRecipients($appointment), new TelemedRoomCreated($appointment, [
+                'message' => 'The patient has created a consultation room. You may now join the consultation.',
+                'action_label' => 'Join the Room',
                 'action_url' => $appointment->meeting_link ?: null,
             ]));
         });
@@ -233,15 +271,16 @@ final class AppointmentNotifier
     }
 
     /**
-     * Doctors who should hear that the patient opened the Jitsi room.
+     * Doctors who should hear about this appointment.
      *
      * The doctor dashboard lists every telemedicine appointment, so a request
      * that has not been assigned to a specific doctor yet still needs to reach
-     * the doctors who can take it.
+     * the doctors who can take it — that is how an unassigned telemedicine
+     * cancellation still reaches a doctor.
      *
      * @return array<int, Staff>
      */
-    private function roomRecipients(Appointment $appointment): array
+    private function doctorRecipients(Appointment $appointment): array
     {
         $assigned = $this->assignedDoctors($appointment);
 

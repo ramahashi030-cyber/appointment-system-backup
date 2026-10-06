@@ -49,7 +49,7 @@ class AppointmentObserver
         $notifier = app(AppointmentNotifier::class);
 
         if ($appointment->wasChanged('status') && $appointment->status === 'Cancelled') {
-            $notifier->cancelled($appointment);
+            $notifier->cancelled($appointment, $appointment->cancellationInitiatedBy);
         }
 
         if ($appointment->wasChanged('staff_id') && $appointment->staff_id !== null) {

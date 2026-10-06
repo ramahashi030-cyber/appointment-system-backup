@@ -93,15 +93,10 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 }
 
 /* ---------- Header on small screens ---------- */
-@media (max-width: 991.98px) {
-    .admin-logout,
-    .admin-logout-btn { width: 38px; padding: 0; justify-content: center; }
-    .admin-logout button,
-    .admin-logout-btn { width: 100%; justify-content: center; }
-}
+/* Unified navbar design now applied globally via admin-layout-append.css and header.css */
+/* These responsive overrides are no longer needed as the design is consistent across all screen sizes */
 @media (max-width: 575.98px) {
     .admin-header-inner { padding: 0 12px; gap: 8px; }
-    .admin-header-actions { gap: 8px; padding: 6px 8px; }
 }
 
 /* ---------- Phones (<= 767px) ---------- */

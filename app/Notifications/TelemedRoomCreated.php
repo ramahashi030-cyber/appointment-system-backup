@@ -23,7 +23,7 @@ class TelemedRoomCreated extends AppointmentNotification
             'title' => 'Telemed Room Created',
             'message' => 'A Jitsi room has been created. You may now join the consultation.',
             'icon' => 'bi-camera-video-fill',
-            'action_label' => 'Join Jitsi',
+            'action_label' => 'Join the Room',
             'action_url' => $appointment->meeting_link ?: route('doctor.appointments'),
             'action_external' => true,
         ], $context);

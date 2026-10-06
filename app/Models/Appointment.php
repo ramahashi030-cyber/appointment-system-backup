@@ -24,6 +24,18 @@ class Appointment extends Model
         'Approved',
     ];
 
+    /**
+     * Who cancelled the appointment that is being written right now.
+     *
+     * The observer fires the real-time notification without knowing which
+     * portal asked for the cancellation, so the cancelling controller tags this
+     * in-memory model first (the patient portal tags it `patient`, which keeps
+     * the cancellation out of the triage queue and in the doctor's bell).
+     *
+     * It is deliberately not persisted: it only describes the current update.
+     */
+    public ?string $cancellationInitiatedBy = null;
+
     protected $fillable = [
         'patient_id',
         'service_id',

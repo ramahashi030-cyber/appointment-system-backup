@@ -55,7 +55,7 @@
                         <td>{{ $appointment['date_display'] ?? '—' }}</td>
                     @endif
                     <td>{{ $appointment['time_display'] ?? $appointment['time_slot'] ?? '—' }}</td>
-                    <td><span class="doctor-status {{ $statusClass }}">{{ $statusLabel }}</span></td>
+                    <td><span class="doctor-status {{ $statusClass }}" data-doctor-status>{{ $statusLabel }}</span></td>
                     <td>{{ $appointment['consultation_reason_label'] ?? 'Not recorded' }}</td>
                     <td>
                         <div class="doctor-table-actions">
@@ -79,12 +79,12 @@
                                 <form method="POST" action="{{ route('doctor.appointments.open-room', $appointment['id']) }}" class="d-inline" data-doctor-create-room-form>
                                     @csrf
                                     <button type="submit" class="doctor-action-button primary" data-doctor-room-action="create">
-                                        <i class="bi bi-camera-video-fill" aria-hidden="true"></i>Create Jitsi Room
+                                        <i class="bi bi-camera-video-fill" aria-hidden="true"></i>Create a Room
                                     </button>
                                 </form>
                             @elseif ($appointment['can_join'] ?? false)
                                 <a href="{{ $appointment['meeting_link'] }}" target="_blank" rel="noopener" class="doctor-action-button primary" data-doctor-room-action="join">
-                                    <i class="bi bi-camera-video-fill" aria-hidden="true"></i>Join Jitsi
+                                    <i class="bi bi-camera-video-fill" aria-hidden="true"></i>Join the Room
                                 </a>
                             @else
                                 <span class="doctor-action-button disabled" aria-disabled="true" data-doctor-room-action="unavailable">Unavailable</span>

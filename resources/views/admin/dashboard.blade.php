@@ -16,6 +16,8 @@
         $adminName = $admin !== null
             ? trim($admin->firstname.' '.$admin->lastname)
             : 'Administrator';
+        // Audit timestamps are stored in UTC; render them in the app display timezone (Asia/Manila).
+        $auditTimezone = config('app.display_timezone');
     @endphp
 
     <div class="admin-dashboard-content">
@@ -56,33 +58,54 @@
         </div>
 
         <div class="admin-dashboard-grid">
-            <div class="admin-dashboard-primary">
+            <div class="admin-dashboard-primary admin-staff-activity-section">
                 <section class="admin-panel admin-table-panel">
                     <header class="admin-panel-header">
                         <div class="admin-panel-title">
-                            <i class="bi bi-hourglass-split" aria-hidden="true"></i>
-                            <h2>Pending Appointment Requests</h2>
+                            <i class="bi bi-journal-text" aria-hidden="true"></i>
+                            <h2>Staff Activity</h2>
                         </div>
-                        <a class="admin-panel-link" href="{{ route('admin.appointments') }}">View all</a>
+                        <a class="admin-panel-link" href="{{ route('admin.audit-logs') }}">View all</a>
                     </header>
-                    <div class="admin-table-body">
-                        @forelse ($pendingRequests as $requestRow)
-                            <a href="{{ route('admin.appointments', ['search' => $requestRow['patient_name'], 'status' => 'Pending']) }}" class="admin-table-row pending-row">
-                                <div class="admin-table-cell admin-person-cell">
-                                    <span class="admin-avatar">{{ $requestRow['initials'] }}</span>
-                                    <span class="admin-person-copy">
-                                        <strong>{{ $requestRow['patient_name'] }}</strong>
-                                    </span>
-                                </div>
-                                <div class="admin-table-cell">{{ $requestRow['service'] }}</div>
-                                <div class="admin-table-cell">{{ $requestRow['requested'] }}</div>
-                                <div class="admin-table-cell">
-                                    <span class="admin-status-pill">{{ $requestRow['status'] }}</span>
-                                </div>
-                            </a>
-                        @empty
-                            <div class="admin-empty-row">No pending appointment requests.</div>
-                        @endforelse
+                    <div class="admin-doctor-table-wrap" style="overflow: visible; max-height: none;">
+                        <table class="admin-doctor-table">
+                            <caption class="visually-hidden">Staff activity audit logs</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Date & time</th>
+                                    <th scope="col">Username</th>
+                                    <th scope="col">Role</th>
+                                    <th scope="col">Action</th>
+                                    <th scope="col">Module</th>
+                                    <th scope="col">Record ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($staffActivity as $log)
+                                    <tr>
+                                        <td>
+                                            <span class="admin-doctor-primary-text">{{ $log['created_at']?->copy()->timezone($auditTimezone)->format('M d, Y') ?? 'N/A' }}</span>
+                                            <small class="admin-doctor-secondary-text">{{ $log['created_at']?->copy()->timezone($auditTimezone)->format('h:i:s A') ?? '' }}</small>
+                                        </td>
+                                        <td><span class="admin-doctor-primary-text">{{ $log['username'] }}</span></td>
+                                        <td>{{ $log['user_role'] }}</td>
+                                        <td><span class="admin-status-pill">{{ $log['action'] }}</span></td>
+                                        <td>{{ $log['module'] }}</td>
+                                        <td>{{ $log['record_id'] ?? 'N/A' }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="admin-doctor-empty">
+                                                <i class="bi bi-journal-x" aria-hidden="true"></i>
+                                                <strong>No staff activity recorded</strong>
+                                                <span>Activity will appear here as staff perform actions in the admin panel.</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
                 </section>
             </div>

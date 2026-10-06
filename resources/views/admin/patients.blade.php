@@ -255,9 +255,11 @@
                         <option value="Female" @selected($filters['gender'] === 'Female')>Female</option>
                     </select>
                 </div>
-                @if ($filters['search'] !== '' || $filters['status'] !== '' || $filters['gender'] !== '')
-                    <a class="admin-clear-filter" href="{{ route('admin.patients') }}">Clear</a>
-                @endif
+                <div class="admin-patient-filter-gender-group">
+                    @if ($filters['search'] !== '' || $filters['status'] !== '' || $filters['gender'] !== '')
+                        <a class="admin-clear-filter" href="{{ route('admin.patients') }}">Clear</a>
+                    @endif
+                </div>
             </form>
 
             {{-- Paginated at 20 rows, so the table is never given its own scrollbar; see pages/patients.css.
@@ -355,7 +357,7 @@
             </div>
 
             <div class="admin-doctor-pagination admin-patient-pagination" data-patient-pagination @if (! $patients->hasPages()) hidden @endif>
-                {{ $patients->links('pagination::bootstrap-5') }}
+                {{ $patients->links('pagination::patient-pagination') }}
             </div>
         </section>
     </div>
@@ -761,7 +763,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="cpHospital">Hospital no.</label>
-                            <input class="form-control" id="cpHospital" name="hospital_number" value="{{ old('hospital_number') }}" placeholder="Hospital no." maxlength="6" pattern="[0-9]*" inputmode="numeric" data-digits-only>
+                            <input class="form-control" id="cpHospital" name="hospital_number" value="{{ old('hospital_number') }}" placeholder="Hospital no." maxlength="10" pattern="[0-9]*" inputmode="numeric" data-digits-only>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="cpStatus">Status</label>
@@ -908,11 +910,11 @@
                     selector: 'input[name="hospital_number"]',
                     label: 'Hospital number',
                     required: false,
-                    maxlength: 6,
+                    maxlength: 10,
                     pattern: '[0-9]*',
                     inputmode: 'numeric',
-                    clean: cleanPatientDigits(6),
-                    message: 'Hospital number may only contain up to 6 digits (numbers only).',
+                    clean: cleanPatientDigits(10),
+                    message: 'Hospital number may only contain up to 10 digits (numbers only).',
                 },
                 {
                     selector: 'input[name="address"], textarea[name="address"]',

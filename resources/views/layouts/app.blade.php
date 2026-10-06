@@ -23,6 +23,7 @@
         'resources/css/notifications.css',
         'resources/js/app.js',
         'resources/js/notifications.js',
+        'resources/js/telemed-rooms.js',
     ])
 
     <style>

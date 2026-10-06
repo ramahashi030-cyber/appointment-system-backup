@@ -288,12 +288,40 @@
         padding-bottom: 0;
     }
 
+    /* Gender dropdown + Clear button: same width, side by side on larger mobile, stacked on small */
+    .admin-patients-page .admin-patient-filter-gender-group {
+        display: flex;
+        gap: 8px;
+        width: 100%;
+    }
+    .admin-patients-page .admin-patient-filter-gender-group .form-select {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+    .admin-patients-page .admin-patient-filter-gender-group .admin-clear-filter {
+        flex: 1 1 auto;
+        text-align: center;
+        padding: 0.375rem 0.75rem;
+    }
+
     .admin-patients-page .admin-patient-pagination {
         justify-content: center;
     }
 
     .admin-patients-page .admin-patient-pagination > nav {
         justify-content: center;
+    }
+}
+
+/* Very small phones: stack Gender + Clear vertically */
+@media (max-width: 400px) {
+    .admin-patients-page .admin-patient-filter-gender-group {
+        flex-direction: column;
+        gap: 8px;
+    }
+    .admin-patients-page .admin-patient-filter-gender-group .form-select,
+    .admin-patients-page .admin-patient-filter-gender-group .admin-clear-filter {
+        width: 100%;
     }
 }
 
@@ -344,7 +372,10 @@
     }
 
     /* Stat cards: compact, icon above the number */
-    .admin-patients-page .admin-doctor-stat-grid { gap: 8px; }
+    .admin-patients-page .admin-doctor-stat-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
 
     .admin-patients-page .admin-doctor-stat-card {
         flex-direction: column;

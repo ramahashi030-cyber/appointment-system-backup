@@ -1,3 +1,5 @@
+import { applyRoomState } from './telemed-rooms';
+
 const onDoctorReady = (callback) => {
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', callback, { once: true });
@@ -122,5 +124,103 @@ onDoctorReady(() => {
                 window.prompt('Copy this Jitsi link:', value);
             }
         });
+    });
+
+    /* ------------------------------------------------- create-room confirm -- */
+
+    // "Create a Room" never posts straight away: creating the room books the
+    // appointment and lets the patient join, so it always goes through the
+    // confirmation modal first. Without JavaScript (or without the modal) the
+    // form still posts on its own and the page reloads with the same result.
+    const createRoomModalElement = document.getElementById('doctorCreateRoomModal');
+    const createRoomModal = createRoomModalElement
+        ? bootstrap.Modal.getOrCreateInstance(createRoomModalElement)
+        : null;
+    const createRoomConfirm = createRoomModalElement
+        ? createRoomModalElement.querySelector('[data-doctor-create-room-confirm]')
+        : null;
+    const createRoomError = createRoomModalElement
+        ? createRoomModalElement.querySelector('[data-doctor-create-room-error]')
+        : null;
+    let pendingCreateRoomForm = null;
+
+    const showCreateRoomError = (message) => {
+        if (!createRoomError) return;
+        createRoomError.textContent = message || '';
+        createRoomError.hidden = !message;
+    };
+
+    document.addEventListener('submit', (event) => {
+        const form = event.target && event.target.closest
+            ? event.target.closest('[data-doctor-create-room-form]')
+            : null;
+
+        if (!form || !createRoomModal) {
+            return;
+        }
+
+        event.preventDefault();
+        pendingCreateRoomForm = form;
+        showCreateRoomError('');
+        createRoomModal.show();
+    });
+
+    createRoomConfirm?.addEventListener('click', async () => {
+        const form = pendingCreateRoomForm;
+
+        if (!form) {
+            return;
+        }
+
+        createRoomConfirm.disabled = true;
+        showCreateRoomError('');
+
+        try {
+            const csrf = form.querySelector('[name="_token"]');
+
+            const response = await fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrf ? csrf.value : '',
+                },
+                credentials: 'same-origin',
+                body: '{}',
+            });
+
+            let payload = null;
+
+            try {
+                payload = await response.json();
+            } catch (error) {
+                payload = null;
+            }
+
+            if (!response.ok) {
+                showCreateRoomError(
+                    (payload && payload.message)
+                        || 'The room could not be created. Please try again.'
+                );
+                return;
+            }
+
+            createRoomModal.hide();
+
+            const row = form.closest('[data-doctor-appointment-row]');
+
+            if (row && payload) {
+                // Swap "Create a Room" for "Join the Room" and the status for
+                // Booked, without waiting for a page reload.
+                applyRoomState(row, payload);
+            }
+        } catch (error) {
+            showCreateRoomError(
+                'The room could not be created. Check your connection and try again.'
+            );
+        } finally {
+            createRoomConfirm.disabled = false;
+        }
     });
 });

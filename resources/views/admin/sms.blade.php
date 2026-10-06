@@ -516,6 +516,54 @@
                 width: 100%;
                 justify-content: center;
             }
+
+            /* Fix: the 7-column booked-patients table squeezed the empty-state
+               placeholder text into a one-character-wide column on mobile.
+               Give the table a minimum width so the empty-state <td colspan="7">
+               has enough room, and let the wrapper scroll horizontally. */
+            .admin-sms-page .admin-doctor-table-wrap {
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .admin-sms-page .admin-sms-booked-table {
+                min-width: 480px;
+            }
+
+            /* Make empty state horizontal on mobile for Booked Patients table */
+            .admin-sms-page .admin-sms-booked-table .admin-doctor-empty {
+                flex-direction: row;
+                flex-wrap: wrap;
+                min-height: auto;
+                padding: 20px 16px;
+                gap: 12px;
+            }
+            .admin-sms-page .admin-sms-booked-table .admin-doctor-empty i {
+                margin-bottom: 0;
+                font-size: 24px;
+            }
+            .admin-sms-page .admin-sms-booked-table .admin-doctor-empty > div,
+            .admin-sms-page .admin-sms-booked-table .admin-doctor-empty > strong,
+            .admin-sms-page .admin-sms-booked-table .admin-doctor-empty > span {
+                flex: 1 1 auto;
+            }
+            .admin-sms-page .admin-sms-booked-table .admin-doctor-empty strong {
+                font-size: 14px;
+            }
+            .admin-sms-page .admin-sms-booked-table .admin-doctor-empty span {
+                font-size: 12px;
+            }
+        }
+
+        /* Tablet: ensure table scrolls if needed */
+        @media (max-width: 991.98px) {
+            .admin-sms-page .admin-doctor-table-wrap {
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+            .admin-sms-page .admin-sms-booked-table {
+                min-width: 600px;
+            }
         }
     </style>
 @endpush

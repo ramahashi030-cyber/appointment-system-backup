@@ -38,6 +38,7 @@ export default defineConfig({
                 'resources/js/doctor-dashboard.js',
                 'resources/js/patient-dashboard.js',
                 'resources/js/notifications.js',
+                'resources/js/telemed-rooms.js',
             ],
             refresh: true,
         }),

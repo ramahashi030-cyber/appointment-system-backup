@@ -229,13 +229,13 @@
                                                             @csrf
                                                             <button type="submit" class="dashboard-join-button" data-patient-room-action="create">
                                                                 <i class="bi bi-camera-video-fill" aria-hidden="true"></i>
-                                                                <span>Create Jitsi Room</span>
+                                                                <span>Create a Room</span>
                                                             </button>
                                                         </form>
                                                     @elseif (($visit['mode'] ?? '') === 'TELE' && ($visit['can_join'] ?? false))
                                                         <a class="dashboard-join-button" href="{{ $visit['join_url'] ?? $visitLink }}" target="_blank" rel="noopener" data-patient-room-action="join">
                                                             <i class="bi bi-camera-video-fill" aria-hidden="true"></i>
-                                                            <span>Join Jitsi</span>
+                                                            <span>Join the Room</span>
                                                         </a>
                                                     @elseif (($visit['mode'] ?? '') === 'TELE' && ! empty($visitLink))
                                                         <span class="dashboard-link-pending" data-patient-room-action="pending">Room not ready</span>

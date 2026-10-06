@@ -79,3 +79,23 @@ every prompt ask if something is missing
 			- add service modal. time slot can input letters and special character
 			- add service modal. service name and homis code can input special characters
 	change all the alert into flashcard modals
+
+
+
+
+
+
+
+
+	Doctors Page.
+	- Change the all the jitsi to join call.
+	- The appointment of the patient will automatically removed when the doctor joining the call in telemed. Have flashcard confirmation of doctor joining in the call and appointment being removed. 
+	- When there's ongoing processing appointment. The doctor cannot log out as long as the process is not finish.
+	- The appointment will be completed when the patient join the call in telemed. The call on the patient page will be activated only when the doctor created the room call
+	- if patients cancel the appointment, notification should go to doctors instead of triager
+
+	Admin
+	DONE -The mobile version sidebar must close automatically when reloading another page.
+
+	SMS Page.
+	- The sms mobile version have an error in text alignment. image attached.

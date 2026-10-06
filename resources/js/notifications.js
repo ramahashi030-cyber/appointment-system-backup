@@ -12,16 +12,16 @@
  *  - Everything is guarded: if Reverb is down, if the endpoint fails, or if
  *    nothing on this page needs notifications, this file exits silently and
  *    leaves the rest of the dashboard untouched.
+ *  - The WebSocket itself lives in realtime.js, shared with the other live
+ *    features on the page, so this file only registers listeners.
  */
 
-import Echo from 'laravel-echo';
-import Pusher from 'pusher-js';
+import { onRealtimeNotification, onRealtimeReconnect } from './realtime';
 
 const POLL_INTERVAL = 15000;
 
 /** @type {{channel: string|null, modalId: string, broadcast: object|null, endpoints: object, csrf: string}|null} */
 let cfg = null;
-let echo = null;
 let started = false;
 let fetching = false;
 let unread = 0;
@@ -310,38 +310,13 @@ function connectEcho() {
         return;
     }
 
-    try {
-        window.Pusher = window.Pusher || Pusher;
+    onRealtimeNotification(() => {
+        refresh();
+    });
 
-        echo = new Echo({
-            broadcaster: 'reverb',
-            key: settings.broadcast.key,
-            wsHost: settings.broadcast.host,
-            wsPort: settings.broadcast.port,
-            wssPort: settings.broadcast.port,
-            forceTLS: !!settings.broadcast.forceTLS,
-            enabledTransports: ['ws', 'wss'],
-            authEndpoint: settings.broadcast.authEndpoint,
-            csrfToken: settings.csrf,
-        });
-
-        echo.private(settings.channel).notification(() => {
-            refresh();
-        });
-
-        const connection = echo.connector.pusher && echo.connector.pusher.connection;
-
-        if (connection && typeof connection.bind === 'function') {
-            connection.bind('state_change', (states) => {
-                if (states && states.current === 'connected') {
-                    refresh();
-                }
-            });
-        }
-    } catch (error) {
-        // Reverb unavailable / blocked: keep the polling fallback below.
-        echo = null;
-    }
+    onRealtimeReconnect(() => {
+        refresh();
+    });
 }
 
 /* ------------------------------------------------------------------ boot --- */

@@ -69,6 +69,13 @@
 
     Each group is also wired to the <nav> via data-bs-parent, so opening one
     group closes the others (accordion behavior).
+
+    Mobile links carry data-bs-dismiss="offcanvas". Admin navigation swaps the
+    .admin-main content over AJAX rather than reloading the document, and the
+    offcanvas lives in .admin-shell, outside .admin-main, so it is never
+    re-created and would otherwise stay open across every navigation. Only the
+    mobile instance gets the attribute: the desktop sidebar is a plain <aside>
+    with no offcanvas to dismiss, so its behaviour is unchanged.
 --}}
 @php
     $instance = $instance ?? 'primary';
@@ -98,6 +105,7 @@
 
             <a class="admin-sidebar-link {{ $isActive ? 'active' : '' }}"
                href="{{ route($link['route']) }}"
+               @if ($instance === 'mobile') data-bs-dismiss="offcanvas" @endif
                @if ($isActive) aria-current="page" @endif>
                 <i class="bi {{ $link['icon'] }}" aria-hidden="true"></i>
                 <span>{{ $link['label'] }}</span>
@@ -132,6 +140,7 @@
 
                             <a class="admin-sidebar-sublink {{ $childActive ? 'active' : '' }}"
                                href="{{ route($child['route']) }}"
+                               @if ($instance === 'mobile') data-bs-dismiss="offcanvas" @endif
                                @if ($childActive) aria-current="page" @endif>
                                 <i class="bi {{ $child['icon'] }}" aria-hidden="true"></i>
                                 <span>{{ $child['label'] }}</span>

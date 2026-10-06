@@ -11,6 +11,7 @@ use App\Models\SmsLog;
 use App\Support\Sms;
 use DateTimeImmutable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -167,6 +168,49 @@ class SmsController extends Controller
         return $sent > 0
             ? back()->with('success', $summary)
             : back()->with('error', $summary);
+    }
+
+    /**
+     * Delete one or more entries from the recently-sent message log.
+     *
+     * The ids are re-checked against the database rather than trusted from the
+     * browser, and the reported count is the number of rows that actually went
+     * away, so a stale page can never claim more deletions than were made.
+     */
+    public function destroyMessages(Request $request): RedirectResponse|JsonResponse
+    {
+        $validated = $request->validate([
+            'messages' => ['required', 'array', 'min:1'],
+            'messages.*' => ['integer'],
+        ]);
+
+        $message = 'The message log is not available.';
+        $status = 404;
+
+        if (Schema::hasTable('sms_logs')) {
+            $ids = collect($validated['messages'])
+                ->map(fn ($id): int => (int) $id)
+                ->filter()
+                ->unique()
+                ->values();
+
+            $deleted = $ids->isEmpty()
+                ? 0
+                : SmsLog::query()->whereIn('id', $ids)->delete();
+
+            if ($deleted > 0) {
+                $message = "{$deleted} message".($deleted === 1 ? '' : 's').' deleted.';
+                $status = 200;
+            } else {
+                $message = 'The selected messages could not be found.';
+            }
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => $message], $status);
+        }
+
+        return back()->with($status < 400 ? 'success' : 'error', $message);
     }
 
     /**

@@ -97,7 +97,7 @@
 
 .admin-dashboard-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.75fr) minmax(300px, 1fr);
+    grid-template-columns: minmax(0, 2.5fr) minmax(260px, 1fr);
     gap: 16px;
     margin-top: 16px;
 }
@@ -242,6 +242,11 @@
     box-shadow: 0 9px 20px rgba(0, 78, 171, .2);
     color: #fff;
     transform: translateY(-8px);
+}
+
+/* Admin panels: override the mark color to the admin primary blue */
+.admin-dashboard-content .admin-telemedicine-mark {
+    color: #0877ed;
 }
 
 .admin-telemedicine-mark > i {

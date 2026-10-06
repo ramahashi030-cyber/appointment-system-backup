@@ -59,6 +59,36 @@
         .admin-dashboard-content.admin-timeslots-page .admin-doctor-empty strong {
             color: #334155;
         }
+
+        /* Table behavior: desktop keeps natural width, tablets get horizontal scroll (mobile.css),
+           phones become stacked cards (layout script + mobile.css). */
+        @media (min-width: 768px) {
+            .admin-dashboard-content.admin-timeslots-page .admin-doctor-table-wrap {
+                overflow: visible !important;
+                max-height: none !important;
+            }
+
+            .admin-dashboard-content.admin-timeslots-page .admin-doctor-table {
+                width: 100%;
+                min-width: 0 !important;
+                table-layout: auto;
+            }
+
+            .admin-dashboard-content.admin-timeslots-page .admin-doctor-table th,
+            .admin-dashboard-content.admin-timeslots-page .admin-doctor-table td {
+                white-space: normal;
+                overflow-wrap: anywhere;
+            }
+        }
+
+        /* editTimeslotModal: plain Bootstrap modal without admin-doctor-modal class;
+           ensure it fits mobile viewport */
+        @media (max-width: 575.98px) {
+            #editTimeslotModal .modal-dialog {
+                width: calc(100% - 16px);
+                margin: 8px auto;
+            }
+        }
     </style>
 
     <div class="admin-dashboard-content admin-doctor-content admin-timeslots-page"

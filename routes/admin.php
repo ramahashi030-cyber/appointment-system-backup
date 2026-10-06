@@ -134,6 +134,7 @@ Route::prefix('admin')->name('admin.')->group(function (): void {
         Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs');
         Route::get('/sms', [SmsController::class, 'index'])->name('sms');
         Route::post('/sms/send', [SmsController::class, 'send'])->name('sms.send');
+        Route::delete('/sms/messages', [SmsController::class, 'destroyMessages'])->name('sms.messages.destroy');
         Route::get('/records', [RecordController::class, 'index'])->name('records');
         Route::post('/records', [RecordController::class, 'store'])->name('records.store');
         Route::delete('/records/{record}', [RecordController::class, 'destroy'])->name('records.destroy');

@@ -11,23 +11,26 @@
 @endsection
 
 @section('content')
-    {{-- Remove table scrollbars: tables wrap to fit instead of scrolling --}}
+    {{-- Table behavior: desktop keeps natural width, tablets get horizontal scroll (mobile.css),
+       phones become stacked cards (layout script + mobile.css). --}}
     <style>
-        .admin-doctor-table-wrap {
-            overflow: visible !important;
-            max-height: none !important;
-        }
+        @media (min-width: 768px) {
+            .admin-doctor-table-wrap {
+                overflow: visible !important;
+                max-height: none !important;
+            }
 
-        .admin-doctor-table {
-            width: 100%;
-            min-width: 0 !important;
-            table-layout: auto;
-        }
+            .admin-doctor-table {
+                width: 100%;
+                min-width: 0 !important;
+                table-layout: auto;
+            }
 
-        .admin-doctor-table th,
-        .admin-doctor-table td {
-            white-space: normal;
-            overflow-wrap: anywhere;
+            .admin-doctor-table th,
+            .admin-doctor-table td {
+                white-space: normal;
+                overflow-wrap: anywhere;
+            }
         }
     </style>
     <div class="admin-dashboard-content admin-doctor-content">
@@ -266,6 +269,18 @@
         </div>
     @endif
 @endsection
+
+@push('styles')
+    <style>
+        /* modal-wide on mobile: fit viewport without horizontal overflow */
+        @media (max-width: 575.98px) {
+            #viewProviderModal.modal-wide .modal-dialog {
+                width: calc(100% - 16px);
+                margin: 8px auto;
+            }
+        }
+    </style>
+@endpush
 
 @push('scripts')
     <script>

@@ -9,6 +9,7 @@ use App\Models\ServiceTimeslotTele;
 use App\Models\Staff;
 use App\Support\AppointmentJitsiRoom;
 use App\Support\AppointmentSchema;
+use App\Support\AppointmentWindow;
 use App\Support\Notifications\AppointmentNotifier;
 use App\Symptom;
 use Illuminate\Contracts\View\View;
@@ -34,6 +35,7 @@ class DoctorDashboardController extends Controller
     public function dashboard(Request $request): View
     {
         AppointmentSchema::ensureCompatibleColumns();
+        AppointmentWindow::closeExpired();
         $now = Carbon::now(self::TIMEZONE);
         $today = $now->copy()->startOfDay();
         $selectedDate = $this->selectedDate($request, $today);
@@ -65,12 +67,7 @@ class DoctorDashboardController extends Controller
         $progress = $totalToday > 0 ? (int) round(($completedToday / $totalToday) * 100) : 0;
 
         $activeUpcoming = $this->presentAppointments(
-            $this->appointmentQuery()
-                ->whereIn('a.status', Appointment::ACTIVE_STATUSES)
-                ->whereDate('a.date', '>=', $today)
-                ->orderBy('a.date')
-                ->orderBy('a.time_slot')
-                ->get()
+            $this->currentAppointments($today)
         );
         $nextAppointment = $this->nextAppointment($activeUpcoming, $now);
         $notificationCount = $activeUpcoming->count();
@@ -111,6 +108,7 @@ class DoctorDashboardController extends Controller
     public function appointments(Request $request): View
     {
         AppointmentSchema::ensureCompatibleColumns();
+        AppointmentWindow::closeExpired();
         $query = $this->appointmentQuery();
         $search = trim((string) $request->query('q', ''));
         $status = trim((string) $request->query('status', ''));
@@ -153,6 +151,7 @@ class DoctorDashboardController extends Controller
 
     public function patients(Request $request): View
     {
+        AppointmentWindow::closeExpired();
         $query = DB::table('appointments as a')
             ->join('patients as p', 'p.id', '=', 'a.patient_id')
             ->where('a.mode', 'TELE');
@@ -228,14 +227,10 @@ class DoctorDashboardController extends Controller
 
     public function notifications(): View
     {
+        AppointmentWindow::closeExpired();
         $today = Carbon::now(self::TIMEZONE)->startOfDay();
         $appointments = $this->presentAppointments(
-            $this->appointmentQuery()
-                ->whereIn('a.status', Appointment::ACTIVE_STATUSES)
-                ->whereDate('a.date', '>=', $today)
-                ->orderBy('a.date')
-                ->orderBy('a.time_slot')
-                ->get()
+            $this->currentAppointments($today)
         );
 
         return view('doctor.notifications', [
@@ -371,15 +366,66 @@ class DoctorDashboardController extends Controller
     }
 
     /**
-     * GET /doctor/appointments/{appointment}/room — live Jitsi room state for polling.
+     * GET /doctor/appointments/{appointment}/room — live room state for polling.
      */
     public function roomStatus(Appointment $appointment, AppointmentJitsiRoom $rooms): JsonResponse
     {
         abort_unless($appointment->mode === 'TELE', 404);
 
+        AppointmentWindow::closeExpired();
+
+        $current = $appointment->fresh() ?? $appointment;
+        $status = (string) ($current->status ?: 'Booked');
+
         return response()->json([
-            'room' => $rooms->presentRoomState($appointment->fresh(), AppointmentJitsiRoom::OPENED_BY_DOCTOR),
+            'room' => $rooms->presentRoomState($current, AppointmentJitsiRoom::OPENED_BY_DOCTOR),
+            'status' => $current->status,
+            'status_label' => ucfirst($status),
+            'status_class' => Str::lower((string) preg_replace('/[^A-Za-z]+/', '', $status)) ?: 'booked',
+            'is_expired' => AppointmentWindow::hasEnded($current),
         ]);
+    }
+
+    /**
+     * Appointments the doctor still has to act on, from $date onwards.
+     *
+     * Every active visit is listed, plus a telemedicine visit the patient has
+     * already joined (`Completed` while its window is still open) — the same
+     * rows the patient dashboard keeps showing, so both sides read the same
+     * state. Once the scheduled end time passes, the sweep has closed the
+     * appointment and it drops off these lists into History.
+     *
+     * @return Collection<int, Appointment>
+     */
+    private function currentAppointments(Carbon $date): Collection
+    {
+        return $this->appointmentQuery()
+            ->whereDate('a.date', '>=', $date)
+            ->where(function (Builder $query): void {
+                $query->whereIn('a.status', Appointment::ACTIVE_STATUSES)
+                    ->orWhereRaw('LOWER(a.status) = ?', ['completed']);
+            })
+            ->orderBy('a.date')
+            ->orderBy('a.time_slot')
+            ->orderBy('a.id')
+            ->get()
+            ->filter(fn (Appointment $row): bool => $this->isCurrent($row))
+            ->values();
+    }
+
+    /**
+     * Still current on the active dashboards: active statuses always, and a
+     * completed visit only while its scheduled window has not ended yet.
+     */
+    private function isCurrent(Appointment $row): bool
+    {
+        $status = (string) $row->status;
+
+        if (Appointment::hasActiveStatus($status)) {
+            return true;
+        }
+
+        return $status === 'Completed' && ! AppointmentWindow::hasEnded($row);
     }
 
     private function appointmentQuery(): Builder
@@ -630,12 +676,7 @@ class DoctorDashboardController extends Controller
 
     private function notificationCount(): int
     {
-        $today = Carbon::now(self::TIMEZONE)->startOfDay();
-
-        return $this->appointmentQuery()
-            ->whereIn('a.status', Appointment::ACTIVE_STATUSES)
-            ->whereDate('a.date', '>=', $today)
-            ->count();
+        return $this->currentAppointments(Carbon::now(self::TIMEZONE)->startOfDay())->count();
     }
 
     private function doctorAccount(): array
