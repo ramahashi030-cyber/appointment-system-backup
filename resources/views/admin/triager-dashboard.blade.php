@@ -16,7 +16,7 @@
         <section class="admin-telemedicine-banner admin-doctor-banner" aria-labelledby="triagerTitle">
             <div class="admin-telemedicine-glow" aria-hidden="true"></div>
             <div class="admin-telemedicine-content">
-                <div class="admin-telemedicine-mark" aria-hidden="true">
+                <div class="admin-telemedicine-mark" aria-hidden="true" style="color: #f4f8ff; background: #0b6fe8;">
                     <i class="bi bi-clipboard2-pulse-fill"></i>
                     <span><i class="bi bi-check2-circle"></i></span>
                 </div>
@@ -154,7 +154,6 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Start Processing buttons
             document.querySelectorAll('[data-start-processing]').forEach((button) => {
                 button.addEventListener('click', () => {
                     const requestId = button.dataset.startProcessing;
@@ -167,7 +166,6 @@
                 });
             });
 
-            // Save Update buttons
             document.querySelectorAll('[data-save-request]').forEach((button) => {
                 button.addEventListener('click', () => {
                     const requestId = button.dataset.saveRequest;
@@ -209,9 +207,6 @@
                 });
             });
 
-            // Schedule modals — Create Appointment Module (calendar + time slots).
-            // The telemed and face-to-face modals share identical markup; each is
-            // initialised against its own modal id, trigger attribute and endpoints.
             const initScheduleModal = ({ modalId, requestAttr, calendarUrl, timeslotsUrl, submitUrl }) => {
                 const modalRoot = document.getElementById(modalId);
                 if (!modalRoot) return;

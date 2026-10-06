@@ -236,7 +236,7 @@
                                 <i class="bi bi-camera-video-fill" aria-hidden="true"></i>Start Consultation
                             </a>
                         @else
-                            <span class="doctor-action-button disabled w-100 mt-3">Jitsi link unavailable</span>
+                            <span class="doctor-action-button disabled w-100 mt-3">Room link unavailable</span>
                         @endif
                     @else
                         <div class="doctor-next-patient">

@@ -45,8 +45,9 @@
             <a href="{{ route('doctor.dashboard') }}" class="doctor-brand" aria-label="QMMC Doctor dashboard">
                 <img src="{{ asset('images/logo.png') }}" alt="Qalinga Medical Center">
                 <span class="doctor-brand-copy">
-                    <strong>QMMC</strong>
-                    <small>DOCTOR</small>
+                    <strong>QALINGA</strong>
+                    <small>DOCTORS</small>
+                    <small>PORTAL</small>
                 </span>
             </a>
 
@@ -196,7 +197,7 @@
     </div>
 
     {{-- Confirmation shown before a doctor creates the consultation room. --}}
-    <div class="modal fade" id="doctorCreateRoomModal" tabindex="-1" aria-labelledby="doctorCreateRoomModalTitle" aria-hidden="true" data-doctor-create-room-modal>
+    <div class="modal fade doctor-confirm-modal" id="doctorCreateRoomModal" tabindex="-1" aria-labelledby="doctorCreateRoomModalTitle" aria-hidden="true" data-doctor-create-room-modal>
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">

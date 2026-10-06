@@ -155,6 +155,21 @@
             color: #b1c3d8;
             cursor: default;
         }
+
+        {{-- Mobile display cap: below 768px this roster renders as a stack of cards
+             and a full page of patients can push everything else off screen, so
+             only the first 3 data rows are made visible there. Rows 4+ stay in the
+             DOM (still submitted by their form, still reachable through the
+             existing pagination), so nothing is deleted. Desktop and tablet are
+             outside this query and keep rendering all records unchanged. Scoped to
+             .admin-patients-page so the history/modal tables are unaffected, and
+             prefixed with .admin-main so it outranks mobile.css's
+             `.admin-table-stack tbody tr { display: flex }` row rule. --}}
+        @media (max-width: 767.98px) {
+            .admin-main .admin-patients-page .admin-patient-table > tbody > tr:nth-child(n+4) {
+                display: none !important;
+            }
+        }
     </style>
 @endpush
 
@@ -194,15 +209,15 @@
         <div class="admin-doctor-stat-grid">
             <article class="admin-doctor-stat-card">
                 <span class="admin-doctor-stat-icon blue"><i class="bi bi-people-fill" aria-hidden="true"></i></span>
-                <span><small>Total patients</small><strong data-patient-stat="total">{{ number_format($patientStats['total']) }}</strong></span>
+                <span class="admin-doctor-stat-text"><small>Total patients</small><strong data-patient-stat="total">{{ number_format($patientStats['total']) }}</strong></span>
             </article>
             <article class="admin-doctor-stat-card">
                 <span class="admin-doctor-stat-icon green"><i class="bi bi-person-check-fill" aria-hidden="true"></i></span>
-                <span><small>Active</small><strong data-patient-stat="active">{{ number_format($patientStats['active']) }}</strong></span>
+                <span class="admin-doctor-stat-text"><small>Active</small><strong data-patient-stat="active">{{ number_format($patientStats['active']) }}</strong></span>
             </article>
             <article class="admin-doctor-stat-card">
                 <span class="admin-doctor-stat-icon orange"><i class="bi bi-person-exclamation" aria-hidden="true"></i></span>
-                <span><small>Deactivated</small><strong data-patient-stat="deactivated">{{ number_format($patientStats['deactivated']) }}</strong></span>
+                <span class="admin-doctor-stat-text"><small>Deactivated</small><strong data-patient-stat="deactivated">{{ number_format($patientStats['deactivated']) }}</strong></span>
             </article>
             {{-- Moved up from the roster header so it sits on the same row as the
                  statistics, following the .admin-doctor-stat-grid +
@@ -846,12 +861,6 @@
                 bootstrap.Modal.getOrCreateInstance(document.getElementById('createPatientModal')).show();
             @endif
 
-            // The Add patient and Edit patient forms share the same input rules:
-            // names accept letters (and single spaces) only and are upper-cased,
-            // the contact and hospital numbers accept digits only within a fixed
-            // length, and the address accepts letters, numbers and spaces only.
-            // Invalid characters are dropped while typing, pasting or on submit,
-            // so only valid values are ever sent to the server.
             const cleanPatientName = (value) => value
                 .replace(/[^A-Za-z ]+/g, '')
                 .replace(/ {2,}/g, ' ')
@@ -929,13 +938,8 @@
 
             const patientFieldSelector = patientFieldRules.map((rule) => rule.selector).join(', ');
 
-            // The profile modal in the header shares a few of these field names,
-            // so only the fields inside the patient modals are ever touched.
             const isPatientField = (input) => $(input).closest('#createPatientModal, #editPatientModal').length > 0;
 
-            // The Edit patient form is rendered from a partial that cannot be
-            // annotated here, so the attributes are applied to whichever fields
-            // the scope contains (the page itself and every injected edit modal).
             const applyPatientFieldRules = ($scope) => {
                 patientFieldRules.forEach((rule) => {
                     $(rule.selector, $scope).each(function () {
@@ -943,10 +947,6 @@
                         this.setAttribute('maxlength', rule.maxlength);
                         this.setAttribute('pattern', rule.pattern);
 
-                        // Required is applied from here too, so a field that lives in the
-                        // Edit patient partial carries the same required attribute as the
-                        // one in the Add patient form. Only rules that ask for it get it,
-                        // so the optional fields are left alone.
                         if (rule.required) {
                             this.setAttribute('required', 'required');
                         }
@@ -1058,25 +1058,8 @@
                 firstInvalid.focus();
             });
 
-            // Appointment and consultation history paging happens inside the view modal.
-            // The previous version fetched a whole re-rendered page and swapped the
-            // clicked <section> into the DOM, so the table's survival depended on a
-            // network round trip: if the panel was missing from the response, the
-            // request failed or was aborted, the handler fell back to
-            // window.location.href and the shell replaced .admin-main - which closed
-            // the modal and took the table with it.
-            //
-            // Both tables are now paged in the browser. Each section carries its own
-            // record set as JSON in a <template> and its own page number, so a click
-            // re-renders the rows of that one tbody and nothing else: no request, no
-            // navigation, no panel replacement, and the table, its header, footer and
-            // controls stay on screen. The controls are buttons, so the layout's
-            // a[href] shell handler never sees them and nothing can be submitted.
             const PATIENT_HISTORY_PER_PAGE = 5;
 
-            // Reads (and caches) the record set of one panel. The state is stored on
-            // the section element itself, so two panels never share a page number and
-            // a modal injected later for another patient starts from its own data.
             const readPatientHistoryState = ($panel) => {
                 const element = $panel[0];
 
@@ -1109,11 +1092,8 @@
                 return element.patientHistory;
             };
 
-            // At least one page always exists, so a click can never land outside it.
             const patientHistoryPageCount = (total) => Math.max(1, Math.ceil(total / PATIENT_HISTORY_PER_PAGE));
 
-            // Clamps anything unexpected (undefined, NaN, 0, a page past the end)
-            // back into the 1..pageCount range before it is used as an index.
             const patientHistoryClampPage = (page, pageCount) => {
                 const wanted = parseInt(page, 10);
                 const safePage = Number.isFinite(wanted) ? wanted : 1;
@@ -1139,8 +1119,6 @@
                         .text(record.statusLabel ?? record.status ?? '—'),
                 ));
 
-            // Only reached when the dataset itself is empty, and it matches the empty
-            // state the row partials render, so the table is never left bare.
             const buildPatientHistoryEmptyRow = (state, columnCount) => $('<tr>')
                 .append($('<td>').attr('colspan', columnCount).append(
                     $('<div class="admin-doctor-empty compact">').append(
@@ -1160,9 +1138,6 @@
                 const pageCount = patientHistoryPageCount(state.records.length);
                 const currentPage = patientHistoryClampPage(requestedPage, pageCount);
 
-                // Page 1 is records 0-4, page 2 is 5-9, and so on; the last page
-                // simply stops at the end of the dataset, so a short final page is
-                // shown rather than skipped.
                 const startIndex = (currentPage - 1) * PATIENT_HISTORY_PER_PAGE;
                 const pageRecords = state.records.slice(startIndex, startIndex + PATIENT_HISTORY_PER_PAGE);
                 const columnCount = Math.max(1, $panel.find('table thead th').length);
@@ -1174,8 +1149,6 @@
                     $rows.append(buildPatientHistoryEmptyRow(state, columnCount));
                 }
 
-                // Rows only: the table element, its head, its footer and its controls
-                // are never emptied, which is what keeps the table on screen.
                 $tbody.empty().append($rows);
 
                 state.currentPage = currentPage;
@@ -1183,8 +1156,6 @@
                 return currentPage;
             };
 
-            // The range line and the control states are derived from the dataset every
-            // time, so the counts stay correct on every page including a partial last one.
             const updatePatientHistoryPagination = ($panel, state) => {
                 const $footer = $panel.find('[data-patient-history-footer]');
 
@@ -1207,10 +1178,6 @@
 
                 $footer.find('[data-patient-history-go]').each(function () {
                     const direction = $(this).attr('data-patient-history-go');
-                    // With a single page there is nothing to step to and nothing to
-                    // jump to, so every control is disabled. Otherwise the two step
-                    // controls go disabled at the edges and « / » stay available as
-                    // jumps to the last and the first page.
                     const targetPage = {
                         first: 1,
                         last: pageCount,
@@ -1235,8 +1202,6 @@
                 renderPatientHistoryPage($panel, state, requestedPage);
                 updatePatientHistoryPagination($panel, state);
 
-                // Keyboard focus follows the page number; preventScroll leaves the
-                // modal exactly where it is instead of jumping the scroll position.
                 const $current = $panel.find('[data-patient-history-current]')[0];
 
                 if ($current) {
@@ -1244,13 +1209,8 @@
                 }
             };
 
-            // Delegated on document so the modals injected by openPatientModal() are
-            // covered, and namespaced + re-bound so a soft navigation cannot leave two
-            // handlers behind and serve a click twice.
             $(document).off('click.patientHistory')
                 .on('click.patientHistory', '[data-patient-history-go]', function (event) {
-                    // The controls are buttons, so this only guards against a stray
-                    // click on a disabled control, not against navigation.
                     event.preventDefault();
 
                     const $button = $(this);
@@ -1282,7 +1242,6 @@
                     goToPatientHistoryPage($panel, targetPage);
                 });
 
-            // Keep the controls in step with the data the server rendered first.
             $('.admin-doctor-activity-grid [data-patient-history]').each(function () {
                 const state = readPatientHistoryState($(this));
 
@@ -1353,7 +1312,6 @@
                 }
 
                 if ($nextForm.length) {
-                    // Keep the existing inputs (and their focus); only sync the Clear link.
                     const $nextClear = $nextForm.find('a.admin-clear-filter');
                     const $currentClear = $form.find('a.admin-clear-filter');
 
@@ -1478,7 +1436,6 @@
                     });
             });
 
-            // View / Edit: open the modal in place so filters, search and page are kept.
             const $modalHost = $tableWrap.closest('.admin-main').length ? $tableWrap.closest('.admin-main') : $(document.body);
             let modalRequest;
 

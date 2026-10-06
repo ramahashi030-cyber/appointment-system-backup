@@ -1025,9 +1025,24 @@
 
 .doctor-table-actions {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 7px;
     white-space: nowrap;
+}
+
+/* Peer notice for a room the patient has opened: a block under the action
+   row, so the nowrap flex row never stretches sideways to fit the text. */
+.doctor-room-notice {
+    margin: 6px 0 0;
+    padding: 7px 9px;
+    border: 1px solid #e0eaf4;
+    border-radius: 8px;
+    background: #f7fbff;
+    color: #4f6e8e;
+    font-size: 9px;
+    line-height: 1.6;
+    text-align: left;
 }
 
 .doctor-action-button {
@@ -1598,6 +1613,86 @@
     color: #4f6e8e;
     font-size: 9px;
     line-height: 1.6;
+}
+
+/* Doctor "create room" confirmation modal */
+.doctor-confirm-modal .modal-content {
+    overflow: hidden;
+    border: 0;
+    border-radius: 17px;
+    box-shadow: 0 24px 70px rgba(11, 47, 90, .25);
+}
+
+.doctor-confirm-modal .modal-dialog {
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 1rem);
+}
+
+@media (min-width: 576px) {
+    /* The dialog has 1.75rem margins above and below, so the shared
+       calc(100% - 1rem) minimum overflows the backdrop, adds a scrollbar and
+       pushes the dialog down — subtract both margins instead. */
+    .doctor-confirm-modal .modal-dialog {
+        min-height: calc(100% - 3.5rem);
+    }
+}
+
+.doctor-confirm-modal .modal-header {
+    padding: 15px 18px;
+    border-bottom-color: #e0eaf4;
+    background: #f7fbff;
+}
+
+.doctor-confirm-modal .modal-title {
+    color: var(--doctor-heading);
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.doctor-confirm-modal .modal-body {
+    padding: 18px 20px;
+    color: #5d7896;
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+.doctor-confirm-modal .modal-body strong {
+    color: var(--doctor-heading);
+    font-weight: 700;
+}
+
+.doctor-confirm-modal .alert {
+    padding: 9px 12px;
+    border-radius: 9px;
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+.doctor-confirm-modal .modal-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 14px 18px;
+    border-top: 1px solid #e0eaf4;
+    background: #f7fbff;
+}
+
+/* Inside a modal the portal's action buttons inherit the page font, which
+   dwarfs them and breaks their layout — pin them to one even line. */
+.doctor-confirm-modal .modal-footer .doctor-action-button {
+    min-height: 32px;
+    padding: 0 15px;
+    border-radius: 9px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.doctor-confirm-modal .modal-footer .doctor-action-button i {
+    font-size: 13px;
 }
 
 /* Doctor profile edit modal */

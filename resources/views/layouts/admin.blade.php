@@ -39,7 +39,7 @@
 
             <footer class="admin-footer">
                 <div class="admin-footer-brand">
-                    <strong>QMMC Admin Portal</strong>
+                    <strong>QALINGA Admin Portal</strong>
                     <span aria-hidden="true">*</span>
                     <span>Doctors and Patient Management</span>
                 </div>

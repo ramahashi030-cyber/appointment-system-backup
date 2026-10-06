@@ -4,7 +4,6 @@
     top: 0;
     z-index: 1025;
     min-height: 74px;
-    margin-top: 10px;
     background: var(--admin-blue);
     border-radius: 0;
 }

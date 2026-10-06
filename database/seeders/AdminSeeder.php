@@ -24,17 +24,5 @@ class AdminSeeder extends Seeder
                 'role' => 'admin',
             ],
         );
-
-        Admin::query()->updateOrCreate(
-            ['username' => 'triager'],
-            [
-                'firstname' => 'Triage',
-                'lastname' => 'Staff',
-                'password' => Hash::make('Password@123'),
-                'email' => 'triager@qmmc.local',
-                'contact_no' => '09293470607',
-                'role' => 'triager',
-            ],
-        );
     }
 }

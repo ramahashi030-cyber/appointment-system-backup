@@ -210,7 +210,6 @@
             });
             $form.find('select, input[type="date"]').on('change', () => load());
 
-            // stopPropagation keeps the layout's page-swap handler from also loading the page.
             const onPaginationClick = function (event) {
                 const link = event.target.closest('[data-audit-pagination] a');
                 if (!link) {

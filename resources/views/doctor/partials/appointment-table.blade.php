@@ -89,8 +89,8 @@
                             @else
                                 <span class="doctor-action-button disabled" aria-disabled="true" data-doctor-room-action="unavailable">Unavailable</span>
                             @endif
-                            <p class="doctor-room-notice small text-muted mb-0 mt-1" data-doctor-room-notice hidden>{{ $appointment['room_peer_notice'] ?? '' }}</p>
                         </div>
+                        <p class="doctor-room-notice" data-doctor-room-notice hidden>{{ $appointment['room_peer_notice'] ?? '' }}</p>
                     </td>
                 </tr>
             @empty

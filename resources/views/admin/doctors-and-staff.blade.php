@@ -32,6 +32,22 @@
                 overflow-wrap: anywhere;
             }
         }
+
+        {{-- Mobile display cap, matching the Patients and Reports pages: below 768px
+             this roster becomes a stack of cards and a full page of providers can
+             take over the screen, so only the first 3 data rows are made visible
+             there. Rows 4+ stay in the DOM (still reachable through the existing
+             pagination and its filters), so no doctor or staff record is deleted.
+             Desktop and tablet sit outside this query and keep rendering every
+             record unchanged. Scoped to this page's own data-doctor-table-wrap so
+             no other admin table is affected, and prefixed with .admin-main so it
+             outranks mobile.css's `.admin-table-stack tbody tr { display: flex }`
+             row rule. --}}
+        @media (max-width: 767.98px) {
+            .admin-main [data-doctor-table-wrap] .admin-doctor-table > tbody > tr:nth-child(n+4) {
+                display: none !important;
+            }
+        }
     </style>
     <div class="admin-dashboard-content admin-doctor-content">
         <section class="admin-telemedicine-banner admin-doctor-banner" aria-labelledby="doctorDirectoryTitle">
@@ -293,9 +309,6 @@
             const currentSearch = new URLSearchParams(window.location.search);
             const initialModalState = modalStates.find(({ parameter }) => currentSearch.has(parameter));
 
-            // Names in the add doctor modal are letters only. Anything else is
-            // dropped as it is typed or pasted, and surrounding spaces are
-            // trimmed, so the value that reaches the server already matches.
             document.querySelectorAll('[data-letters-only]').forEach((input) => {
                 input.addEventListener('input', () => {
                     input.value = input.value
@@ -304,9 +317,6 @@
                 });
             });
 
-            // Employee ID and contact number take digits with optional space
-            // or hyphen separators, so anything else is dropped as it is typed
-            // or pasted.
             document.querySelectorAll('[data-digits-only]').forEach((input) => {
                 input.addEventListener('input', () => {
                     input.value = input.value

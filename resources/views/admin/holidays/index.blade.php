@@ -387,22 +387,18 @@
             const emptyState = document.getElementById('emptyState');
             const backBtn = document.getElementById('backToServicesBtn');
 
-            // Set back button URL
             if (backBtn) {
                 backBtn.href = backUrl;
             }
 
-            // Load holidays on page load
             loadHolidays();
 
-            // Handle form submission
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
                 const formData = new FormData(form);
                 const csrfToken = formData.get('_token');
 
-                // Disable button during request
                 addBtn.disabled = true;
 
                 addBtn.innerHTML =
@@ -427,7 +423,6 @@
                         throw data;
                     }
 
-                    // Success
                     showToast('success', data.message);
 
                     form.reset();
@@ -438,7 +433,6 @@
 
                     if (error.errors) {
 
-                        // Validation errors
                         showValidationErrors(error.errors);
 
                     } else if (error.message) {
@@ -462,7 +456,6 @@
                 }
             });
 
-            // Load holidays via AJAX
             async function loadHolidays() {
                 try {
                     const response = await fetch(dataUrl, {
@@ -487,7 +480,6 @@
                 }
             }
 
-            // Render holidays table
             function renderHolidays(holidays) {
 
                 tableBody.innerHTML = '';
@@ -544,11 +536,9 @@
                     tableBody.appendChild(row);
                 });
 
-                // Attach delete handlers
                 attachDeleteHandlers();
             }
 
-            // Attach delete button handlers
             function attachDeleteHandlers() {
 
                 document
@@ -558,7 +548,6 @@
                     });
             }
 
-            // Handle delete
             async function handleDelete(e) {
 
                 const btn = e.currentTarget;
@@ -625,10 +614,8 @@
                 }
             }
 
-            // Show validation errors
             function showValidationErrors(errors) {
 
-                // Clear previous errors
                 form
                     .querySelectorAll('.is-invalid')
                     .forEach((el) => {
@@ -666,7 +653,6 @@
                     }
                 });
 
-                // Focus first invalid field
                 const firstInvalid =
                     form.querySelector('.is-invalid');
 
@@ -675,10 +661,8 @@
                 }
             }
 
-            // Toast notification
             function showToast(type, message) {
 
-                // Remove existing toasts
                 document
                     .querySelectorAll('.admin-toast')
                     .forEach((t) => t.remove());
@@ -709,7 +693,6 @@
 
                 document.body.appendChild(toast);
 
-                // Auto dismiss after 3 seconds
                 setTimeout(() => {
 
                     toast.classList.remove('show');
@@ -721,7 +704,6 @@
                 }, 3000);
             }
 
-            // Escape HTML
             function escapeHtml(text) {
 
                 const div =

@@ -723,11 +723,10 @@ class TelemedController extends Controller
         $appointment = Appointment::query()
             ->where('id', $request->integer('cancel_id'))
             ->where('patient_id', $patientId)
-            ->whereIn('status', Appointment::PATIENT_CANCELLABLE_STATUSES)
             ->whereIn('mode', ['TELE', 'FACE'])
             ->first();
 
-        if ($appointment === null) {
+        if ($appointment === null || ! $this->patientCanCancel($appointment)) {
             $message = 'That appointment could not be cancelled.';
 
             if ($request->expectsJson()) {
@@ -940,7 +939,6 @@ class TelemedController extends Controller
                 $symptoms,
             )));
 
-            $isActive = Appointment::hasActiveStatus((string) $row->status);
             $roomState = app(AppointmentJitsiRoom::class)->presentRoomState($row, AppointmentJitsiRoom::OPENED_BY_PATIENT);
             $displayStatus = $this->patientDisplayStatus($row);
 
@@ -976,7 +974,7 @@ class TelemedController extends Controller
                 'room_status_url' => $row->mode === 'TELE'
                     ? route('telemed.appointment.room', $row, false)
                     : null,
-                'can_cancel' => $isActive && in_array((string) $row->mode, ['TELE', 'FACE'], true),
+                'can_cancel' => $this->patientCanCancel($row),
                 'is_expired' => $row->mode === 'TELE'
                     ? AppointmentWindow::hasEnded($row)
                     : ($row->date ? $row->date->lt(Carbon::today()) : false),
@@ -996,8 +994,10 @@ class TelemedController extends Controller
      * Best available label for a booked appointment, most specific first:
      *
      *   1. the service the triager assigned (`service_id` joined per mode)
-     *   2. the consultation reason captured on the request
-     *   3. the consultation type, so the row is never a bare "Consultation"
+     *   2. the symptoms the patient chose in step 2 of the request, when the
+     *      stored reason is only "None of the above"
+     *   3. the consultation reason captured on the request
+     *   4. the consultation type, so the row is never a bare "Consultation"
      *
      * Legacy rows were stored with a NULL or orphaned `service_id`, so the
      * fallbacks are what keep those readable instead of misleading.
@@ -1010,9 +1010,31 @@ class TelemedController extends Controller
             return $serviceName;
         }
 
-        $reasonLabel = ConsultationReason::tryFrom((string) $row->consultation_reason)?->label();
+        return Telemed::fallbackServiceLabel($row);
+    }
 
-        return $reasonLabel ?? self::modeLabel((string) $row->mode);
+    /**
+     * Whether the signed-in patient may still cancel this appointment.
+     *
+     * Active visits qualify, and so does a telemedicine visit that only reads
+     * `Completed` because the patient joined the room while its scheduled
+     * window is still open — joining must not take the cancel action away.
+     * Once the end time passes the visit is History and locked, and a
+     * face-to-face visit the staff completed stays locked too.
+     */
+    private function patientCanCancel(Appointment $appointment): bool
+    {
+        if (! in_array((string) $appointment->mode, ['TELE', 'FACE'], true)) {
+            return false;
+        }
+
+        if (Appointment::hasActiveStatus((string) $appointment->status)) {
+            return true;
+        }
+
+        return (string) $appointment->mode === 'TELE'
+            && (string) $appointment->status === 'Completed'
+            && ! AppointmentWindow::hasEnded($appointment);
     }
 
     private function patientDisplayStatus(Appointment $row): string

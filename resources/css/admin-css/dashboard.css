@@ -238,19 +238,20 @@
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: linear-gradient(145deg, #2a8cff, #075ed3);
+    background: #0b6fe8;
     box-shadow: 0 9px 20px rgba(0, 78, 171, .2);
-    color: #fff;
+    color: #f4f8ff;
     transform: translateY(-8px);
 }
 
 /* Admin panels: override the mark color to the admin primary blue */
 .admin-dashboard-content .admin-telemedicine-mark {
-    color: #0877ed;
+    color: #f4f8ff;
 }
 
 .admin-telemedicine-mark > i {
-    font-size: 36px;
+    color: #f4f8ff;
+    font-size: 26px;
     transform: translate(-3px, -1px);
 }
 
@@ -268,6 +269,10 @@
     background: #79b7ed;
     color: #fff;
     font-size: 15px;
+}
+
+.admin-telemedicine-mark > span > i {
+    color: #f4f8ff;
 }
 
 .admin-telemedicine-copy {
@@ -569,9 +574,36 @@
     color: #fff;
     font-size: 11px;
     text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+/* The rendered base background is a gradient (see pages/holidays.css), which
+   background-color cannot animate. The hover colour arrives through this
+   overlay instead, fading in over 0.5s beneath the label and icon. */
+.admin-primary-button::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: #146fd3;
+    opacity: 0;
+    transition: opacity 0.5s ease;
 }
 
 .admin-primary-button:hover {
-    background: #146fd3;
     color: #fff;
+}
+
+.admin-primary-button:hover:not(:disabled)::before {
+    opacity: 1;
+}
+
+/* Fade the base gradient layer (pages/holidays.css) out while the overlay fades
+   in, so no blue remains beneath the overlay's anti-aliased corners. */
+.admin-primary-button:hover:not(:disabled)::after {
+    opacity: 0;
 }

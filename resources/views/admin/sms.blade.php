@@ -188,13 +188,8 @@
                                     <td colspan="7">
                                         <div class="admin-doctor-empty">
                                             <i class="bi bi-chat-dots" aria-hidden="true"></i>
-                                            @if ($hasFilters)
-                                                <strong>No booked patients found</strong>
-                                                <span>Adjust the filters or search, or wait for a patient to book an appointment.</span>
-                                            @else
-                                                <strong>No patients found</strong>
-                                                <span>Please apply a filter to view booked patients.</span>
-                                            @endif
+                                            <strong>No patient found</strong>
+                                            <span>Please apply a filter to view booked patients.</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -510,6 +505,15 @@
             .admin-sms-page .admin-sms-toolbar,
             .admin-sms-page .admin-sms-actions {
                 padding: 12px 14px;
+            }
+
+            /* Mobile: the service dropdown and the two date fields sit too close
+               together and read as one block. Give the dropdown and the first date
+               their own bottom spacing so all three controls keep a clean,
+               separate vertical row. */
+            .admin-sms-page .admin-sms-toolbar .admin-doctor-filters > .form-select,
+            .admin-sms-page .admin-sms-toolbar .admin-doctor-filters > input[type="date"]:not(:last-of-type) {
+                margin-bottom: 14px;
             }
 
             .admin-sms-page .admin-sms-actions .admin-primary-button {

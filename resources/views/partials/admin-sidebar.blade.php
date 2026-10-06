@@ -3,7 +3,7 @@
 
     <a class="admin-brand" href="{{ route('admin.dashboard') }}" aria-label="QMMC admin dashboard">
         <span class="admin-brand-mark" aria-hidden="true"><i class="bi bi-shield-fill"></i></span>
-        <span class="admin-brand-copy"><strong>QMMC</strong><small>ADMIN PANEL</small></span>
+        <span class="admin-brand-copy"><strong>QALINGA</strong><small>ADMIN PANEL</small></span>
     </a>
 
     @include('partials.admin-sidebar-nav', ['instance' => 'desktop'])
@@ -18,7 +18,7 @@
     <div class="offcanvas-header admin-mobile-menu-header">
         <a class="admin-brand" href="{{ route('admin.dashboard') }}" id="adminMobileMenuLabel">
             <span class="admin-brand-mark" aria-hidden="true"><i class="bi bi-shield-fill"></i></span>
-            <span class="admin-brand-copy"><strong>QMMC</strong><small>ADMIN PANEL</small></span>
+            <span class="admin-brand-copy"><strong>QALINGA</strong><small>ADMIN PANEL</small></span>
         </a>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close menu"></button>
     </div>

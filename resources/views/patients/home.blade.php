@@ -1,4 +1,4 @@
-﻿{{--
+{{--
     Patient telemedicine dashboard.
 
     Expected variables:
@@ -183,7 +183,8 @@
                                             $visitId = (int) ($visit['id'] ?? 0);
                                             $visitStatusLower = strtolower($visitStatus);
                                             $visitIsCancelled = str_contains($visitStatusLower, 'cancel');
-                                            $visitIsActive = in_array($visitStatusLower, ['booked', 'pending', 'confirmed', 'approved'], true);
+                                            $visitCanCancel = (bool) ($visit['can_cancel']
+                                                ?? in_array($visitStatusLower, ['booked', 'pending', 'confirmed', 'approved'], true));
                                             $statusClass = $visitIsCancelled ? 'cancelled' : 'booked';
                                             $searchText = strtolower(implode(' ', [$visitService, $visitDate, $visitTime, $visitStatus]));
                                         @endphp
@@ -242,8 +243,6 @@
                                                     @else
                                                         <span class="dashboard-link-pending">Pending</span>
                                                     @endif
-                                                    <p class="dashboard-room-notice small text-muted mb-0" data-patient-room-notice hidden>{{ $visit['room_peer_notice'] ?? '' }}</p>
-
                                                     @if (($visit['mode'] ?? '') === 'FACE' && !empty($visit['qr_code_url']))
                                                         <div class="dashboard-qr-section">
                                                             <img src="{{ $visit['qr_code_url'] }}" alt="Appointment QR Code" class="dashboard-qr-image">
@@ -260,7 +259,7 @@
                                                         </button>
                                                         <ul class="dropdown-menu dropdown-menu-end">
                                                             <li><a class="dropdown-item" href="{{ route('telemed.mine') }}">View appointment</a></li>
-                                                            @if ($visitId > 0 && $visitIsActive)
+                                                            @if ($visitId > 0 && $visitCanCancel)
                                                                 <li><hr class="dropdown-divider"></li>
                                                                 <li>
                                                                     <button
@@ -276,6 +275,7 @@
                                                         </ul>
                                                     </div>
                                                 </div>
+                                                <p class="dashboard-room-notice" data-patient-room-notice hidden>{{ $visit['room_peer_notice'] ?? '' }}</p>
                                             </td>
                                         </tr>
                                     @endforeach

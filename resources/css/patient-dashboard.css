@@ -1118,18 +1118,34 @@
 
 .dashboard-table-action-group {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: flex-end;
     gap: 7px;
 }
 
+/* Peer notice for a room the other side has opened. It sits on its own line
+   under the controls: as a flex sibling of the action button it squeezed the
+   label into three lines and pushed the ⋮ menu into the neighbouring column. */
+.dashboard-room-notice {
+    margin: 6px 0 0;
+    padding: 7px 9px;
+    border: 1px solid #dceaf9;
+    border-radius: 8px;
+    background: #f4f9ff;
+    color: #4f6e8e;
+    font-size: 10px;
+    line-height: 1.5;
+    text-align: left;
+}
+
 .dashboard-join-button {
     display: inline-flex;
-    height: 31px;
+    min-height: 31px;
     align-items: center;
     justify-content: center;
     gap: 5px;
-    padding: 0 12px;
+    padding: 4px 12px;
     border-radius: 999px;
     background: #075fbe;
     color: #fff;
@@ -1987,6 +2003,13 @@
 
     .dashboard-table-actions {
         text-align: left;
+    }
+
+    /* The action cell is a label/value grid here: park the notice in the value
+       column so it stays aligned under the buttons instead of sliding back
+       into the 80px label column. */
+    .dashboard-table-actions .dashboard-room-notice {
+        grid-column: 2;
     }
 
     .dashboard-table-action-group {

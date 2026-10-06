@@ -1,0 +1,287 @@
+/* ===== SMS Module styling — scoped to this page only ===== */
+
+/* Breathing room between the stacked dashboard cards */
+.admin-sms-page .admin-sms-panel + .admin-sms-panel {
+    margin-top: 18px;
+}
+
+/* Single, unified filter/search toolbar (the two GET forms render as one card row) */
+.admin-sms-page .admin-sms-toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px 20px;
+    border-bottom: 1px solid #e4edf7;
+    background: #fbfdff;
+}
+
+.admin-sms-page .admin-sms-toolbar .admin-doctor-filters {
+    padding: 0;
+    border-bottom: 0;
+    background: transparent;
+}
+
+.admin-sms-page .admin-sms-toolbar .admin-primary-button,
+.admin-sms-page .admin-sms-toolbar .admin-clear-filter {
+    margin-top: 0;
+}
+
+.admin-sms-page .admin-sms-toolbar .form-control {
+    height: 38px;
+    border-color: #d5e4f5;
+    border-radius: 9px;
+    color: #315786;
+    font-size: 11px;
+}
+
+.admin-sms-page .admin-sms-toolbar .form-control:focus {
+    border-color: #55a9ff;
+    box-shadow: 0 0 0 3px rgba(85, 169, 255, .14);
+}
+
+/* FIX 1: Date inputs - 14px font size for placeholder and value */
+.admin-sms-page .admin-sms-toolbar input[type="date"].form-control {
+    font-size: 14px;
+}
+
+/* FIX 2: Service type dropdown - readable text, proper padding, no clipping */
+.admin-sms-page .admin-sms-toolbar select.form-select {
+    font-size: 14px;
+    height: 38px;
+    line-height: 1.4;
+    padding-right: 40px; /* space for dropdown arrow */
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* Booked patients table: centre the selection column and tidy the checkboxes */
+.admin-sms-page .admin-sms-booked-table th:first-child,
+.admin-sms-page .admin-sms-booked-table td:first-child {
+    width: 52px;
+    text-align: center;
+}
+
+.admin-sms-page .admin-doctor-table input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: #0877ed;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+/* Tables: no fixed-height internal scroll area, let the card grow naturally */
+.admin-sms-page .admin-doctor-table-wrap {
+    overflow: visible !important;
+    max-height: none !important;
+    height: auto;
+}
+
+/* Booked patients: keep the stored contact number on one line */
+.admin-sms-page .admin-doctor-table .admin-sms-col-contact {
+    white-space: nowrap;
+}
+
+/* Recently sent messages: spread the columns across the full card width.
+   Recipient and Sent At keep their content on one line with a little
+   breathing room, while Message absorbs the remaining space. */
+.admin-sms-page .admin-sms-history-table .admin-sms-col-patient {
+    min-width: 180px;
+    white-space: nowrap;
+}
+
+.admin-sms-page .admin-sms-history-table .admin-sms-col-recipient {
+    min-width: 160px;
+    white-space: nowrap;
+}
+
+.admin-sms-page .admin-sms-history-table .admin-sms-col-message {
+    width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.admin-sms-page .admin-sms-history-table .admin-sms-col-sent {
+    min-width: 200px;
+    padding-left: 28px;
+    padding-right: 24px;
+    white-space: nowrap;
+}
+
+/* Pagination strip sits cleanly under the booked-patient table */
+.admin-sms-page .admin-doctor-pagination {
+    background: #fbfdff;
+}
+
+/* Footer action bar inside the booked-patient card */
+.admin-sms-page .admin-sms-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 14px 20px;
+    border-top: 1px solid #e4edf7;
+    background: #fbfdff;
+}
+
+.admin-sms-page .admin-sms-actions .admin-primary-button {
+    margin-top: 0;
+}
+
+.admin-sms-page .admin-sms-notice {
+    display: inline-flex;
+    align-items: center;
+    color: #b4234a;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.admin-sms-page .admin-sms-notice[hidden] {
+    display: none !important;
+}
+
+/* Send-message modal: match the add/view appointment and record modals */
+#smsMessageModal .modal-body {
+    background: #f4f8ff;
+}
+
+#smsMessageModal .admin-panel {
+    border: 1px solid #0877ed;
+    background: #f4f8ff;
+}
+
+#smsMessageModal .admin-panel-title {
+    padding: 12px 20px;
+    background: #0877ed;
+}
+
+#smsMessageModal .admin-panel-title h3 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+#smsMessageModal .admin-panel-title i {
+    color: #ffffff;
+    font-size: 16px;
+}
+
+#smsMessageModal .admin-panel > .admin-muted-text {
+    margin: 0;
+    padding: 14px 20px 0;
+}
+
+#smsMessageModal .admin-panel > .form-field {
+    padding: 12px 20px 18px;
+}
+
+#smsMessageModal .form-control {
+    min-height: 40px;
+    border-color: #d5e4f5;
+    background-color: #ffffff;
+    color: #0a326c;
+    font-size: 15px;
+}
+
+#smsMessageModal .form-control:focus {
+    border-color: #55a9ff;
+    box-shadow: 0 0 0 3px rgba(85, 169, 255, .14);
+}
+
+@media (max-width: 767.98px) {
+    .admin-sms-page .admin-sms-toolbar,
+    .admin-sms-page .admin-sms-actions {
+        padding: 12px 14px;
+    }
+
+    .admin-sms-page .admin-sms-actions .admin-primary-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Fix: the 7-column booked-patients table squeezed the empty-state
+       placeholder text into a one-character-wide column on mobile.
+       Give the table a minimum width so the empty-state <td colspan="7">
+       has enough room, and let the wrapper scroll horizontally. */
+    .admin-sms-page .admin-doctor-table-wrap {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .admin-sms-page .admin-sms-booked-table {
+        min-width: 480px;
+    }
+
+    /* Make empty state stacked on mobile for Booked Patients table (icon above text, centered) */
+    .admin-sms-page .admin-sms-booked-table .admin-doctor-empty {
+        flex-direction: column;
+        flex-wrap: nowrap;
+        min-height: auto;
+        padding: 20px 16px;
+        gap: 10px;
+        justify-content: center;
+        text-align: center;
+        width: 100%;
+    }
+    .admin-sms-page .admin-sms-booked-table .admin-doctor-empty i {
+        margin-bottom: 0;
+        font-size: 24px;
+    }
+    .admin-sms-page .admin-sms-booked-table .admin-doctor-empty strong,
+    .admin-sms-page .admin-sms-booked-table .admin-doctor-empty span {
+        flex: none;
+        width: 100%;
+        white-space: normal;
+        overflow-wrap: normal;
+        word-break: normal;
+    }
+    .admin-sms-page .admin-sms-booked-table .admin-doctor-empty strong {
+        font-size: 14px;
+    }
+    .admin-sms-page .admin-sms-booked-table .admin-doctor-empty span {
+        font-size: 12px;
+    }
+
+    /* Ensure the empty-state row/cell spans full table width and centers content */
+    .admin-sms-page .admin-sms-booked-table tbody tr:only-child td,
+    .admin-sms-page .admin-sms-booked-table tbody tr:first-child:last-child td {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    /* Mobile filter section: smaller text and lighter opacity for placeholders */
+    .admin-sms-page .admin-sms-toolbar input[type="date"].form-control {
+        font-size: 12px;
+    }
+    .admin-sms-page .admin-sms-toolbar input[type="date"].form-control::placeholder {
+        color: rgba(49, 87, 134, 0.65);
+        opacity: 1;
+    }
+    .admin-sms-page .admin-sms-toolbar .admin-doctor-search input::placeholder {
+        font-size: 12px;
+        color: rgba(49, 87, 134, 0.65);
+        opacity: 1;
+    }
+    .admin-sms-page .admin-sms-toolbar select.form-select {
+        font-size: 12px;
+        padding-right: 36px;
+        text-overflow: ellipsis;
+    }
+    .admin-sms-page .admin-sms-toolbar select.form-select option {
+        font-size: 12px;
+    }
+}
+
+/* Tablet: ensure table scrolls if needed */
+@media (max-width: 991.98px) {
+    .admin-sms-page .admin-doctor-table-wrap {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+    .admin-sms-page .admin-sms-booked-table {
+        min-width: 600px;
+    }
+}

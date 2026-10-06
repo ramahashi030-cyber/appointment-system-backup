@@ -352,7 +352,7 @@
         transform: none;
     }
 
-    .admin-patients-page .admin-telemedicine-mark > i { font-size: 24px; }
+    .admin-patients-page .admin-telemedicine-mark > i { font-size: 17px; }
 
     .admin-patients-page .admin-telemedicine-mark > span {
         width: 24px;
@@ -371,18 +371,41 @@
         font-size: 11px;
     }
 
-    /* Stat cards: compact, icon above the number */
+    /* Stat cards: icon on left, label+number on right */
     .admin-patients-page .admin-doctor-stat-grid {
         grid-template-columns: 1fr;
         gap: 8px;
     }
 
     .admin-patients-page .admin-doctor-stat-card {
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
-        gap: 6px;
-        padding: 10px 6px;
-        text-align: center;
+        gap: 12px;
+        padding: 12px;
+        text-align: left;
+    }
+
+    .admin-patients-page .admin-doctor-stat-icon {
+        flex-shrink: 0;
+    }
+
+    .admin-patients-page .admin-doctor-stat-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    .admin-patients-page .admin-doctor-stat-text small {
+        color: #7893b6;
+        font-size: 9px;
+        text-align: left;
+    }
+
+    .admin-patients-page .admin-doctor-stat-text strong {
+        color: #0a326c;
+        font-size: 18px;
+        text-align: left;
     }
 
     /* Roster header */
@@ -515,6 +538,16 @@
     }
 
     .admin-patients-page .admin-patient-pagination { padding: 12px 14px; }
+
+    /* Add Patient Modal: make it scrollable on mobile */
+    #createPatientModal .modal-dialog {
+        max-height: calc(100vh - 2rem);
+    }
+    #createPatientModal .modal-body {
+        max-height: calc(100vh - 14rem);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
 }
 
 /* Very small phones: stack the two half-width fields */

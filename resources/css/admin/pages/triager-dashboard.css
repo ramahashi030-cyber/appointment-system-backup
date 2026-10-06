@@ -22,10 +22,10 @@
     width: 92px;
     height: 92px;
     flex: 0 0 92px;
-    background: linear-gradient(145deg, #2a8cff 0%, #0668d4 100%);
+    background: #0b6fe8;
     box-shadow: 0 12px 24px rgba(0, 78, 171, .28);
 }
-.triager-dashboard-content .admin-telemedicine-mark > i { font-size: 38px; }
+.triager-dashboard-content .admin-telemedicine-mark > i { font-size: 27px; }
 .triager-dashboard-content .admin-telemedicine-copy h1 {
     color: #08356f;
     font-size: clamp(26px, 2vw, 34px);

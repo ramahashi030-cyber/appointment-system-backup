@@ -286,7 +286,6 @@
                 'Accept': 'application/json',
             };
 
-            // Rows currently shown, keyed by id (used to fill the edit modal)
             let rowsById = {};
 
             const csrfToken = () =>
@@ -299,12 +298,10 @@
 
             loadTimeslots();
 
-            // Service changed: load its time slots
             serviceSelect.addEventListener('change', () => {
                 loadSlots(serviceSelect.value, slotSelect);
             });
 
-            // ---------- ADD ----------
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 clearErrors(form);
@@ -343,7 +340,6 @@
                 }
             });
 
-            // ---------- LOAD ----------
             async function loadTimeslots() {
                 try {
                     const response = await fetch(dataUrl, { headers: jsonHeaders });
@@ -388,7 +384,6 @@
                 }
             }
 
-            // ---------- RENDER ----------
             function renderTimeslots(timeslots) {
                 tableBody.innerHTML = '';
                 rowsById = {};
@@ -430,7 +425,6 @@
                 });
             }
 
-            // Row buttons (event delegation, so re-rendering needs no re-binding)
             tableBody.addEventListener('click', (e) => {
                 const editBtn = e.target.closest('.edit-timeslot-btn');
                 const deleteBtn = e.target.closest('.delete-timeslot-btn');
@@ -442,7 +436,6 @@
                 }
             });
 
-            // ---------- EDIT ----------
             const editModal = bootstrap.Modal.getOrCreateInstance(editModalEl);
 
             async function openEditModal(id) {
@@ -497,7 +490,6 @@
                 }
             });
 
-            // ---------- DELETE ----------
             async function handleDelete(btn) {
                 const item = rowsById[btn.dataset.timeslotId];
                 if (!item) return;
@@ -532,7 +524,6 @@
                 }
             }
 
-            // ---------- HELPERS ----------
             function clearErrors(formEl) {
                 formEl.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
                 formEl.querySelectorAll('.invalid-feedback').forEach(el => el.remove());

@@ -152,7 +152,12 @@
                     $aWaitingForDoctor = $appt['waiting_for_doctor'] ?? false;
                     $aMode = $appt['mode'] ?? 'TELE';
                     $aExpired = $appt['is_expired'] ?? false;
-                    $aIsActive = in_array(strtolower((string) $aStatus), ['booked', 'pending', 'confirmed'], true);
+                    // A visit stays "upcoming" while it is still open: the
+                    // controller's can_cancel keeps a telemedicine visit that
+                    // only reads Completed (because the patient joined) in play
+                    // until its scheduled end, exactly like the dashboard.
+                    $aIsActive = (bool) ($appt['can_cancel']
+                        ?? in_array(strtolower((string) $aStatus), ['booked', 'pending', 'confirmed'], true));
                     $aGroup = ($aIsActive && !$aExpired) ? 'upcoming' : 'past';
                     $aQrUrl = $appt['qr_code_url'] ?? null;
                     $aReason = $appt['consultation_reason_label'] ?? null;

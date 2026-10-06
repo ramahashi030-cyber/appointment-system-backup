@@ -22,10 +22,9 @@
                 <img src="{{ asset('images/logo.png') }}" alt="Qalinga Medical Center">
                 <div>
                     <strong>QMMC</strong>
-                    <span>DOCTOR PORTAL</span>
+                    <span>DOCTORS PORTAL</span>
                 </div>
             </div>
-
             <div class="doctor-login-message">
                 <span><i class="bi bi-camera-video-fill me-1" aria-hidden="true"></i> Telemedicine Workspace</span>
                 <h1>Your patients and schedule, together.</h1>
@@ -39,7 +38,6 @@
                 <span class="doctor-login-icon" aria-hidden="true"><i class="bi bi-person-badge"></i></span>
                 <h2>Welcome, Doctor</h2>
                 <p>Sign in with your dedicated doctor account.</p>
-
                 @if ($errors->any())
                     <div class="doctor-login-error" role="alert">
                         {{ $errors->first() }}

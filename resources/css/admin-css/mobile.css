@@ -128,7 +128,7 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
         text-align: left;
     }
     .admin-main .admin-telemedicine-mark { width: 54px; height: 54px; flex-basis: 54px; transform: none; }
-    .admin-main .admin-telemedicine-mark > i { font-size: 24px; transform: none; }
+    .admin-main .admin-telemedicine-mark > i { font-size: 17px; transform: none; }
     .admin-main .admin-telemedicine-copy { flex: 1 1 200px; }
     .admin-main .admin-telemedicine-copy h1 { font-size: 21px; }
     .admin-main .admin-telemedicine-welcome { font-size: 14px; }
@@ -235,7 +235,7 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
     /* ---- Triager dashboard ---- */
     .triager-dashboard-content .admin-telemedicine-banner { height: auto; min-height: 0; }
     .triager-dashboard-content .admin-telemedicine-mark { width: 56px; height: 56px; flex-basis: 56px; }
-    .triager-dashboard-content .admin-telemedicine-mark > i { font-size: 24px; }
+    .triager-dashboard-content .admin-telemedicine-mark > i { font-size: 17px; }
     .triager-dashboard-content .admin-telemedicine-copy h1 { font-size: 22px; }
     .triager-dashboard-content .admin-telemedicine-welcome { font-size: 15px; }
     .triager-card-grid { padding: 12px; gap: 12px; }

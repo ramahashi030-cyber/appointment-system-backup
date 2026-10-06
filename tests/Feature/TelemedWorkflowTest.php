@@ -7,6 +7,7 @@ use App\Models\ServiceTele;
 use App\Models\Staff;
 use App\Notifications\AppointmentCancelled;
 use App\Support\StaffDoctorSchema;
+use App\Support\Telemed;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
@@ -378,6 +379,71 @@ test('a patient cancellation reaches the doctor with the reason, never the triag
         );
 });
 
+test('joining the room does not take the cancel action away before the visit ends', function () {
+    telemedWorkflowTables();
+
+    $patient = makePatient(['username' => 'workflow-late-cancel']);
+
+    // Joining marks the visit Completed, but its scheduled window is tomorrow,
+    // so the dashboard must still offer the cancel action for it.
+    $joined = telemedWorkflowAppointment($patient, [
+        'status' => 'Completed',
+        'room_opened' => true,
+        'room_opened_by' => 'doctor',
+        'meeting_link' => 'https://meet.jit.si/workflow-late-cancel',
+    ]);
+
+    $dashboard = $this->withSession(telemedWorkflowPatientSession($patient))
+        ->get(route('telemed.home'));
+
+    $dashboard->assertOk();
+
+    $presented = collect($dashboard->viewData('upcoming'))
+        ->firstWhere('id', $joined->getKey());
+
+    expect($presented)->not->toBeNull()
+        ->and($presented['can_cancel'])->toBeTrue();
+
+    // My Visits keeps the same visit in its upcoming group, cancel action and all.
+    $this->withSession(telemedWorkflowPatientSession($patient))
+        ->get(route('telemed.mine'))
+        ->assertOk()
+        ->assertSee('data-group="upcoming"', false)
+        ->assertSee('data-open-appointment-cancel', false);
+
+    // Cancelling it works, and still reaches the doctor with the reason.
+    $this->withSession(telemedWorkflowPatientSession($patient))
+        ->postJson(route('telemed.book.cancel'), [
+            'cancel_id' => $joined->getKey(),
+            'cancellation_reason' => 'The doctor never arrived in the room.',
+        ])
+        ->assertOk();
+
+    expect($joined->refresh()->status)->toBe('Cancelled')
+        ->and($joined->cancellation_reason)->toBe('The doctor never arrived in the room.');
+});
+
+test('a telemedicine visit whose scheduled window has ended cannot be cancelled', function () {
+    telemedWorkflowTables();
+
+    $patient = makePatient(['username' => 'workflow-closed-cancel']);
+
+    $ended = telemedWorkflowAppointment($patient, [
+        'status' => 'Completed',
+        'date' => now('Asia/Manila')->subDay()->toDateString(),
+    ]);
+
+    $this->withSession(telemedWorkflowPatientSession($patient))
+        ->postJson(route('telemed.book.cancel'), [
+            'cancel_id' => $ended->getKey(),
+            'cancellation_reason' => 'Too late to cancel.',
+        ])
+        ->assertStatus(422);
+
+    expect($ended->refresh()->status)->toBe('Completed')
+        ->and($ended->cancellation_reason)->toBeNull();
+});
+
 test('the room buttons use the agreed labels on both dashboards', function () {
     telemedWorkflowTables();
 
@@ -406,4 +472,40 @@ test('the room buttons use the agreed labels on both dashboards', function () {
         ->assertSee('Join the Room')
         ->assertDontSee('Create Jitsi Room')
         ->assertDontSee('Join Jitsi');
+});
+
+test('a telemedicine visit reads as the symptoms the patient chose instead of "none of the above"', function () {
+    telemedWorkflowTables();
+
+    $patient = makePatient(['username' => 'workflow-symptom-service']);
+
+    $appointment = telemedWorkflowAppointment($patient, [
+        'service_id' => null,
+        'consultation_reason' => 'none_of_the_above',
+        'symptoms' => ['cough', 'fever_or_chills'],
+        'complaint_details' => 'Cough for three days.',
+        'status' => 'Booked',
+    ]);
+
+    // Step 2 answers are what read as the service until triage assigns one —
+    // the stored "none of the above" reason must never surface as the service.
+    expect(Telemed::activeAppointment($patient->getKey())['service_name'])
+        ->toBe('Cough / Ubo, Fever/Chills / Lagnat o ginaw');
+
+    $this->withSession(telemedWorkflowPatientSession($patient))
+        ->get(route('telemed.home'))
+        ->assertOk()
+        ->assertSee('Cough / Ubo')
+        ->assertSee('Fever/Chills / Lagnat o ginaw');
+
+    // The same label carries into history once the visit is over.
+    $appointment->update([
+        'date' => now('Asia/Manila')->subDay()->toDateString(),
+        'status' => 'Completed',
+    ]);
+
+    $this->withSession(telemedWorkflowPatientSession($patient))
+        ->getJson(route('telemed.history'))
+        ->assertOk()
+        ->assertJsonPath('history.0.service_name', 'Cough / Ubo, Fever/Chills / Lagnat o ginaw');
 });

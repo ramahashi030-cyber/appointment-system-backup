@@ -346,12 +346,14 @@
     </div>
 
     {{-- EDIT SERVICE MODAL
-         Dismissible backdrop (stated rather than left to the Bootstrap
-         default): a click on the dimmed area outside the dialog closes it,
-         while a click inside the dialog does not. The script flashes the
-         danger colour once on that same outside click. --}}
+         Static backdrop with the keyboard disabled — the Add Service modal's own
+         setting. An outside click raises `hidePrevented.bs.modal` instead of
+         closing, so the dialog only flashes the danger colour once and stays
+         open; a click inside the dialog raises nothing. Cancel and the X are the
+         only things that close it. --}}
     <div class="modal fade admin-doctor-modal admin-service-modal" id="editServiceModal" tabindex="-1"
-         aria-labelledby="editServiceModalTitle" aria-hidden="true" data-bs-backdrop="true">
+         aria-labelledby="editServiceModalTitle" aria-hidden="true"
+         data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <header class="modal-header admin-doctor-modal-header">
@@ -395,10 +397,12 @@
     </div>
 
     {{-- DELETE SERVICE MODAL
-         Same dismissible backdrop as the Edit modal: outside click closes it
-         and flashes the danger colour once, inside click does neither. --}}
+         Same static backdrop as the Edit modal: an outside click flashes the
+         danger colour once and the dialog stays open, an inside click does
+         nothing, and Cancel and the X are the only things that close it. --}}
     <div class="modal fade admin-doctor-modal admin-service-modal admin-service-modal-narrow" id="deleteServiceModal" tabindex="-1"
-         aria-labelledby="deleteServiceModalTitle" aria-hidden="true" data-bs-backdrop="true">
+         aria-labelledby="deleteServiceModalTitle" aria-hidden="true"
+         data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <header class="modal-header admin-doctor-modal-header">
@@ -438,11 +442,6 @@
 
 @push('scripts')
     <script>
-        /*
-         * Wrapped in an IIFE and guarded because the admin layout swaps pages by
-         * AJAX and re-evaluates every inline script with $.globalEval: top-level
-         * const declarations would collide on the second visit.
-         */
         (function () {
             'use strict';
 
@@ -484,7 +483,6 @@
                 return form.querySelector('[name="' + name + '"]');
             };
 
-            /* ------------------------------------------------ timeslot rows */
 
             function createSlotEditor(form) {
                 const editor = form.querySelector('[data-slot-editor]');
@@ -495,7 +493,6 @@
                     return Array.from(rowsEl.querySelectorAll('[data-slot-row]'));
                 }
 
-                /* Keeps names contiguous (timeslots[0], [1], ...) so validation errors map back. */
                 function refresh() {
                     const list = rows();
                     let total = 0;
@@ -530,8 +527,6 @@
                     inputs[0].value = slot && slot.time_slot != null ? slot.time_slot : '';
                     inputs[1].value = slot && slot.slots != null ? slot.slots : '';
 
-                    /* A row built here is never server-rendered, so the time slot
-                       rules are applied here as well as on the initial pass. */
                     applyServiceFieldRules(row);
 
                     return row;
@@ -573,7 +568,6 @@
             const addEditor = createSlotEditor(addForm);
             const editEditor = createSlotEditor(editForm);
 
-            /* ------------------------------------------------------ helpers */
 
             function setDays(form, days) {
                 form.querySelectorAll('input[name="availability_day[]"]').forEach(function (box) {
@@ -587,7 +581,6 @@
                 });
             }
 
-            /* Server rendered text-field errors have no .is-invalid sibling, so Bootstrap hides them. */
             function revealErrors(form) {
                 form.querySelectorAll('.invalid-feedback').forEach(function (node) {
                     node.classList.add('d-block');
@@ -613,11 +606,9 @@
                 editEditor.setRows(Array.isArray(data.timeslots) && data.timeslots.length ? data.timeslots : [blankSlot()]);
             }
 
-            /* ------------------------------------------------- add modal */
 
             const addContent = addEl.querySelector('.modal-content');
 
-            /* Outside click / Escape on the static modal: blink the border once, change nothing else. */
             addEl.addEventListener('hidePrevented.bs.modal', function () {
                 addContent.classList.remove('admin-service-modal-blocked');
                 void addContent.offsetWidth;
@@ -630,31 +621,12 @@
                 }
             });
 
-            /* Cancel resets once the modal has finished closing; X (data-bs-dismiss) just closes. */
             addEl.querySelector('[data-service-cancel]').addEventListener('click', function () {
                 addEl.addEventListener('hidden.bs.modal', resetAddForm, { once: true });
                 addModal.hide();
             });
 
-            /* ------------------------------------- outside click: edit / delete */
 
-            /*
-             * Bootstrap decides an outside click with one test: the `mousedown`
-             * and the `click` both have to land on the `.modal` element itself.
-             * (`.modal-dialog` is pointer-events: none and `.modal-content` is
-             * auto, so every click outside the dialog resolves to `.modal`, and
-             * a click inside it never does.) The blink below is armed by exactly
-             * the same pair, so it fires once per outside click, never for a
-             * click inside the dialog, and never for a drag that starts inside
-             * and ends outside.
-             *
-             * It reuses the existing `admin-service-modal-blocked` class and its
-             * `adminServiceModalBlocked` keyframes rather than adding a second
-             * animation: one 0.5s run that flashes the services danger colour
-             * #d9534f and returns to the modal's own border, dropped again on
-             * `animationend` so it cannot loop. The forced reflow is what lets a
-             * second outside click flash again instead of being ignored.
-             */
             function blinkServiceModal(element) {
                 const content = element.querySelector('.modal-content');
 
@@ -666,28 +638,25 @@
             [editEl, deleteEl].forEach(function (element) {
                 const content = element.querySelector('.modal-content');
 
-                content.addEventListener('animationend', function (event) {
-                    if (event.animationName === 'adminServiceModalBlocked') {
-                        content.classList.remove('admin-service-modal-blocked');
-                    }
+                const dropServiceModalBlink = function () {
+                    content.classList.remove('admin-service-modal-blocked');
+                };
+
+                ['animationend', 'animationcancel'].forEach(function (name) {
+                    content.addEventListener(name, function (event) {
+                        if (event.animationName === 'adminServiceModalBlocked') {
+                            dropServiceModalBlink();
+                        }
+                    });
                 });
 
-                element.addEventListener('mousedown', function (event) {
-                    if (event.target !== element) {
-                        return;
-                    }
+                element.addEventListener('hidden.bs.modal', dropServiceModalBlink);
 
-                    element.addEventListener('click', function (clickEvent) {
-                        if (clickEvent.target !== element) {
-                            return;
-                        }
-
-                        blinkServiceModal(element);
-                    }, { once: true });
+                element.addEventListener('hidePrevented.bs.modal', function () {
+                    blinkServiceModal(element);
                 });
             });
 
-            /* ------------------------------------------------ edit modal */
 
             root.querySelectorAll('[data-service-edit]').forEach(function (button) {
                 button.addEventListener('click', function () {
@@ -703,7 +672,6 @@
                 });
             });
 
-            /* ---------------------------------------------- delete modal */
 
             const deleteName = deleteEl.querySelector('[data-delete-name]');
             const deleteWarning = deleteEl.querySelector('[data-delete-warning]');
@@ -717,7 +685,6 @@
                     deleteForm.setAttribute('action', template.replace('__ID__', encodeURIComponent(button.dataset.serviceDelete)));
                     deleteName.textContent = button.dataset.serviceName || '';
 
-                    /* The controller refuses this delete as well; disabling it just says why up front. */
                     deleteWarning.hidden = count === 0;
                     deleteWarning.textContent = count === 0
                         ? ''
@@ -729,36 +696,7 @@
                 });
             });
 
-            /* ------------------------------------------- service field rules */
 
-            /*
-             * Service name, HOMIS code and Time slot live in the shared
-             * admin.services._form partial, so the rules are declared once here
-             * and applied to whichever form is in scope — the same approach the
-             * patient page uses. Sanitising on `input` also covers paste, autofill
-             * and drag-drop, because all of them raise `input`; the submit pass
-             * is the backstop for a value that never came through `input` (a
-             * stored row filled in by fillEdit, for instance) and is what refuses
-             * the submission.
-             *
-             * Deliberately no `pattern` attribute: HTML constraint validation
-             * runs *before* the submit event, so a stored value that predates
-             * these rules would raise an opaque native bubble the admin cannot
-             * act on. Without it the submit pass always gets its turn, corrects
-             * the field, and reports the field and the reason on the flashcard —
-             * which is also what keeps stored service names from being rewritten
-             * behind the admin's back.
-             *
-             * The cleaners only remove characters the field does not accept.
-             * Leading and trailing spaces are deliberately NOT trimmed there:
-             * stripping them on every keystroke eats the space the user is about
-             * to type after "Family", which would weld the next word onto it.
-             * They are trimmed once, by `finish`, on submit.
-             *
-             * Time slot keeps the stored "08:00 - 10:00" shape (Service::
-             * syncTimeslots matches rows on that label), so digits, colons,
-             * spaces and the range dash stay and letters do not.
-             */
             const cleanServiceName = (value) => value
                 .replace(/[^A-Za-z0-9 ]+/g, '')
                 .replace(/ {2,}/g, ' ')
@@ -816,7 +754,6 @@
                 });
             }
 
-            /* Returns true when the field actually had to be corrected. */
             function sanitizeServiceField(input, rule) {
                 const cleaned = rule.clean(input.value);
 
@@ -835,16 +772,7 @@
                 });
             }
 
-            /* ---------------------------------------- flashcard notices */
 
-            /*
-             * The established admin toast (see admin/timeslots.blade.php and
-             * admin/holidays — same `.admin-toast` markup and the same
-             * holidays.css styling, already loaded for this page). It replaces a
-             * browser alert with a dismissible flashcard that carries the same
-             * message, clears any earlier one instead of stacking, and removes
-             * itself after three seconds so it never blocks the page.
-             */
             function showToast(type, message) {
                 document.querySelectorAll('.admin-toast').forEach(function (card) {
                     card.remove();
@@ -877,13 +805,10 @@
                 }, 3000);
             }
 
-            /* Server-rendered rows exist only in the add form; makeRow covers the
-               rest, so both entry points are attributed. */
             applyServiceFieldRules(addForm);
             applyServiceFieldRules(editForm);
 
             [addForm, editForm].forEach(function (form) {
-                /* Delegated, so a timeslot row added after load is covered too. */
                 form.addEventListener('input', function (event) {
                     const rule = serviceRuleFor(event.target);
 
@@ -923,7 +848,6 @@
                 });
             });
 
-            /* --------------------------------- initial state after load */
 
             if (failedForm === 'edit' && editSeed) {
                 resetAddForm();

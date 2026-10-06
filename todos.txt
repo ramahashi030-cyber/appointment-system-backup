@@ -1,101 +1,26 @@
-td
-DOCTORS AND PATIENT PAGE
- - view doctors always show same doctor even though admin click different doctor
- - change the background color of column header
- - in view doctors modal appointments table is too little		
- - increase the text size of schedule and status column data including the actions
-
-DOCTORS AND PATIENT MODAL
- - increase all the text sizes inside the doctors and staff modal both view and edit
- - close button of doctors modal needs to double click to close make it one single click
- - make the width of appointments history and consultation history on top of each other so that it extent in the end side of the modal
- - availability schedule background color of the table change to #ffffff
-
-
-
-
-
-
-
-
-
-
-ADMIN PANEL TODO
-every prompt ask if something is missing
-
+ADMIN PANEL TODO :
 
 	ADMIN DASHBOARD
 		- display how many online booking in current date --
 		- display how many walking registration -- 
 
-	ADMIN PROFILE
-		 DONE - first name and last name input field should only contain letters
-		 DONE - password max length is 15 minimum of 6, combination of capital and small letters with numbers and special character
-
 	PATIENTS PAGE
-		  DONE - replace pending stat-card, replace pending with deactivated in filter, make the clear button visible all the time --
 		  - move the 'add patient' button with the same row of stat card
  		  - contact number on both edit and add patient should be required
-		
-		ADD PATIENT
-		  DONE - validate edit patient form, text field should not contain any number or special character, number field should not contain any letter or special character
-		  DONE - set contact number max length to 11
-		  DONE - address should not contain special character
-		  DONE - hospital number max length set to 6 and should not contain letters and special character
-		  DONE - patient first last middle name translate into capital letter when saving into database
-		
-		VIEW
-		  DONE - show the whole address of the patient, adjust the registered and put under the hospital number
-		  DONE - appointment history: footer 'Showing 1 to 10 of 22 results' is not visible
-		  DONE - appointment history: change the pagination to: << 1 >> maximum of 5 data's
-		  DONE - remove 'view all' button inside appointment history
-		  DONE - consultation history: add pagination to the footer: << 1 >> maximum of 5
-		  DONE - remove 'view all' button inside consultation history
-		  DONE - remove 'view records' button to medical information table 
-		  DONE - the table arrows turning the next page of the table make the whole data table vanished after clicking it
 
 	DOCTORS PAGE
-		DONE - both first last middle name should transform into capital letter when saving into database
-
-		ADD DOCTORS
-		  DONE - first name, last name, middle name input field should only contain letters
-		  DONE - employee ID and contact number should only contain numbers and max length of 11
-		  DONE - minimum password length should be 6 and max length of 15 combination of Capital Small letters with numbers and special character
-
-		EDIT
-		  - remove consultation type table/input field
 
 
 
+--------------------------
+	TRIAGER PANEL and ADMIN PANEL
+		change the color of the telemedicine mark into #1e5eb1 and the fill to #f4f8ff
 
-
-    ADMIN PANEL
-
-	SERVICES
-		FACE TO FACE and TELEMEDICINE
-			- edit and delete button modal closes when clicked outside the modal
-			- edit and delete button modals border should show a single blink danger color when clicked outside
-			- add services modal. create service and cancel button are not align
-			- add service modal. time slot can input letters and special character
-			- add service modal. service name and homis code can input special characters
-	change all the alert into flashcard modals
-
-
-
-
-
-
-
-
+----------------------------------------------
 	Doctors Page.
-	- Change the all the jitsi to join call.
+	- Change the all the jitsi to join room, 
 	- The appointment of the patient will automatically removed when the doctor joining the call in telemed. Have flashcard confirmation of doctor joining in the call and appointment being removed. 
 	- When there's ongoing processing appointment. The doctor cannot log out as long as the process is not finish.
 	- The appointment will be completed when the patient join the call in telemed. The call on the patient page will be activated only when the doctor created the room call
 	- if patients cancel the appointment, notification should go to doctors instead of triager
-
-	Admin
-	DONE -The mobile version sidebar must close automatically when reloading another page.
-
-	SMS Page.
-	- The sms mobile version have an error in text alignment. image attached.
+	- if patient accidentaly closes the jitsi, patient can still join the jitsi as long as the doctor is still in the meeting room and the call time is not over(e.g: 8:00 - 10:00)

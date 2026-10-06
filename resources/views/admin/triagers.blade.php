@@ -32,6 +32,19 @@
                 overflow-wrap: anywhere;
             }
         }
+
+        {{-- Mobile display cap: phones (<=767.98px) turn this table into stacked
+             cards, and a long roster can swallow the whole page. Only the first
+             3 data rows are rendered visible there; rows 4+ stay in the DOM and
+             stay in the form, so nothing is deleted and desktop/tablet (>=768px)
+             still show every record exactly as before. `.admin-main` is prefixed
+             so this outranks mobile.css's `.admin-table-stack tbody tr { display:
+             flex }`, which is what the row-limit rule has to beat. --}}
+        @media (max-width: 767.98px) {
+            .admin-main .admin-triagers-page .admin-doctor-table > tbody > tr:nth-child(n+4) {
+                display: none !important;
+            }
+        }
     </style>
     <div class="admin-dashboard-content admin-doctor-content admin-triagers-page">
         <section class="admin-telemedicine-banner admin-doctor-banner" aria-labelledby="triagerDirectoryTitle">

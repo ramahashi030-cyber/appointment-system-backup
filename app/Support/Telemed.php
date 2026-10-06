@@ -8,6 +8,7 @@ use App\Models\HolidayTele;
 use App\Models\Patient;
 use App\Models\ServiceTele;
 use App\Models\ServiceTimeslotTele;
+use App\Symptom;
 use Illuminate\Support\Carbon;
 
 /**
@@ -226,11 +227,49 @@ class Telemed
             'time_slot' => $row->time_slot,
             'status' => $row->status,
             'meeting_link' => $row->meeting_link,
-            'service_name' => $service?->service_name
-                ?? ConsultationReason::tryFrom((string) $row->consultation_reason)?->label()
-                ?? 'Telemedicine',
+            'service_name' => $service?->service_name ?? self::fallbackServiceLabel($row),
             'is_expired' => AppointmentWindow::hasEnded($row),
         ];
+    }
+
+    /**
+     * Service label for a visit the triage team has not assigned a service to.
+     *
+     * A telemedicine request always stores "None of the above" as its reason —
+     * the patient answered with symptoms instead of a consultation type — so
+     * the symptoms they chose in step 2 of the request read as the service.
+     * "None of the above" itself is never a useful service name, so it falls
+     * back to the consultation type when nothing was chosen.
+     */
+    public static function fallbackServiceLabel(Appointment $row): string
+    {
+        $reason = ConsultationReason::tryFrom((string) $row->consultation_reason);
+        $modeLabel = $row->mode === 'FACE' ? 'Face-to-Face' : 'Telemedicine';
+
+        if ($reason !== ConsultationReason::NoneOfTheAbove) {
+            return $reason?->label() ?? $modeLabel;
+        }
+
+        $symptoms = self::symptomLabels($row);
+
+        return $symptoms === [] ? $modeLabel : implode(', ', $symptoms);
+    }
+
+    /**
+     * Labels for the symptoms the patient picked in step 2 of the request.
+     *
+     * @return array<int, string>
+     */
+    public static function symptomLabels(Appointment $row): array
+    {
+        $symptoms = is_array($row->symptoms) ? $row->symptoms : [];
+
+        return array_values(array_filter(array_map(
+            fn (mixed $symptom): ?string => is_string($symptom)
+                ? Symptom::tryFrom($symptom)?->label()
+                : null,
+            $symptoms,
+        )));
     }
 
     /**

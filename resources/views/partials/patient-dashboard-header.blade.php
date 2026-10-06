@@ -10,7 +10,7 @@
     <div class="patient-dashboard-header-inner">
         <a class="patient-header-brand d-xl-none" href="{{ route('telemed.home') }}" aria-label="QMMC Patient home">
             <span class="patient-brand-symbol" aria-hidden="true"><i class="bi bi-heart-fill"></i></span>
-            <span class="patient-brand-copy"><strong>QMMC</strong><small>PATIENT</small></span>
+            <span class="patient-brand-copy"><strong>QALINGA</strong><small>PATIENTS</small><small>PORTAL</small></span>
         </a>
 
         <button class="patient-menu-toggle d-xl-none" type="button"

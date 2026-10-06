@@ -24,7 +24,7 @@
         <section class="admin-telemedicine-banner" aria-label="QMMC telemedicine consultation">
             <div class="admin-telemedicine-glow" aria-hidden="true"></div>
             <div class="admin-telemedicine-content">
-                <div class="admin-telemedicine-mark" aria-hidden="true">
+                <div class="admin-telemedicine-mark" aria-hidden="true" style="color: #f4f8ff; background: #0b6fe8;">
                     <i class="bi bi-heart-fill"></i>
                     <span><i class="bi bi-camera-video-fill"></i></span>
                 </div>

@@ -22,7 +22,7 @@
 
     <a class="patient-brand" href="{{ route('telemed.home') }}" aria-label="QMMC Patient home">
         <span class="patient-brand-symbol" aria-hidden="true"><i class="bi bi-heart-fill"></i></span>
-        <span class="patient-brand-copy"><strong>QMMC</strong><small>PATIENT</small></span>
+        <span class="patient-brand-copy"><strong>QALINGA</strong><small>PATIENTS</small><small>PORTAL</small></span>
     </a>
 
     <nav class="patient-sidebar-nav">
@@ -51,7 +51,7 @@
     <div class="offcanvas-header patient-mobile-menu-header">
         <a class="patient-brand" href="{{ route('telemed.home') }}" id="patientMobileMenuLabel">
             <span class="patient-brand-symbol" aria-hidden="true"><i class="bi bi-heart-fill"></i></span>
-            <span class="patient-brand-copy"><strong>QMMC</strong><small>PATIENT</small></span>
+            <span class="patient-brand-copy"><strong>QALINGA</strong><small>PATIENTS</small><small>PORTAL</small></span>
         </a>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close menu"></button>
     </div>

@@ -32,6 +32,21 @@
                 overflow-wrap: anywhere;
             }
         }
+
+        {{-- Mobile display cap: on phones (<=767.98px) this Reports table becomes a
+             stack of cards, so a full page of rows can take over the screen. Only
+             the first 3 data rows are shown there. Rows 4+ remain in the DOM and
+             are still submitted by their form, so no report data is deleted and
+             pagination continues to work; desktop and tablet (>=768px) are
+             untouched and still render every record. Scoped to this page's own
+             data-appointment-table-wrap so no other admin table is affected, and
+             prefixed with `.admin-main` to outrank mobile.css's
+             `.admin-table-stack tbody tr { display: flex }` row rule. --}}
+        @media (max-width: 767.98px) {
+            .admin-main [data-appointment-table-wrap] .admin-doctor-table > tbody > tr:nth-child(n+4) {
+                display: none !important;
+            }
+        }
     </style>
     <div class="admin-dashboard-content admin-doctor-content">
         <section class="admin-telemedicine-banner admin-doctor-banner" aria-labelledby="appointmentDirectoryTitle">
@@ -374,7 +389,6 @@
 @push('scripts')
     <script>
         $(function() {
-            // Modal state management
             const modalStates = [
                 { element: document.getElementById('addAppointmentModal'), parameter: 'create' },
                 { element: document.getElementById('viewAppointmentModal'), parameter: 'view' },
@@ -416,7 +430,6 @@
                 }
             });
 
-            // Filter form AJAX
             const form = document.querySelector('[data-appointment-filters]');
             if (!form) {
                 return;
@@ -521,7 +534,6 @@
                 updateFilters(link.href);
             });
 
-            // ---- Appointment CRUD via jQuery AJAX ----
             const appointmentRoutes = {
                 show: @json(route('admin.appointments.show', ['id' => '__ID__'])),
                 update: @json(route('admin.appointments.update', ['id' => '__ID__'])),
@@ -566,7 +578,6 @@
                 FACE: @json(($services ?? collect())->map(fn ($s) => ['id' => $s->id, 'name' => $s->service_name])->values()),
                 TELE: @json(($servicesTele ?? collect())->map(fn ($s) => ['id' => $s->id, 'name' => $s->service_name])->values()),
             };
-            // Hidden input fixed to this page's type (FACE or TELE).
             const $mode = $('#appointmentMode');
             const $service = $('#appointmentService');
             const populateServices = (mode, selected = '') => {
@@ -587,7 +598,6 @@
 
             $(modalEl).on('hidden.bs.modal', () => setFormMode());
 
-            // Create + Update
             $apptForm.off('submit.appointmentCrud').on('submit.appointmentCrud', function (event) {
                 event.preventDefault();
                 if ($submitBtn.prop('disabled')) {
@@ -620,7 +630,6 @@
                 });
             });
 
-            // Read one appointment into the edit form
             $(document).off('click.appointmentEdit').on('click.appointmentEdit', '.appointment-edit-btn', function () {
                 const btn = $(this);
                 if (btn.prop('disabled')) {
@@ -649,7 +658,6 @@
                     });
             });
 
-            // Delete
             $(document).off('click.appointmentDelete').on('click.appointmentDelete', '.appointment-delete-btn', function () {
                 const btn = $(this);
                 if (btn.prop('disabled') || !confirm('Delete this appointment permanently? This cannot be undone.')) {
@@ -671,7 +679,6 @@
                 });
             });
 
-            // Status actions (approve, reject, confirm, cancel, start, complete)
             $(document).off('click.appointmentActions').on('click.appointmentActions', '.appointment-action-btn', function () {
                 const btn = $(this);
                 const action = btn.data('action');

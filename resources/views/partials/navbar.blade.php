@@ -68,7 +68,7 @@
 
         <a class="navbar-brand d-flex align-items-center gap-2" href="/telemed">
             <img class="auth-brand-logo" src="{{ asset('images/logo.png') }}" alt="Qalinga logo" style="height: 50px; width: auto;">
-            <span>QMMC PATIENT</span>
+            <span>PATIENT PORTAL</span>
         </a>
 
         <div class="d-flex align-items-center gap-2 order-lg-3">

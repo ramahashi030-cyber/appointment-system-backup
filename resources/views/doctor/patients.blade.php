@@ -7,7 +7,7 @@
     <div class="doctor-page-header">
         <div>
             <h1>Telemedicine Patients</h1>
-            <p>Patients with at least one appointment in the doctor portal.</p>
+            <p>Patients with at least one appointment in the doctors portal.</p>
         </div>
         <a href="{{ route('doctor.appointments') }}" class="doctor-action-button">
             <i class="bi bi-calendar2-check" aria-hidden="true"></i>All appointments

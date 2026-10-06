@@ -214,7 +214,6 @@
                 load();
             });
 
-            // stopPropagation keeps the layout's page-swap handler from also handling these links.
             $form.on('click', 'a.admin-clear-filter', function (event) {
                 event.preventDefault();
                 event.stopPropagation();

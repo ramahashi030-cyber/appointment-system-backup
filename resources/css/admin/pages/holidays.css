@@ -139,26 +139,28 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 18px;
+    padding: 0 16px;
     border-bottom: 1px solid #eaf1f9;
-    background: linear-gradient(120deg, #f5faff, #fff 70%);
+    background-color: #0b6fe8;
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
 }
 
 .admin-holidays-page .admin-panel-title {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .admin-holidays-page .admin-panel-title i {
-    font-size: 18px;
-    color: #1685ee;
+    font-size: 15px;
+    color: #ffffff;
 }
 
 .admin-holidays-page .admin-panel-title h2 {
     margin: 0;
-    color: #0a326c;
-    font-size: 15px;
+    color: #ffffff;
+    font-size: 12px;
     font-weight: 700;
 }
 
@@ -286,14 +288,28 @@
     padding: 0 18px;
     border: 0;
     border-radius: 9px;
-    background: linear-gradient(135deg, #1b8ffb, #0a6ed6);
+    background: transparent;
     box-shadow: 0 8px 16px rgba(22, 133, 238, .22);
     color: #fff;
     cursor: pointer;
     font-family: inherit;
     font-size: 13px;
     font-weight: 600;
-    transition: box-shadow .15s ease, transform .1s ease;
+    transition: background-color 0.5s ease, color 0.5s ease, box-shadow .15s ease, transform .1s ease;
+}
+
+/* Base look moved onto its own layer (byte-identical gradient) so it can fade out
+   beneath the hover overlay from admin-css/dashboard.css; otherwise the blue bleeds
+   through the overlay's anti-aliased corners as a thin sliver. Both layers share the
+   same rounded shape (inset: 0, border-radius: inherit, parent overflow: hidden). */
+.admin-primary-button::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    border-radius: inherit;
+    background: linear-gradient(135deg, #1b8ffb, #0a6ed6);
+    transition: opacity 0.5s ease;
 }
 
 .admin-primary-button:hover:not(:disabled) {
@@ -307,6 +323,11 @@
     color: #94a9c2;
     cursor: not-allowed;
     transform: none;
+}
+
+/* Keep the disabled grey exactly as it renders today: no gradient layer, no fade. */
+.admin-primary-button:disabled::after {
+    content: none;
 }
 
 /* Banner styles */
@@ -342,7 +363,7 @@
     align-items: center;
     justify-content: center;
     border-radius: 14px;
-    background: rgba(255,255,255,.18);
+    background: #0b6fe8;
     backdrop-filter: blur(6px);
     font-size: 24px;
 }
@@ -454,12 +475,19 @@
     font-family: inherit;
     font-size: 13px;
     font-weight: 600;
-    transition: box-shadow .15s ease, transform .1s ease;
+    transition: background-color 0.5s ease, color 0.5s ease, box-shadow .15s ease, transform .1s ease;
 }
 
 .admin-doctor-add-button:hover {
     box-shadow: 0 10px 20px rgba(22, 133, 238, .28);
     transform: translateY(-1px);
+}
+
+/* Buttons carrying both .admin-primary-button (gradient layer + hover overlay)
+   and .admin-doctor-add-button: keep the gradient on the layer only, so nothing
+   blue remains under the overlay at the corners. */
+.admin-doctor-add-button.admin-primary-button {
+    background: transparent;
 }
 
 .admin-doctor-stat-action {

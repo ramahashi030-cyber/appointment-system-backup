@@ -73,6 +73,44 @@
     font-weight: 700;
     box-shadow: 0 5px 16px rgba(33, 86, 145, .06);
     cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    transition: background-color 0.5s ease, color 0.5s ease, box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+/* The base background is a gradient (see pages/holidays.css .admin-doctor-add-button),
+   and gradients cannot be animated by background-color. The hover colour is painted
+   by this overlay instead, which fades in over 0.5s while the icon and label stay
+   above it (z-index: -1 sits over the button background, under the content). */
+.admin-doctor-stat-action::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: #edf6ff;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+/* The add buttons also carry .admin-doctor-add-button, whose blue gradient is the
+   rendered base and bleeds through the overlay's anti-aliased corners as a thin
+   dark-blue sliver. Move that gradient onto its own layer (byte-identical value)
+   so it can fade out while the hover overlay fades in; both layers share the same
+   rounded shape via inset: 0, border-radius: inherit and the parent's clipping. */
+.admin-doctor-add-button.admin-doctor-stat-action {
+    background: transparent;
+}
+
+.admin-doctor-add-button.admin-doctor-stat-action::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    border-radius: inherit;
+    background: linear-gradient(135deg, #1b8ffb, #0a6ed6);
+    transition: opacity 0.5s ease;
 }
 
 .admin-doctor-stat-action > i {
@@ -89,8 +127,17 @@
 
 .admin-doctor-stat-action:hover,
 .admin-doctor-stat-action:focus-visible {
-    background: #edf6ff;
     color: #073a7b;
+}
+
+.admin-doctor-stat-action:hover::before,
+.admin-doctor-stat-action:focus-visible::before {
+    opacity: 1;
+}
+
+.admin-doctor-stat-action:hover::after,
+.admin-doctor-stat-action:focus-visible::after {
+    opacity: 0;
 }
 
 .admin-doctor-stat-card {
