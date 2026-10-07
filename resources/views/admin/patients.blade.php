@@ -176,6 +176,254 @@
                 display: none !important;
             }
         }
+
+        /* =============================================================
+           Standard Admin modal system — source of truth: the Add Patient
+           modal (#createPatientModal, sized by pages/patients.css). These
+           rules only restate that modal's measurements for the other
+           modals on this page. Markup, behaviour and content are untouched.
+           ============================================================= */
+
+        /* One width for every Admin modal: the Add Patient dialog
+           (width: calc(100% - 30px); max-width: 640px). Phones keep the
+           shared calc(100% - 16px) rule from admin-css/responsive.css. */
+        .admin-doctor-modal .modal-dialog {
+            max-width: 640px;
+        }
+
+        /* Content spacing follows the reference (12px row gap, 4px label gap). */
+        .admin-doctor-modal .admin-doctor-form {
+            gap: 12px;
+        }
+
+        .admin-doctor-modal .admin-doctor-form-grid {
+            gap: 12px;
+        }
+
+        .admin-doctor-modal .admin-doctor-form .form-field {
+            gap: 4px;
+        }
+
+        /* Field sizing follows the reference (12px labels, 13px controls). */
+        .admin-doctor-modal .admin-doctor-form .form-field > label,
+        .admin-doctor-modal .admin-doctor-form .form-field > label span {
+            font-size: 12px;
+        }
+
+        .admin-doctor-modal .admin-doctor-form .form-control,
+        .admin-doctor-modal .admin-doctor-form .form-select {
+            min-height: 0;
+            padding: 0.375rem 0.5rem;
+            font-size: 13px;
+        }
+
+        /* Action area mirrors the reference footer: centered, 8px apart,
+           with no separator rule above the buttons. The row keeps its
+           existing top spacing (margin from pages/holidays.css + padding
+           from doctor.css): these rows sit inside forms, so they do not get
+           the modal-body padding that separates the reference footer. */
+        .admin-doctor-modal .admin-doctor-form-actions {
+            justify-content: center;
+            gap: 8px;
+            border-top: none;
+        }
+
+        .admin-doctor-modal .modal-footer {
+            justify-content: center;
+            border-top: none;
+            padding-top: 0;
+            gap: 8px;
+        }
+
+        /* Button type matches the reference: 13px inside every modal. */
+        .admin-doctor-modal .admin-primary-button,
+        .admin-doctor-modal .admin-secondary-button,
+        .admin-doctor-modal .admin-danger-button {
+            font-size: 13px;
+        }
+
+        /* Phones: action buttons stay inline like the reference footer
+           instead of stretching into full-width rows. */
+        @media (max-width: 767.98px) {
+            .admin-doctor-modal .admin-doctor-form-actions {
+                flex-wrap: wrap;
+            }
+
+            .admin-doctor-modal .admin-doctor-form-actions > * {
+                flex: 0 0 auto;
+            }
+        }
+
+        /* =============================================================
+           Deactivation flashcard — the [data-patient-alert] card the
+           patient toggle handler injects after the stat grid. It never
+           picked up the admin alert styling (`.admin-main > .alert` in
+           admin-css/layout.css does not match it: the card sits inside
+           .admin-dashboard-content), so it rendered as a full-column
+           banner — up to ~1600px wide — with the stock 6px radius and
+           default body type, and its close button top-aligned in the
+           corner. Presentation only, scoped to this one flashcard: the
+           card's classes, markup, dismissal and the deactivate/activate
+           logic behind it are untouched, and no other alert, modal or
+           page element matches these selectors.
+           ============================================================= */
+
+        /* Proportioned like this page's dialogs (640px system) instead of
+           spanning the content column, on the admin alert radius. */
+        [data-patient-alert] {
+            max-width: 640px;
+            padding: 14px 46px 14px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.45;
+        }
+
+        /* The X sits on the message's centre line instead of the top-right
+           corner, with a compact hit area clear of the text. */
+        [data-patient-alert] .btn-close {
+            top: 50%;
+            right: 10px;
+            padding: .375rem;
+            transform: translateY(-50%);
+        }
+
+        /* =============================================================
+           Patient Deactivation confirmation flashcard — replaces the
+           browser's native confirm() for the roster's Deactivate button
+           (#confirmDeactivatePatient, markup in this file). A compact
+           card in this page's modal language: 12px radius, the admin
+           modal elevation, the shared 40px / 9px-radius admin buttons —
+           with a danger treatment for the destructive action. Scoped to
+           this one flashcard: no other modal, alert or page element
+           matches these selectors.
+           ============================================================= */
+
+        #confirmDeactivatePatient .modal-dialog {
+            max-width: 420px;
+        }
+
+        #confirmDeactivatePatient .modal-content {
+            overflow: hidden;
+            border: 1px solid #f2c9c6;
+            border-top: 3px solid #c93f36;
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 24px 60px rgba(7, 30, 61, .3);
+        }
+
+        #confirmDeactivatePatient .admin-patient-confirm-body {
+            position: relative;
+            display: flex;
+            gap: 14px;
+            padding: 22px 22px 14px;
+        }
+
+        #confirmDeactivatePatient .admin-patient-confirm-icon {
+            display: inline-flex;
+            width: 44px;
+            height: 44px;
+            flex: 0 0 44px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #e05a52, #c93f36);
+            box-shadow: 0 8px 16px rgba(201, 63, 54, .22);
+            color: #fff;
+            font-size: 20px;
+        }
+
+        #confirmDeactivatePatient .admin-patient-confirm-copy {
+            min-width: 0;
+            padding-right: 20px; /* keeps text clear of the close button */
+        }
+
+        #confirmDeactivatePatient .admin-patient-confirm-body .modal-title {
+            margin: 0;
+            color: #0a326c;
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        #confirmDeactivatePatient .admin-patient-confirm-text {
+            margin: 6px 0 0;
+            color: #315786;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        #confirmDeactivatePatient .admin-patient-confirm-text strong {
+            color: #0a326c;
+            font-weight: 700;
+            overflow-wrap: anywhere; /* long patient names wrap cleanly */
+        }
+
+        #confirmDeactivatePatient .admin-patient-confirm-note {
+            margin: 6px 0 0;
+            color: #8ca2bd;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        #confirmDeactivatePatient .btn-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: .4rem;
+        }
+
+        #confirmDeactivatePatient .admin-patient-confirm-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            padding: 0 22px 22px;
+        }
+
+        /* Outside-click / Escape acknowledgement. The flashcard refuses to be
+           dismissed from outside, so each invalid attempt answers with one red
+           danger ring that fades out (~3/4s) — visible once, never blinking
+           continuously. Scoped to this flashcard only. */
+        @keyframes admin-patient-confirm-danger-nudge {
+            0% {
+                box-shadow: 0 24px 60px rgba(7, 30, 61, .3), 0 0 0 4px rgba(224, 90, 82, .95);
+            }
+
+            60% {
+                box-shadow: 0 24px 60px rgba(7, 30, 61, .3), 0 0 0 4px rgba(224, 90, 82, .95);
+            }
+
+            100% {
+                box-shadow: 0 24px 60px rgba(7, 30, 61, .3), 0 0 0 4px rgba(224, 90, 82, 0);
+            }
+        }
+
+        #confirmDeactivatePatient .modal-content.is-danger-nudge {
+            animation: admin-patient-confirm-danger-nudge .75s ease-out 1 forwards;
+        }
+
+        /* Bootstrap's own static-backdrop scale pop is replaced by the red
+           outline above, so the card itself never moves. */
+        #confirmDeactivatePatient.modal-static .modal-dialog {
+            transform: none;
+        }
+
+        /* Phones: 16px gutters like the other admin modals, and the card
+           fills the viewport minus those gutters. */
+        @media (max-width: 575.98px) {
+            #confirmDeactivatePatient .modal-dialog {
+                width: calc(100% - 16px);
+                margin: 8px auto;
+            }
+
+            #confirmDeactivatePatient .admin-patient-confirm-body {
+                padding: 18px 16px 12px;
+            }
+
+            #confirmDeactivatePatient .admin-patient-confirm-actions {
+                padding: 0 16px 18px;
+            }
+        }
     </style>
 @endpush
 
@@ -804,12 +1052,52 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Create</button>
+                    <button type="button" class="admin-secondary-button" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="admin-primary-button">
+                        <i class="bi bi-check-lg" aria-hidden="true"></i>
+                        <span>Create</span>
+                    </button>
                 </div>
             </form>
         </div>
     </div>
+    </div>
+
+    {{-- Patient Deactivation confirmation flashcard.
+         Replaces the native browser confirm() that used to open from the
+         roster's Deactivate button: the question (patient name included)
+         is filled from the button's existing data-name, the X and Cancel
+         are the only ways it closes, and the flashcard's Deactivate button
+         runs the same PATCH the old OK button sent. --}}
+    {{-- data-bs-backdrop="static" + data-bs-keyboard="false": outside clicks and
+         Escape report a "hidePrevented" event (answered below with a brief red
+         danger outline) instead of closing. Only X and Cancel dismiss this
+         flashcard; Deactivate submits. --}}
+    <div class="modal fade" id="confirmDeactivatePatient" tabindex="-1"
+         data-bs-backdrop="static" data-bs-keyboard="false"
+         aria-labelledby="confirmDeactivatePatientTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="admin-patient-confirm-body">
+                    <span class="admin-patient-confirm-icon" aria-hidden="true">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                    </span>
+                    <div class="admin-patient-confirm-copy">
+                        <h2 class="modal-title" id="confirmDeactivatePatientTitle">Deactivate Patient?</h2>
+                        <p class="admin-patient-confirm-text">Are you sure you want to deactivate <strong data-confirm-patient-name></strong>?</p>
+                        <p class="admin-patient-confirm-note">Their status will change to Pending; they can be reactivated at any time.</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="admin-patient-confirm-actions">
+                    <button type="button" class="admin-secondary-button" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="admin-danger-button" data-confirm-deactivate>
+                        <i class="bi bi-person-x" aria-hidden="true"></i>
+                        <span>Deactivate</span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -1444,21 +1732,25 @@
                 $('.admin-doctor-stat-grid').after($alert);
             };
 
-            $tableWrap.on('click', '[data-patient-toggle]', function () {
-                const $button = $(this);
+            /* ------------------------------------------------------------------
+               Deactivation confirmation flashcard. The roster's Deactivate
+               button used to ask with the browser's native confirm(), which
+               cannot be styled; the same question — patient name included —
+               is now asked inside this page's flashcard. Cancel and the X
+               are the only things that dismiss it — outside clicks and
+               Escape are answered with a brief red danger outline instead.
+               The PATCH request is
+               issued solely by the flashcard's Deactivate button and is the
+               exact request the old OK button sent (route, method, CSRF and
+               patient URL all come from the row's existing data-url).
+               Activation keeps its original native prompt untouched.
+               ------------------------------------------------------------------ */
+            const confirmDeactivateModal = bootstrap.Modal.getOrCreateInstance(
+                document.getElementById('confirmDeactivatePatient'),
+            );
+            let pendingDeactivation = null;
 
-                if ($button.prop('disabled')) {
-                    return;
-                }
-
-                const isActive = $button.attr('data-active') === '1';
-                const verb = isActive ? 'Deactivate' : 'Activate';
-                const $label = $button.find('[data-patient-toggle-label]');
-
-                if (!window.confirm(verb + ' ' + $button.attr('data-name') + '?')) {
-                    return;
-                }
-
+            const runPatientToggle = ({ $button, $label, isActive, verb }) => {
                 $button.prop('disabled', true);
                 $label.text(isActive ? 'Deactivating…' : 'Activating…');
 
@@ -1492,6 +1784,72 @@
                         $label.text(verb);
                         showAlert('danger', (xhr.responseJSON && xhr.responseJSON.message) || 'Unable to update the patient status. Please try again.');
                     });
+            };
+
+            $tableWrap.on('click', '[data-patient-toggle]', function () {
+                const $button = $(this);
+
+                if ($button.prop('disabled')) {
+                    return;
+                }
+
+                const isActive = $button.attr('data-active') === '1';
+                const verb = isActive ? 'Deactivate' : 'Activate';
+                const $label = $button.find('[data-patient-toggle-label]');
+
+                if (isActive) {
+                    pendingDeactivation = { $button, $label, isActive, verb };
+                    $('[data-confirm-patient-name]').text($button.attr('data-name'));
+                    confirmDeactivateModal.show();
+                    return;
+                }
+
+                if (!window.confirm(verb + ' ' + $button.attr('data-name') + '?')) {
+                    return;
+                }
+
+                runPatientToggle({ $button, $label, isActive, verb });
+            });
+
+            $('[data-confirm-deactivate]').on('click', () => {
+                const pending = pendingDeactivation;
+                pendingDeactivation = null;
+
+                if (!pending) {
+                    return;
+                }
+
+                confirmDeactivateModal.hide();
+                runPatientToggle(pending);
+            });
+
+            document.getElementById('confirmDeactivatePatient').addEventListener('hidden.bs.modal', () => {
+                pendingDeactivation = null;
+            });
+
+            /* Outside clicks and Escape never dismiss this flashcard: with the
+               static backdrop Bootstrap reports every invalid dismiss attempt
+               as "hidePrevented" instead of hiding, and we answer it with a
+               single brief red danger outline on the card. The card stays open
+               throughout — only X and Cancel close it, and nothing is
+               submitted from here. */
+            let dangerNudgeTimer = null;
+
+            document.getElementById('confirmDeactivatePatient').addEventListener('hidePrevented.bs.modal', () => {
+                const content = document.querySelector('#confirmDeactivatePatient .modal-content');
+
+                if (!content) {
+                    return;
+                }
+
+                content.classList.remove('is-danger-nudge');
+                void content.offsetWidth; /* restart the animation on rapid repeat clicks */
+                content.classList.add('is-danger-nudge');
+                window.clearTimeout(dangerNudgeTimer);
+                dangerNudgeTimer = window.setTimeout(() => {
+                    content.classList.remove('is-danger-nudge');
+                    dangerNudgeTimer = null;
+                }, 750);
             });
 
             const $modalHost = $tableWrap.closest('.admin-main').length ? $tableWrap.closest('.admin-main') : $(document.body);

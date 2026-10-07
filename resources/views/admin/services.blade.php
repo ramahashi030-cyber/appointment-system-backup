@@ -66,6 +66,252 @@
                 display: none !important;
             }
         }
+
+        /* =============================================================
+           Standard Admin modal system — source of truth: the Add Patient
+           modal (#createPatientModal, sized by pages/patients.css). These
+           rules only restate that modal's measurements for the other
+           modals on this page. Markup, behaviour and content are untouched.
+           ============================================================= */
+
+        /* One width for every Admin modal: the Add Patient dialog
+           (width: calc(100% - 30px); max-width: 640px). Phones keep the
+           shared calc(100% - 16px) rule from admin-css/responsive.css. */
+        .admin-doctor-modal .modal-dialog {
+            max-width: 640px;
+        }
+
+        /* Content spacing follows the reference (12px row gap, 4px label gap). */
+        .admin-doctor-modal .admin-doctor-form {
+            gap: 12px;
+        }
+
+        .admin-doctor-modal .admin-doctor-form-grid {
+            gap: 12px;
+        }
+
+        .admin-doctor-modal .admin-doctor-form .form-field {
+            gap: 4px;
+        }
+
+        /* Field sizing follows the reference (12px labels, 13px controls). */
+        .admin-doctor-modal .admin-doctor-form .form-field > label,
+        .admin-doctor-modal .admin-doctor-form .form-field > label span {
+            font-size: 12px;
+        }
+
+        .admin-doctor-modal .admin-doctor-form .form-control,
+        .admin-doctor-modal .admin-doctor-form .form-select {
+            min-height: 0;
+            padding: 0.375rem 0.5rem;
+            font-size: 13px;
+        }
+
+        /* Action area mirrors the reference footer: centered, 8px apart,
+           with no separator rule above the buttons. The row keeps its
+           existing top spacing (margin from pages/holidays.css + padding
+           from doctor.css): these rows sit inside forms, so they do not get
+           the modal-body padding that separates the reference footer. */
+        .admin-doctor-modal .admin-doctor-form-actions {
+            justify-content: center;
+            gap: 8px;
+            border-top: none;
+        }
+
+        .admin-doctor-modal .modal-footer {
+            justify-content: center;
+            border-top: none;
+            padding-top: 0;
+            gap: 8px;
+        }
+
+        /* Button type matches the reference: 13px inside every modal. */
+        .admin-doctor-modal .admin-primary-button,
+        .admin-doctor-modal .admin-secondary-button,
+        .admin-doctor-modal .admin-danger-button {
+            font-size: 13px;
+        }
+
+        /* Service-styled modals (.admin-service-modal) carry doubled-up rules
+           in pages/services.css, so the standard is restated here with the
+           same (or higher) specificity. The navy section panels, delete-question
+           copy and slot editor are content-specific and stay untouched. */
+        .admin-doctor-modal.admin-service-modal .modal-dialog {
+            max-width: 640px;
+        }
+
+        .admin-doctor-modal.admin-service-modal .modal-body {
+            padding: 20px;
+        }
+
+        .admin-doctor-modal.admin-service-modal .admin-service-form.admin-doctor-form .form-field {
+            gap: 4px;
+        }
+
+        .admin-doctor-modal.admin-service-modal .admin-service-form.admin-doctor-form .form-control,
+        .admin-doctor-modal.admin-service-modal .admin-service-form.admin-doctor-form .form-select {
+            min-height: 0;
+            padding: 0.375rem 0.5rem;
+        }
+
+        .admin-doctor-modal.admin-service-modal .admin-doctor-form-actions,
+        .admin-doctor-modal.admin-service-modal .admin-service-form-actions {
+            justify-content: center;
+            gap: 8px;
+            padding-top: 0;
+            border-top: none;
+        }
+
+        .admin-doctor-modal.admin-service-modal .admin-primary-button,
+        .admin-doctor-modal.admin-service-modal .admin-secondary-button,
+        .admin-doctor-modal.admin-service-modal .admin-danger-button {
+            font-size: 13px;
+        }
+
+        /* Phones: body padding and action buttons follow the reference. */
+        @media (max-width: 767.98px) {
+            .admin-doctor-modal.admin-service-modal .modal-body {
+                padding: 14px;
+            }
+
+            .admin-doctor-modal .admin-doctor-form-actions {
+                flex-wrap: wrap;
+            }
+
+            .admin-doctor-modal .admin-doctor-form-actions > * {
+                flex: 0 0 auto;
+            }
+        }
+
+        /* =============================================================
+           Add Service modal standard — Face to Face and Telemedicine both
+           render admin/services/_form.blade.php inside #addServiceModal, so
+           this one scoped block covers both contexts. pages/services.css
+           carries a doubled-up navy theme for
+           `.admin-doctor-modal.admin-service-modal`; the rules below
+           restate the standard light design (the Add Patient modal's
+           palette and rhythm) for the add modal only. Edit / Delete
+           modals, markup, validation, field names and behaviour are
+           untouched.
+           ============================================================= */
+
+        /* Sections: light cards with the standard head and hairline divider. */
+        #addServiceModal .admin-service-form-section {
+            border-color: #e2ecf8;
+            background: #fff;
+        }
+
+        #addServiceModal .admin-service-form-section-head {
+            padding: 13px 16px;
+            border-bottom: 1px solid #eaf1f9;
+            background: linear-gradient(120deg, #f5faff, #fff 70%);
+        }
+
+        #addServiceModal .admin-service-form-section-copy h3 {
+            color: #0a326c;
+            font-size: 14.5px;
+        }
+
+        #addServiceModal .admin-service-form-section-copy p {
+            color: #6a83a4;
+            font-size: 12px;
+        }
+
+        /* One content rhythm: 12px rows and 16px section padding (the 4px
+           label gap and 12px grid gap come from the standard block above). */
+        #addServiceModal .admin-service-form-body {
+            gap: 12px;
+            padding: 16px;
+        }
+
+        /* Standard light palette for labels, markers and helper copy. */
+        #addServiceModal .admin-service-form .form-field > label {
+            color: #315786;
+        }
+
+        #addServiceModal .admin-field-required {
+            color: #d9534f;
+            font-size: 12px;
+        }
+
+        #addServiceModal .admin-field-optional {
+            color: #8ca2bd;
+            font-size: 12px;
+        }
+
+        #addServiceModal .admin-field-hint {
+            color: #8ca2bd;
+            font-size: 12px;
+        }
+
+        #addServiceModal .admin-service-form .form-control,
+        #addServiceModal .admin-service-form .form-select {
+            min-height: 0;
+            padding: 0.375rem 0.5rem;
+            font-size: 13px;
+        }
+
+        #addServiceModal .admin-service-form .form-control::placeholder {
+            color: #6c757d;
+            opacity: .5;
+        }
+
+        #addServiceModal .invalid-feedback {
+            color: #dc3545;
+            font-size: 13px;
+        }
+
+        /* Available-day chips: standard light chip, solid blue when selected. */
+        #addServiceModal .admin-service-day-picker {
+            gap: 6px;
+        }
+
+        #addServiceModal .admin-service-day-option span {
+            min-width: 46px;
+            height: 34px;
+            border-color: #d8e5f4;
+            background: #fbfdff;
+            color: #5b7ba6;
+        }
+
+        #addServiceModal .admin-service-day-option span:hover {
+            border-color: #9ec8f5;
+            background: #f0f7ff;
+        }
+
+        /* Timeslot editor: light inset panel, standard control sizing. */
+        #addServiceModal .admin-service-slot-editor {
+            padding: 14px;
+            border-color: #e2ecf8;
+            background: #fbfdff;
+        }
+
+        #addServiceModal .admin-service-slot-editor-head {
+            color: #7f97b5;
+        }
+
+        #addServiceModal .admin-service-slot-hint {
+            color: #7f97b5;
+            font-size: 12px;
+        }
+
+        #addServiceModal .admin-service-slot-editor-row .form-control {
+            height: auto;
+            min-height: 0;
+            padding: 0.375rem 0.5rem;
+        }
+
+        #addServiceModal .admin-service-slot-add {
+            min-height: 0;
+            font-size: 13px;
+        }
+
+        /* Phones: section padding matches the reference's 14px body padding. */
+        @media (max-width: 767.98px) {
+            #addServiceModal .admin-service-form-body {
+                padding: 14px;
+            }
+        }
     </style>
 @endpush
 
@@ -414,10 +660,10 @@
          Same static backdrop as the Edit modal: an outside click flashes the
          danger colour once and the dialog stays open, an inside click does
          nothing, and Cancel and the X are the only things that close it. --}}
-    <div class="modal fade admin-doctor-modal admin-service-modal admin-service-modal-narrow" id="deleteServiceModal" tabindex="-1"
+    <div class="modal fade admin-doctor-modal admin-service-modal" id="deleteServiceModal" tabindex="-1"
          aria-labelledby="deleteServiceModalTitle" aria-hidden="true"
          data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <header class="modal-header admin-doctor-modal-header">
                     <div class="admin-telemedicine-glow" aria-hidden="true"></div>

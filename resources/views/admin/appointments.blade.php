@@ -329,7 +329,7 @@
 
     <!-- View Appointment Modal -->
     @if (($providerModal ?? null) === 'view')
-        <div class="modal fade admin-doctor-modal modal-wide" id="viewAppointmentModal" tabindex="-1" aria-labelledby="viewAppointmentModalTitle" aria-hidden="true">
+        <div class="modal fade admin-doctor-modal" id="viewAppointmentModal" tabindex="-1" aria-labelledby="viewAppointmentModalTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content">
                     <header class="modal-header admin-doctor-modal-header">
@@ -399,11 +399,104 @@
 
 @push('styles')
     <style>
-        /* modal-wide on mobile: fit viewport without horizontal overflow */
-        @media (max-width: 575.98px) {
-            #viewAppointmentModal.modal-wide .modal-dialog {
-                width: calc(100% - 16px);
-                margin: 8px auto;
+        /* =============================================================
+           Standard Admin modal system — source of truth: the Add Patient
+           modal (#createPatientModal, sized by pages/patients.css). These
+           rules only restate that modal's measurements for the other
+           modals on this page. Markup, behaviour and content are untouched.
+           ============================================================= */
+
+        /* One width for every Admin modal: the Add Patient dialog
+           (width: calc(100% - 30px); max-width: 640px). Phones keep the
+           shared calc(100% - 16px) rule from admin-css/responsive.css. */
+        .admin-doctor-modal .modal-dialog {
+            max-width: 640px;
+        }
+
+        /* Content spacing follows the reference (12px row gap, 4px label gap). */
+        .admin-doctor-modal .admin-doctor-form {
+            gap: 12px;
+        }
+
+        .admin-doctor-modal .admin-doctor-form-grid {
+            gap: 12px;
+        }
+
+        .admin-doctor-modal .admin-doctor-form .form-field {
+            gap: 4px;
+        }
+
+        /* Field sizing follows the reference (12px labels, 13px controls). */
+        .admin-doctor-modal .admin-doctor-form .form-field > label,
+        .admin-doctor-modal .admin-doctor-form .form-field > label span {
+            font-size: 12px;
+        }
+
+        .admin-doctor-modal .admin-doctor-form .form-control,
+        .admin-doctor-modal .admin-doctor-form .form-select {
+            min-height: 0;
+            padding: 0.375rem 0.5rem;
+            font-size: 13px;
+        }
+
+        /* Action area mirrors the reference footer: centered, 8px apart,
+           with no separator rule above the buttons. The row keeps its
+           existing top spacing (margin from pages/holidays.css + padding
+           from doctor.css): these rows sit inside forms, so they do not get
+           the modal-body padding that separates the reference footer. */
+        .admin-doctor-modal .admin-doctor-form-actions {
+            justify-content: center;
+            gap: 8px;
+            border-top: none;
+        }
+
+        .admin-doctor-modal .modal-footer {
+            justify-content: center;
+            border-top: none;
+            padding-top: 0;
+            gap: 8px;
+        }
+
+        /* Button type matches the reference: 13px inside every modal. */
+        .admin-doctor-modal .admin-primary-button,
+        .admin-doctor-modal .admin-secondary-button,
+        .admin-doctor-modal .admin-danger-button {
+            font-size: 13px;
+        }
+
+        /* ID-scoped page rules (appointments.css) outrank the class rules
+           above, so the standard typography is restated for these two
+           modals. The blue panels and the field rhythm inside them (row
+           padding + hairline separators) are this page's container layout
+           and stay exactly as they were. */
+        #addAppointmentModal .form-field > label,
+        #viewAppointmentModal .form-field > label,
+        #addAppointmentModal .form-field > label span {
+            font-size: 12px;
+        }
+
+        #addAppointmentModal .form-control,
+        #addAppointmentModal .form-select,
+        #viewAppointmentModal .form-control,
+        #viewAppointmentModal .form-select {
+            min-height: 0;
+            padding: 0.375rem 0.5rem;
+            font-size: 13px;
+        }
+
+        #viewAppointmentModal .form-field p {
+            font-size: 13px;
+        }
+
+        /* Phones: action buttons stay inline like the reference footer
+           instead of stretching into full-width rows. */
+        @media (max-width: 767.98px) {
+            .admin-doctor-modal .admin-doctor-form-actions {
+                flex-wrap: wrap;
+            }
+
+            .admin-doctor-modal .admin-doctor-form-actions > * {
+                flex: 0 0 auto;
             }
         }
     </style>

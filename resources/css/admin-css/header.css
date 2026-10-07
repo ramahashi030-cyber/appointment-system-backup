@@ -100,6 +100,13 @@
     font-size: 18px;
 }
 
+/* Profile circle hover border: shows the moment the cursor is over the
+   circle (no click needed) and returns to normal when it leaves. */
+.admin-header .admin-user:hover .admin-user-avatar {
+    border-color: #fff;
+    border-radius: 100%;
+}
+
 .admin-user-copy {
     display: flex;
     min-width: 0;
@@ -185,7 +192,7 @@
     font-size: 12px;
     font-weight: 500;
     text-decoration: none;
-    transition: background-color .16s ease, border-color .16s ease, color .16s ease, box-shadow .16s ease;
+    transition: background-color .3s ease-in-out, border-color .16s ease, color .16s ease, box-shadow .16s ease;
     cursor: pointer;
     white-space: nowrap;
 }

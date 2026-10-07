@@ -237,7 +237,7 @@
     </div>
 
     @if ($providerModal === 'view')
-        <div class="modal fade admin-doctor-modal modal-wide" id="viewProviderModal" tabindex="-1" aria-labelledby="viewProviderModalTitle" aria-hidden="true">
+        <div class="modal fade admin-doctor-modal" id="viewProviderModal" tabindex="-1" aria-labelledby="viewProviderModalTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content">
                     <header class="modal-header admin-doctor-modal-header">
@@ -294,11 +294,143 @@
 
 @push('styles')
     <style>
-        /* modal-wide on mobile: fit viewport without horizontal overflow */
-        @media (max-width: 575.98px) {
-            #viewProviderModal.modal-wide .modal-dialog {
-                width: calc(100% - 16px);
-                margin: 8px auto;
+        /* =============================================================
+           Standard Admin modal system — source of truth: the Add Patient
+           modal (#createPatientModal, sized by pages/patients.css). These
+           rules only restate that modal's measurements for the other
+           modals on this page. Markup, behaviour and content are untouched.
+           ============================================================= */
+
+        /* One width for every Admin modal: the Add Patient dialog
+           (width: calc(100% - 30px); max-width: 640px). Phones keep the
+           shared calc(100% - 16px) rule from admin-css/responsive.css. */
+        .admin-doctor-modal .modal-dialog {
+            max-width: 640px;
+        }
+
+        /* Content spacing follows the reference (12px row gap, 4px label gap). */
+        .admin-doctor-modal .admin-doctor-form {
+            gap: 12px;
+        }
+
+        .admin-doctor-modal .admin-doctor-form-grid {
+            gap: 12px;
+        }
+
+        .admin-doctor-modal .admin-doctor-form .form-field {
+            gap: 4px;
+        }
+
+        /* Field sizing follows the reference (12px labels, 13px controls). */
+        .admin-doctor-modal .admin-doctor-form .form-field > label,
+        .admin-doctor-modal .admin-doctor-form .form-field > label span {
+            font-size: 12px;
+        }
+
+        .admin-doctor-modal .admin-doctor-form .form-control,
+        .admin-doctor-modal .admin-doctor-form .form-select {
+            min-height: 0;
+            padding: 0.375rem 0.5rem;
+            font-size: 13px;
+        }
+
+        /* Action area mirrors the reference footer: centered, 8px apart,
+           with no separator rule above the buttons. The row keeps its
+           existing top spacing (margin from pages/holidays.css + padding
+           from doctor.css): these rows sit inside forms, so they do not get
+           the modal-body padding that separates the reference footer. */
+        .admin-doctor-modal .admin-doctor-form-actions {
+            justify-content: center;
+            gap: 8px;
+            border-top: none;
+        }
+
+        .admin-doctor-modal .modal-footer {
+            justify-content: center;
+            border-top: none;
+            padding-top: 0;
+            gap: 8px;
+        }
+
+        /* Button type matches the reference: 13px inside every modal. */
+        .admin-doctor-modal .admin-primary-button,
+        .admin-doctor-modal .admin-secondary-button,
+        .admin-doctor-modal .admin-danger-button {
+            font-size: 13px;
+        }
+
+        /* Phones: action buttons stay inline like the reference footer
+           instead of stretching into full-width rows. */
+        @media (max-width: 767.98px) {
+            .admin-doctor-modal .admin-doctor-form-actions {
+                flex-wrap: wrap;
+            }
+
+            .admin-doctor-modal .admin-doctor-form-actions > * {
+                flex: 0 0 auto;
+            }
+        }
+
+        /* =============================================================
+           Add Doctor modal — spacing fix + design alignment with the standard.
+
+           Cause of the uneven spacing (not random margins): every section
+           body restated its own measurements in admin-css/doctor.css —
+           17px grid gap, 18px schedule gap, 14px time-grid gap, 20px
+           padding — and wrapped the fields in a nested blue box, so the
+           modal never used the reference's 12px row rhythm or its flat
+           content area. The rules below restate the standard measurements
+           for this one modal; markup, fields, validation and behaviour
+           are untouched. Scoped with #addDoctorModal so the edit/view
+           modals and the shared doctors._form partial stay as they are.
+           ============================================================= */
+
+        /* Sections get the standard light treatment: quiet head with a
+           hairline divider instead of the dark strip, no heavy shadow. */
+        #addDoctorModal .admin-panel {
+            border-color: #e2ecf8;
+            box-shadow: none;
+        }
+
+        #addDoctorModal .admin-panel-header {
+            border-bottom: 1px solid #eaf1f9;
+            background: linear-gradient(120deg, #f5faff, #fff 70%);
+            color: #0a326c;
+        }
+
+        /* Section bodies: 12px rows/columns and 16px inner padding, with the
+           nested blue box dropped so fields sit on the section surface the
+           way the reference fields sit on the modal body. The day grid keeps
+           its 8px chip gap — chip pickers stay dense (the service day picker
+           uses 6px) and seven 70px chips need the room inside 640px. */
+        #addDoctorModal .admin-doctor-form-grid,
+        #addDoctorModal .admin-doctor-schedule-fields {
+            gap: 12px;
+            padding: 16px;
+            border: none;
+            background: transparent;
+        }
+
+        #addDoctorModal .admin-doctor-time-grid {
+            gap: 12px;
+        }
+
+        /* Password guidance reads as helper text, and the switch label
+           follows control sizing — both on the standard type scale. */
+        #addDoctorModal .form-text {
+            color: #8ca2bd;
+            font-size: 12px;
+        }
+
+        #addDoctorModal .form-check-label {
+            font-size: 13px;
+        }
+
+        /* Phones: section padding matches the reference's 14px body padding. */
+        @media (max-width: 767.98px) {
+            #addDoctorModal .admin-doctor-form-grid,
+            #addDoctorModal .admin-doctor-schedule-fields {
+                padding: 14px;
             }
         }
 

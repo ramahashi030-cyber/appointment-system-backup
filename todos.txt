@@ -1,3 +1,15 @@
+DON'T TOUCH THIS ---------------------------------------------------------
+###CREATE USER 'qalinga_user'@'%' IDENTIFIED BY 'Qalinga123';
+
+###GRANT ALL PRIVILEGES ON patient_appointment.* 
+###TO 'qalinga_user'@'%';
+
+###FLUSH PRIVILEGES;
+###
+--------------------------------------------------------------------------
+
+
+
 ADMIN PANEL TODO :
 
 	ADMIN DASHBOARD
@@ -10,18 +22,22 @@ ADMIN PANEL TODO :
 	DOCTORS PAGE
 
 
+
+
+	- MODALS IN THE ADMIN PANEL UI PATTERN
+		- BORDER SHOWS DANGER COLOR WHEN USER/ADMIN ACCIDENTALLY CLICKED OUTSIDE THE MODALS	
+		- 
+
+
+
 Modal
 - have a standard one design modal. 
 
-patients.blade.php
--the date of birth must be required so as address and email
+	Fix the deactivation flashcard ui of patiens.blade.php
+	The deactivation ui and function of doctors-and-staff must be look like and function like the patients.blade.php
 
+RBAC
+	triager, doctor and admin.
 
-----------------------------------------------
-	Doctors Page.
-	- Change the all the jitsi to join room, 
-	- The appointment of the patient will automatically removed when the doctor joining the call in telemed. Have flashcard confirmation of doctor joining in the call and appointment being removed. 
-	- When there's ongoing processing appointment. The doctor cannot log out as long as the process is not finish.
-	- The appointment will be completed when the patient join the call in telemed. The call on the patient page will be activated only when the doctor created the room call
-	- if patients cancel the appointment, notification should go to doctors instead of triager
-	- if patient accidentaly closes the jitsi, patient can still join the jitsi as long as the doctor is still in the meeting room and the call time is not over(e.g: 8:00 - 10:00)
+Doctors page.
+	change the deactivation button of doctors-and-staff.blade.php to look like the deactivation button and flashcard of patients.blade.php

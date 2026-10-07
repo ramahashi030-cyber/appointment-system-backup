@@ -148,41 +148,63 @@
         </div>
     </div>
 
-    {{-- EDIT MODAL --}}
-    <div class="modal fade" id="editTimeslotModal" tabindex="-1" aria-labelledby="editTimeslotModalTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+    {{-- EDIT TIMESLOT MODAL
+         Same banner header, icon mark and section card as the other admin modals;
+         all field ids/names and the novalidate submit flow are unchanged. --}}
+    <div class="modal fade admin-doctor-modal admin-service-modal" id="editTimeslotModal" tabindex="-1"
+         aria-labelledby="editTimeslotModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
-                <form id="editTimeslotForm" novalidate>
-                    @csrf
-                    <div class="modal-header">
-                        <h2 class="modal-title fs-5" id="editTimeslotModalTitle">Edit unavailable timeslot</h2>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <header class="modal-header admin-doctor-modal-header">
+                    <div class="admin-telemedicine-glow" aria-hidden="true"></div>
+                    <div class="admin-telemedicine-content">
+                        <div class="admin-telemedicine-mark" aria-hidden="true">
+                            <i class="bi bi-pencil-fill"></i>
+                        </div>
+                        <div class="admin-telemedicine-copy">
+                            <h2 class="modal-title" id="editTimeslotModalTitle">Edit unavailable timeslot</h2>
+                            <p class="admin-telemedicine-description">Update the date, time slot or reason for this unavailable period.</p>
+                        </div>
                     </div>
-                    <div class="modal-body">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </header>
+                <div class="modal-body">
+                    <form id="editTimeslotForm" class="admin-doctor-form" novalidate>
+                        @csrf
                         <input type="hidden" id="editTimeslotId">
 
-                        <div class="mb-3">
-                            <label for="editService" class="form-label">Service</label>
-                            <input type="text" class="form-control" id="editService" readonly>
+                        <div class="admin-panel">
+                            <div class="admin-panel-title">
+                                <i class="bi bi-calendar2-x-fill" aria-hidden="true"></i>
+                                <h3>Unavailable period</h3>
+                            </div>
+                            <div class="form-field">
+                                <label for="editService">Service</label>
+                                <input type="text" class="form-control" id="editService" readonly>
+                            </div>
+                            <div class="form-field">
+                                <label for="editDate">Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="editDate" name="unavailable_date" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="editSlot">Time Slot <span class="text-danger">*</span></label>
+                                <select class="form-select" id="editSlot" name="timeslot_id" required></select>
+                            </div>
+                            <div class="form-field">
+                                <label for="editReason">Reason</label>
+                                <input type="text" class="form-control" id="editReason" name="reason" maxlength="255">
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="editDate" class="form-label">Date</label>
-                            <input type="date" class="form-control" id="editDate" name="unavailable_date" required>
+
+                        <div class="admin-doctor-form-actions">
+                            <button type="submit" class="admin-primary-button" id="editTimeslotSave">
+                                <i class="bi bi-check-lg" aria-hidden="true"></i>
+                                <span>Save</span>
+                            </button>
+                            <button type="button" class="admin-secondary-button" data-bs-dismiss="modal">Cancel</button>
                         </div>
-                        <div class="mb-3">
-                            <label for="editSlot" class="form-label">Time Slot</label>
-                            <select class="form-select" id="editSlot" name="timeslot_id" required></select>
-                        </div>
-                        <div class="mb-0">
-                            <label for="editReason" class="form-label">Reason</label>
-                            <input type="text" class="form-control" id="editReason" name="reason" maxlength="255">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary" id="editTimeslotSave">Save</button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -192,10 +214,10 @@
          treatment, static backdrop, Delete / Cancel buttons. The selected
          timeslot's details are filled from the row's data attributes, and
          confirming runs the existing AJAX destroy flow. --}}
-    <div class="modal fade admin-doctor-modal admin-service-modal admin-service-modal-narrow" id="deleteTimeslotModal" tabindex="-1"
+    <div class="modal fade admin-doctor-modal admin-service-modal" id="deleteTimeslotModal" tabindex="-1"
          aria-labelledby="deleteTimeslotModalTitle" aria-hidden="true"
          data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <header class="modal-header admin-doctor-modal-header">
                     <div class="admin-telemedicine-glow" aria-hidden="true"></div>
@@ -226,6 +248,126 @@
         </div>
     </div>
 @endsection
+
+@push('styles')
+    <style>
+        /* =============================================================
+           Standard Admin modal system — source of truth: the Add Patient
+           modal (#createPatientModal, sized by pages/patients.css). These
+           rules only restate that modal's measurements for the other
+           modals on this page. Markup, behaviour and content are untouched.
+           ============================================================= */
+
+        /* One width for every Admin modal: the Add Patient dialog
+           (width: calc(100% - 30px); max-width: 640px). Phones keep the
+           shared calc(100% - 16px) rule from admin-css/responsive.css. */
+        .admin-doctor-modal .modal-dialog {
+            max-width: 640px;
+        }
+
+        /* Content spacing follows the reference (12px row gap, 4px label gap). */
+        .admin-doctor-modal .admin-doctor-form {
+            gap: 12px;
+        }
+
+        .admin-doctor-modal .admin-doctor-form-grid {
+            gap: 12px;
+        }
+
+        .admin-doctor-modal .admin-doctor-form .form-field {
+            gap: 4px;
+        }
+
+        /* Field sizing follows the reference (12px labels, 13px controls). */
+        .admin-doctor-modal .admin-doctor-form .form-field > label,
+        .admin-doctor-modal .admin-doctor-form .form-field > label span {
+            font-size: 12px;
+        }
+
+        .admin-doctor-modal .admin-doctor-form .form-control,
+        .admin-doctor-modal .admin-doctor-form .form-select {
+            min-height: 0;
+            padding: 0.375rem 0.5rem;
+            font-size: 13px;
+        }
+
+        /* Action area mirrors the reference footer: centered, 8px apart,
+           with no separator rule above the buttons. The row keeps its
+           existing top spacing (margin from pages/holidays.css + padding
+           from doctor.css): these rows sit inside forms, so they do not get
+           the modal-body padding that separates the reference footer. */
+        .admin-doctor-modal .admin-doctor-form-actions {
+            justify-content: center;
+            gap: 8px;
+            border-top: none;
+        }
+
+        .admin-doctor-modal .modal-footer {
+            justify-content: center;
+            border-top: none;
+            padding-top: 0;
+            gap: 8px;
+        }
+
+        /* Button type matches the reference: 13px inside every modal. */
+        .admin-doctor-modal .admin-primary-button,
+        .admin-doctor-modal .admin-secondary-button,
+        .admin-doctor-modal .admin-danger-button {
+            font-size: 13px;
+        }
+
+        /* Service-styled modals (.admin-service-modal) carry doubled-up rules
+           in pages/services.css, so the standard is restated here with the
+           same (or higher) specificity. The slot editor and hint copy are
+           content-specific and stay untouched. */
+        .admin-doctor-modal.admin-service-modal .modal-dialog {
+            max-width: 640px;
+        }
+
+        .admin-doctor-modal.admin-service-modal .modal-body {
+            padding: 20px;
+        }
+
+        .admin-doctor-modal.admin-service-modal .admin-service-form.admin-doctor-form .form-field {
+            gap: 4px;
+        }
+
+        .admin-doctor-modal.admin-service-modal .admin-service-form.admin-doctor-form .form-control,
+        .admin-doctor-modal.admin-service-modal .admin-service-form.admin-doctor-form .form-select {
+            min-height: 0;
+            padding: 0.375rem 0.5rem;
+        }
+
+        .admin-doctor-modal.admin-service-modal .admin-doctor-form-actions,
+        .admin-doctor-modal.admin-service-modal .admin-service-form-actions {
+            justify-content: center;
+            gap: 8px;
+            padding-top: 0;
+            border-top: none;
+        }
+
+        .admin-doctor-modal.admin-service-modal .admin-primary-button,
+        .admin-doctor-modal.admin-service-modal .admin-secondary-button,
+        .admin-doctor-modal.admin-service-modal .admin-danger-button {
+            font-size: 13px;
+        }
+
+        /* Phones: body padding and action buttons follow the reference. */
+        @media (max-width: 767.98px) {
+            .admin-doctor-modal.admin-service-modal .modal-body {
+                padding: 14px;
+            }
+
+            .admin-doctor-modal .admin-doctor-form-actions {
+                flex-wrap: wrap;
+            }
+
+            .admin-doctor-modal .admin-doctor-form-actions > * {
+                flex: 0 0 auto;
+            }
+        }
+    </style>
+@endpush
 
 @push('scripts')
     <script>

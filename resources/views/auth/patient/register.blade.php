@@ -2,7 +2,17 @@
 
 @section('title', 'Registration')
 @section('description', 'Create your QMMC Patient Portal account.')
-@section('body-class', 'auth-registration-page')
+@section('body-class', 'auth-registration-page auth-portal')
+
+{{-- LEFT: hospital photo panel (shared with login) --}}
+@section('art')
+    @include('auth.partials.portal-hero')
+@endsection
+
+@push('styles')
+    @include('auth.partials.portal-styles')
+    @include('auth.partials.portal-register')
+@endpush
 
 @section('brand')
     <div class="auth-brand">
@@ -16,7 +26,7 @@
 
         <span class="auth-brand-text">
             <strong>QMMC Patient Portal</strong>
-            <span>Signup page</span>
+            <span>Create your patient portal account</span>
         </span>
     </div>
 @endsection

@@ -48,6 +48,12 @@
                 font-size: 9px;
             }
         }
+
+        /* The account cluster is just the profile circle now, so keep its
+           hover highlight perfectly circular around the avatar. */
+        .admin-header .admin-user:hover {
+            border-radius: 100%;
+        }
     </style>
 @endonce
 
@@ -97,17 +103,13 @@
                             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                         @endif>
                     <span class="admin-user-avatar" aria-hidden="true"><i class="bi bi-person-fill"></i></span>
-                    <span class="admin-user-copy">
-                        <strong>{{ $adminName }}</strong>
-                        <small>Administrator</small>
-                    </span>
                 </button>
 
                 @if ($admin !== null)
                     <div class="dropdown-menu dropdown-menu-end admin-user-menu" aria-labelledby="adminUserMenuToggle">
                         <div class="admin-user-menu-header">
-                            <span>Admin Profile</span>
-                            <small>{{ $adminName }}</small>
+                            <Strong>{{ $adminName }}</Strong>
+                            <small>Administrator</small>
                         </div>
                         <button type="button" class="dropdown-item"
                                 data-bs-toggle="modal" data-bs-target="#adminProfileModal">
@@ -200,7 +202,7 @@
                         </div>
                         <div class="admin-telemedicine-copy">
                             <h2 class="modal-title" id="adminProfileModalTitle">My profile</h2>
-                            <p class="admin-telemedicine-description">Update your name and change your password.</p>
+                            <p class="admin-telemedicine-description">Update admin information.</p>
                         </div>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -254,41 +256,47 @@
                         </div>
                     </form>
 
-                    <hr class="my-2">
+                    <div class="d-flex justify-content-end mt-2">
+                        <button type="button" class="btn btn-outline-primary" id="adminProfilePasswordToggle" aria-expanded="false" aria-controls="adminPasswordSection">Change password</button>
+                    </div>
 
-                    {{-- Change password --}}
-                    <form id="adminPasswordForm" method="POST" action="{{ route('admin.profile.password') }}" novalidate>
-                        @csrf
-                        @method('PUT')
+                    <div id="adminPasswordSection" class="d-none">
+                        <hr class="my-2">
 
-                        <div class="d-flex align-items-center gap-2 mb-2">
-                            <i class="bi bi-shield-lock-fill text-primary" aria-hidden="true"></i>
-                            <h3 class="h6 fw-semibold mb-0">Change password</h3>
-                        </div>
+                        {{-- Change password --}}
+                        <form id="adminPasswordForm" method="POST" action="{{ route('admin.profile.password') }}" novalidate>
+                            @csrf
+                            @method('PUT')
 
-                        <div class="row g-2">
-                            <div class="col-12">
-                                <label class="form-label" for="adminProfileCurrentPassword">Current password <span class="text-danger">*</span></label>
-                                <input type="password" class="form-control" id="adminProfileCurrentPassword" name="current_password" placeholder="Current password" required maxlength="100" autocomplete="current-password">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-shield-lock-fill text-primary" aria-hidden="true"></i>
+                                <h3 class="h6 fw-semibold mb-0">Change password</h3>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label" for="adminProfileNewPassword">New password <span class="text-danger">*</span></label>
-                                <input type="password" class="form-control" id="adminProfileNewPassword" name="password" placeholder="New password" required minlength="{{ $passwordMinLength }}" maxlength="{{ $passwordMaxLength }}" autocomplete="new-password">
-                                <div class="form-text">{{ $passwordHint }}</div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label" for="adminProfileConfirmPassword">Confirm new password <span class="text-danger">*</span></label>
-                                <input type="password" class="form-control" id="adminProfileConfirmPassword" name="password_confirmation" placeholder="Confirm new password" required minlength="{{ $passwordMinLength }}" maxlength="{{ $passwordMaxLength }}" autocomplete="new-password">
-                            </div>
-                        </div>
 
-                        <div class="d-flex justify-content-end gap-2 mt-2">
-                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check-lg" aria-hidden="true"></i> Change password
-                            </button>
-                        </div>
-                    </form>
+                            <div class="row g-2">
+                                <div class="col-12">
+                                    <label class="form-label" for="adminProfileCurrentPassword">Current password <span class="text-danger">*</span></label>
+                                    <input type="password" class="form-control" id="adminProfileCurrentPassword" name="current_password" placeholder="Current password" required maxlength="100" autocomplete="current-password">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="adminProfileNewPassword">New password <span class="text-danger">*</span></label>
+                                    <input type="password" class="form-control" id="adminProfileNewPassword" name="password" placeholder="New password" required minlength="{{ $passwordMinLength }}" maxlength="{{ $passwordMaxLength }}" autocomplete="new-password">
+                                    <div class="form-text">{{ $passwordHint }}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="adminProfileConfirmPassword">Confirm new password <span class="text-danger">*</span></label>
+                                    <input type="password" class="form-control" id="adminProfileConfirmPassword" name="password_confirmation" placeholder="Confirm new password" required minlength="{{ $passwordMinLength }}" maxlength="{{ $passwordMaxLength }}" autocomplete="new-password">
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2 mt-2">
+                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-lg" aria-hidden="true"></i> Change password
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -303,8 +311,8 @@
             #adminProfileModal .modal-body .form-control {
                 border-color: transparent;
                 box-shadow: 0 1px 2px rgba(13, 40, 90, .08), 0 3px 10px rgba(13, 40, 90, .06);
-                padding: .45rem .7rem;
-                font-size: 13px;
+                padding: .52rem .8rem;
+                font-size: 14px;
             }
 
             #adminProfileModal .modal-body .form-control:focus {
@@ -313,7 +321,7 @@
             }
 
             #adminProfileModal .modal-body .form-control::placeholder {
-                font-size: 12px;
+                font-size: 13px;
             }
 
             #adminProfileModal .modal-body .btn {
@@ -489,6 +497,29 @@
 
         $modal.on('hidden.bs.modal.adminProfile', function () {
             $profileContent.removeClass('admin-profile-modal-blocked');
+        });
+
+        // Password fields stay collapsed until "Change password" is clicked so
+        // the modal remains compact while they are hidden. Clicking the same
+        // button again collapses the section, and any close resets it for the
+        // next open.
+        var $passwordSection = $('#adminPasswordSection');
+        var $passwordToggle = $('#adminProfilePasswordToggle');
+
+        if ($passwordToggle.length) {
+            $passwordToggle.off('.adminProfile').on('click.adminProfile', function () {
+                var expand = $passwordSection.hasClass('d-none');
+                $passwordSection.toggleClass('d-none', !expand);
+                $passwordToggle.attr('aria-expanded', String(expand));
+                if (expand) {
+                    $passwordSection.find('input').first().trigger('focus');
+                }
+            });
+        }
+
+        $modal.on('hidden.bs.modal.adminProfile', function () {
+            $passwordSection.addClass('d-none');
+            $passwordToggle.attr('aria-expanded', 'false');
         });
 
         // First and last name are letters only. Anything else is dropped as it

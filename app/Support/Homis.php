@@ -2,15 +2,19 @@
 
 namespace App\Support;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
- * Read-only access to the hospital information system (HOMIS).
+ * Access to the hospital information system (HOMIS).
  *
  * HOMIS is a SQL Server database reached through the operating system ODBC
  * DSN. The legacy QALINGA1 pages used the same connection for hperson, hrxo,
  * and hdocord. Patient portal identifiers are mapped through the local
  * patients.hospital_number value (hpercode in HOMIS).
+ *
+ * Reads serve the patient portal; lookupPerson() and registerOpd() serve the
+ * OPD kiosk check-in and are the only HOMIS writes in the application.
  */
 class Homis
 {
@@ -388,6 +392,308 @@ class Homis
     public static function available(): bool
     {
         return self::status()['available'];
+    }
+
+    /**
+     * Look up a person in HOMIS by hospital number for the kiosk check-in.
+     *
+     * Unlike person(), this reports why nothing came back so the kiosk can
+     * tell "HOMIS did not answer" apart from "no such person".
+     *
+     * @return array{status: 'ok'|'error', found: bool, person: array<string, string>|null, message: string}
+     */
+    public static function lookupPerson(string $hpercode): array
+    {
+        $hpercode = trim($hpercode);
+
+        if ($hpercode === '') {
+            return ['status' => 'ok', 'found' => false, 'person' => null, 'message' => 'Hospital number is missing.'];
+        }
+
+        $connection = self::connection();
+
+        if ($connection === false) {
+            return ['status' => 'error', 'found' => false, 'person' => null, 'message' => 'HOMIS connection failed.'];
+        }
+
+        try {
+            $rows = self::fetchAll(
+                $connection,
+                'SELECT hpercode, patfirst, patmiddle, patlast, patbdate, patsex
+                 FROM hperson
+                 WHERE hpercode = ?',
+                [$hpercode],
+            );
+
+            if ($rows === null) {
+                return ['status' => 'error', 'found' => false, 'person' => null, 'message' => 'HOMIS person query failed.'];
+            }
+
+            if ($rows === []) {
+                return ['status' => 'ok', 'found' => false, 'person' => null, 'message' => 'Hospital number not found in HOMIS.'];
+            }
+
+            $row = $rows[0];
+            $person = [];
+
+            foreach (['hpercode', 'patfirst', 'patmiddle', 'patlast', 'patbdate', 'patsex'] as $column) {
+                $person[$column] = trim((string) ($row[$column] ?? ''));
+            }
+
+            return ['status' => 'ok', 'found' => true, 'person' => $person, 'message' => ''];
+        } finally {
+            self::close($connection);
+        }
+    }
+
+    /**
+     * Register an OPD encounter in HOMIS for a kiosk check-in.
+     *
+     * Mirrors the legacy QALINGA1 update_appointment.php flow: compute the
+     * patient's age from the date of birth, allocate the daily case number and
+     * per-type queue number, then insert henctr + hopdlog. It is idempotent:
+     * when the encounter code already exists in HOMIS the existing encounter
+     * is adopted instead of inserted again, so retries and re-scans can never
+     * duplicate an encounter for the same appointment.
+     *
+     * @param  array<string, string>  $person  Person row from lookupPerson().
+     * @return array{status: 'ok'|'error', enccode: string, message: string}
+     */
+    public static function registerOpd(array $person, string $dob, string $tscode, string $diagtxt, string $enccode): array
+    {
+        $hpercode = trim((string) ($person['hpercode'] ?? ''));
+        $enccode = trim($enccode);
+
+        if ($hpercode === '' || $enccode === '') {
+            return self::registrationError($enccode, 'Hospital number or encounter code is missing.');
+        }
+
+        $connection = self::connection();
+
+        if ($connection === false) {
+            return self::registrationError($enccode, 'HOMIS connection failed.');
+        }
+
+        try {
+            $encdate = Carbon::now(self::registrationTimezone())->format('Y-m-d H:i:s');
+            $fhud = (string) config('kiosk.homis.fhud', '0001818');
+            $entryby = (string) config('kiosk.homis.entry_by', 'na');
+            $tacode = (string) config('kiosk.homis.tacode', 'SERVI');
+
+            // Adopt an encounter a previous attempt (or another terminal)
+            // already inserted for this encounter code.
+            $existing = self::fetchAll($connection, 'SELECT hpercode FROM henctr WHERE enccode = ?', [$enccode]);
+
+            if ($existing === null) {
+                return self::registrationError($enccode, 'HOMIS encounter query failed.');
+            }
+
+            if ($existing === []) {
+                $inserted = self::execute(
+                    $connection,
+                    'INSERT INTO henctr
+                        (enccode, fhud, hpercode, encdate, enctime, toecode, sopcode1, encstat, enclock, updsw, confdl, entryby, tacode)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                    [
+                        $enccode,
+                        $fhud,
+                        $hpercode,
+                        $encdate,
+                        $encdate,
+                        (string) config('kiosk.homis.toecode', 'OPD'),
+                        (string) config('kiosk.homis.sopcode1', 'SELPA'),
+                        'A',
+                        'N',
+                        'N',
+                        'N',
+                        $entryby,
+                        $tacode,
+                    ],
+                );
+
+                if (! $inserted) {
+                    // A concurrent attempt may have won the insert; adopt it.
+                    $retry = self::fetchAll($connection, 'SELECT hpercode FROM henctr WHERE enccode = ?', [$enccode]);
+
+                    if ($retry === null || $retry === []) {
+                        return self::registrationError($enccode, 'HOMIS encounter insert failed.');
+                    }
+                }
+            } elseif (trim((string) ($existing[0]['hpercode'] ?? '')) !== $hpercode) {
+                return self::registrationError($enccode, 'Encounter code is already used by another patient.');
+            }
+
+            $opdRows = self::fetchAll($connection, 'SELECT enccode FROM hopdlog WHERE enccode = ?', [$enccode]);
+
+            if ($opdRows === null) {
+                return self::registrationError($enccode, 'HOMIS OPD log query failed.');
+            }
+
+            if ($opdRows === []) {
+                $inserted = self::insertOpdLog($connection, $hpercode, $dob, $tscode, $diagtxt, $enccode, $encdate);
+
+                if (! $inserted) {
+                    $retry = self::fetchAll($connection, 'SELECT enccode FROM hopdlog WHERE enccode = ?', [$enccode]);
+
+                    if ($retry === null || $retry === []) {
+                        return self::registrationError($enccode, 'HOMIS OPD log insert failed.');
+                    }
+                }
+            }
+
+            return ['status' => 'ok', 'enccode' => $enccode, 'message' => ''];
+        } finally {
+            self::close($connection);
+        }
+    }
+
+    /**
+     * Insert the hopdlog row with the legacy age / case number / queue number
+     * logic.
+     */
+    private static function insertOpdLog(mixed $connection, string $hpercode, string $dob, string $tscode, string $diagtxt, string $enccode, string $encdate): bool
+    {
+        $age = self::ageParts($dob);
+        $patage = $age['years'];
+        $patagemo = $patage < 1 ? $age['months'] : 0;
+        $patagedy = $patage < 1 && $patagemo < 1 ? $age['days'] : 0;
+
+        return self::execute(
+            $connection,
+            'INSERT INTO hopdlog
+                (enccode, hpercode, upicode, patage, tacode, tscode, opddate, opdtime, opdrem, opdstat, opdlock, updsw, confdl, casenum, patagemo, patagedy, entryby, newold, queno, opdtxt, telesched)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [
+                $enccode,
+                $hpercode,
+                '',
+                $patage,
+                (string) config('kiosk.homis.tacode', 'SERVI'),
+                $tscode,
+                $encdate,
+                $encdate,
+                (string) config('kiosk.homis.opd_remark', 'PAS Registration'),
+                'A',
+                'N',
+                'N',
+                'N',
+                self::nextCaseNumber($connection),
+                $patagemo,
+                $patagedy,
+                (string) config('kiosk.homis.entry_by', 'na'),
+                trim($hpercode) !== '' ? 'N' : 'Y',
+                self::nextQueueNumber($connection, $tscode),
+                $diagtxt,
+                (string) config('kiosk.homis.tele_flag', 'N'),
+            ],
+        );
+    }
+
+    /**
+     * Next daily case number (YYYY-NNNNNN), like the legacy kiosk computed it.
+     */
+    private static function nextCaseNumber(mixed $connection): string
+    {
+        $year = Carbon::now(self::registrationTimezone())->format('Y');
+        $rows = self::fetchAll(
+            $connection,
+            'SELECT MAX(casenum) AS casenum FROM hopdlog WHERE SUBSTRING(casenum, 1, 4) = ?',
+            [$year],
+        );
+
+        $last = $rows === null || $rows === [] ? '' : trim((string) ($rows[0]['casenum'] ?? ''));
+
+        if ($last === '') {
+            return $year.'-000001';
+        }
+
+        $sequence = intval(substr($last, 5)) + 1;
+
+        return $year.'-'.str_pad((string) $sequence, 6, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Next queue number for the service type, counted from today's OPD log.
+     */
+    private static function nextQueueNumber(mixed $connection, string $tscode): int
+    {
+        $tstype = '';
+
+        if (trim($tscode) !== '') {
+            $rows = self::fetchAll($connection, 'SELECT tstype FROM htypser WHERE tscode = ?', [trim($tscode)]);
+            $tstype = $rows === null || $rows === [] ? '' : trim((string) ($rows[0]['tstype'] ?? ''));
+        }
+
+        $rows = self::fetchAll(
+            $connection,
+            'SELECT COUNT(a.enccode) AS queueno
+             FROM hopdlog a WITH (NOLOCK), htypser b WITH (NOLOCK)
+             WHERE (a.opddate > CONVERT(VARCHAR(10), GETDATE(), 101)
+                AND a.opddate < DATEADD(DAY, 1, CONVERT(VARCHAR(10), GETDATE(), 101)))
+                AND a.tscode = b.tscode
+                AND b.tstype = ?',
+            [$tstype],
+        );
+
+        if ($rows === null || $rows === []) {
+            return 1;
+        }
+
+        return (int) $rows[0]['queueno'] + 1;
+    }
+
+    /**
+     * Whole years, months and days between the date of birth and today in the
+     * registration timezone, like the legacy kiosk computed them.
+     *
+     * @return array{years: int, months: int, days: int}
+     */
+    private static function ageParts(string $dob): array
+    {
+        $dob = trim($dob);
+
+        if ($dob === '') {
+            return ['years' => 0, 'months' => 0, 'days' => 0];
+        }
+
+        try {
+            $birth = Carbon::createFromFormat('Y-m-d', substr($dob, 0, 10), self::registrationTimezone())->startOfDay();
+        } catch (\Throwable) {
+            return ['years' => 0, 'months' => 0, 'days' => 0];
+        }
+
+        $interval = $birth->diff(Carbon::now(self::registrationTimezone())->startOfDay());
+
+        return ['years' => $interval->y, 'months' => $interval->m, 'days' => $interval->d];
+    }
+
+    private static function registrationTimezone(): string
+    {
+        return (string) config('app.display_timezone', 'Asia/Manila');
+    }
+
+    /**
+     * @return array{status: 'error', enccode: string, message: string}
+     */
+    private static function registrationError(string $enccode, string $message): array
+    {
+        return ['status' => 'error', 'enccode' => $enccode, 'message' => $message];
+    }
+
+    /**
+     * Run a parameterised statement without fetching rows.
+     *
+     * @param  array<int, string|int>  $parameters
+     */
+    private static function execute(mixed $connection, string $sql, array $parameters = []): bool
+    {
+        $statement = @odbc_prepare($connection, $sql);
+
+        if ($statement === false) {
+            return false;
+        }
+
+        return (bool) @odbc_execute($statement, $parameters);
     }
 
     private static function connection(): mixed

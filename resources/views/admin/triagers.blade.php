@@ -143,7 +143,7 @@
 
     {{-- ADD TRIAGER MODAL --}}
     <div class="modal fade admin-doctor-modal" id="addTriagerModal" tabindex="-1" aria-labelledby="addTriagerModalTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <header class="modal-header admin-doctor-modal-header">
                     <div class="admin-telemedicine-glow" aria-hidden="true"></div>
@@ -153,6 +153,7 @@
                         </div>
                         <div class="admin-telemedicine-copy">
                             <h2 class="modal-title" id="addTriagerModalTitle">Add triager</h2>
+                            <p class="admin-telemedicine-description">Create a new triager account and sign-in credentials.</p>
                         </div>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -289,10 +290,10 @@
          treatment, static backdrop, Delete / Cancel buttons. The selected
          triager's name is filled from the row's data attributes, and confirming
          submits the same destroy form as before. --}}
-    <div class="modal fade admin-doctor-modal admin-service-modal admin-service-modal-narrow" id="deleteTriagerModal" tabindex="-1"
+    <div class="modal fade admin-doctor-modal admin-service-modal" id="deleteTriagerModal" tabindex="-1"
          aria-labelledby="deleteTriagerModalTitle" aria-hidden="true"
          data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <header class="modal-header admin-doctor-modal-header">
                     <div class="admin-telemedicine-glow" aria-hidden="true"></div>
@@ -328,6 +329,136 @@
         </div>
     </div>
 @endsection
+
+@push('styles')
+    <style>
+        /* =============================================================
+           Standard Admin modal system — source of truth: the Add Patient
+           modal (#createPatientModal, sized by pages/patients.css). These
+           rules only restate that modal's measurements for the other
+           modals on this page. Markup, behaviour and content are untouched.
+           ============================================================= */
+
+        /* One width for every Admin modal: the Add Patient dialog
+           (width: calc(100% - 30px); max-width: 640px). Phones keep the
+           shared calc(100% - 16px) rule from admin-css/responsive.css. */
+        .admin-doctor-modal .modal-dialog {
+            max-width: 640px;
+        }
+
+        /* Content spacing follows the reference (12px row gap, 4px label gap). */
+        .admin-doctor-modal .admin-doctor-form {
+            gap: 12px;
+        }
+
+        .admin-doctor-modal .admin-doctor-form-grid {
+            gap: 12px;
+        }
+
+        .admin-doctor-modal .admin-doctor-form .form-field {
+            gap: 4px;
+        }
+
+        /* Field sizing follows the reference (12px labels, 13px controls). */
+        .admin-doctor-modal .admin-doctor-form .form-field > label,
+        .admin-doctor-modal .admin-doctor-form .form-field > label span {
+            font-size: 12px;
+        }
+
+        .admin-doctor-modal .admin-doctor-form .form-control,
+        .admin-doctor-modal .admin-doctor-form .form-select {
+            min-height: 0;
+            padding: 0.375rem 0.5rem;
+            font-size: 13px;
+        }
+
+        /* Action area mirrors the reference footer: centered, 8px apart,
+           with no separator rule above the buttons. The row keeps its
+           existing top spacing (margin from pages/holidays.css + padding
+           from doctor.css): these rows sit inside forms, so they do not get
+           the modal-body padding that separates the reference footer. */
+        .admin-doctor-modal .admin-doctor-form-actions {
+            justify-content: center;
+            gap: 8px;
+            border-top: none;
+        }
+
+        .admin-doctor-modal .modal-footer {
+            justify-content: center;
+            border-top: none;
+            padding-top: 0;
+            gap: 8px;
+        }
+
+        /* Button type matches the reference: 13px inside every modal. */
+        .admin-doctor-modal .admin-primary-button,
+        .admin-doctor-modal .admin-secondary-button,
+        .admin-doctor-modal .admin-danger-button {
+            font-size: 13px;
+        }
+
+        /* Service-styled delete modal (.admin-service-modal) carries doubled-up
+           rules in pages/services.css, so the standard is restated here with
+           the same (or higher) specificity. */
+        .admin-doctor-modal.admin-service-modal .modal-dialog {
+            max-width: 640px;
+        }
+
+        .admin-doctor-modal.admin-service-modal .modal-body {
+            padding: 20px;
+        }
+
+        .admin-doctor-modal.admin-service-modal .admin-doctor-form-actions,
+        .admin-doctor-modal.admin-service-modal .admin-service-form-actions {
+            justify-content: center;
+            gap: 8px;
+            padding-top: 0;
+            border-top: none;
+        }
+
+        .admin-doctor-modal.admin-service-modal .admin-primary-button,
+        .admin-doctor-modal.admin-service-modal .admin-secondary-button,
+        .admin-doctor-modal.admin-service-modal .admin-danger-button {
+            font-size: 13px;
+        }
+
+        /* ID-scoped page rules (triagers.css) outrank the class rules above,
+           so the standard typography is restated for the Add / Edit triager
+           modals. The blue panels and the field rhythm inside them (row
+           padding + hairline separators) are this page's container layout
+           and stay exactly as they were. */
+        #addTriagerModal .form-field > label,
+        #editTriagerModal .form-field > label,
+        #addTriagerModal .form-field > label span,
+        #editTriagerModal .form-field > label span {
+            font-size: 12px;
+        }
+
+        #addTriagerModal .form-control,
+        #addTriagerModal .form-select,
+        #editTriagerModal .form-control,
+        #editTriagerModal .form-select {
+            min-height: 0;
+            padding: 0.375rem 0.5rem;
+            font-size: 13px;
+        }
+
+        /* Phones: body padding and action buttons follow the reference. */
+        @media (max-width: 767.98px) {
+            .admin-doctor-modal.admin-service-modal .modal-body {
+                padding: 14px;
+            }
+
+            .admin-doctor-modal .admin-doctor-form-actions {
+                flex-wrap: wrap;
+            }
+
+            .admin-doctor-modal .admin-doctor-form-actions > * {
+                flex: 0 0 auto;
+            }
+        }
+    </style>
+@endpush
 
 @push('scripts')
     <script>
