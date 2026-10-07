@@ -118,6 +118,13 @@
         .admin-doctor-empty strong {
             color: #334155;
         }
+
+        /* Desktop/PC only: the Holiday management trust row is hidden on phones. */
+        @media (max-width: 767.98px) {
+            .admin-telemedicine-trust[aria-label="Holiday management features"] {
+                display: none !important;
+            }
+        }
     </style>
 
     <div
@@ -162,6 +169,14 @@
                     <p class="admin-telemedicine-description">
                         {{ $config['description'] }}
                     </p>
+
+                    <div class="admin-telemedicine-trust" aria-label="Holiday management features">
+                        <span><i class="bi bi-calendar-x-fill" aria-hidden="true"></i> Holiday Management</span>
+                        <b aria-hidden="true">•</b>
+                        <span>Non-working Days</span>
+                        <b aria-hidden="true">•</b>
+                        <span>Schedule Awareness</span>
+                    </div>
 
                 </div>
             </div>
@@ -364,6 +379,44 @@
         </div>
 
     </div>
+
+    {{-- DELETE HOLIDAY MODAL
+         Mirror of the Services Delete Service modal: same header banner, icon
+         treatment, static backdrop, Delete / Cancel buttons. The selected
+         holiday's details are filled from the row's data attributes, and
+         confirming runs the existing AJAX destroy flow. --}}
+    <div class="modal fade admin-doctor-modal admin-service-modal admin-service-modal-narrow" id="deleteHolidayModal" tabindex="-1"
+         aria-labelledby="deleteHolidayModalTitle" aria-hidden="true"
+         data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <header class="modal-header admin-doctor-modal-header">
+                    <div class="admin-telemedicine-glow" aria-hidden="true"></div>
+                    <div class="admin-telemedicine-content">
+                        <div class="admin-telemedicine-mark" aria-hidden="true">
+                            <i class="bi bi-trash3-fill"></i>
+                        </div>
+                        <div class="admin-telemedicine-copy">
+                            <h2 class="modal-title" id="deleteHolidayModalTitle">Delete Holiday</h2>
+                            <p class="admin-telemedicine-description">This removes the holiday from the schedule.</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </header>
+                <div class="modal-body">
+                    <p class="admin-service-delete-question">Delete this holiday?</p>
+                    <p class="admin-service-delete-name" data-delete-name></p>
+                    <div class="admin-doctor-form-actions admin-service-form-actions">
+                        <button type="button" class="admin-danger-button" data-delete-confirm>
+                            <i class="bi bi-trash3" aria-hidden="true"></i>
+                            <span>Delete</span>
+                        </button>
+                        <button type="button" class="admin-secondary-button" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -390,6 +443,45 @@
             if (backBtn) {
                 backBtn.href = backUrl;
             }
+
+            const deleteModalEl =
+                document.getElementById('deleteHolidayModal');
+
+            const deleteNameEl =
+                deleteModalEl.querySelector('[data-delete-name]');
+
+            const deleteConfirmBtn =
+                deleteModalEl.querySelector('[data-delete-confirm]');
+
+            const deleteModal =
+                bootstrap.Modal.getOrCreateInstance(deleteModalEl);
+
+            let pendingHoliday = null;
+
+            /* Static backdrop: an outside click (or Escape) does not close the
+               modal — it flashes the danger border once, like the Services
+               delete modal. X and Cancel are the only ways out. */
+            const deleteContent =
+                deleteModalEl.querySelector('.modal-content');
+
+            deleteModalEl.addEventListener('hidePrevented.bs.modal', () => {
+                deleteContent.classList.remove('admin-service-modal-blocked');
+                void deleteContent.offsetWidth;
+                deleteContent.classList.add('admin-service-modal-blocked');
+            });
+
+            deleteContent.addEventListener('animationend', (event) => {
+                if (event.animationName === 'adminServiceModalBlocked') {
+                    deleteContent.classList.remove('admin-service-modal-blocked');
+                }
+            });
+
+            deleteModalEl.addEventListener(
+                'hidden.bs.modal',
+                () => {
+                    pendingHoliday = null;
+                }
+            );
 
             loadHolidays();
 
@@ -552,15 +644,23 @@
 
                 const btn = e.currentTarget;
 
-                const holidayId = btn.dataset.holidayId;
-                const holidayDate = btn.dataset.holidayDate;
-                const holidayDesc = btn.dataset.holidayDesc;
+                pendingHoliday = {
+                    id: btn.dataset.holidayId,
+                    date: btn.dataset.holidayDate,
+                    desc: btn.dataset.holidayDesc,
+                };
 
-                if (
-                    !confirm(
-                        `Are you sure you want to delete "${holidayDesc}" on ${holidayDate}?`
-                    )
-                ) {
+                deleteNameEl.textContent =
+                    `${pendingHoliday.desc} — ${pendingHoliday.date}`;
+
+                deleteModal.show();
+            }
+
+            deleteConfirmBtn.addEventListener('click', confirmDeleteHoliday);
+
+            async function confirmDeleteHoliday() {
+
+                if (!pendingHoliday) {
                     return;
                 }
 
@@ -570,12 +670,12 @@
                 const destroyUrl =
                     destroyUrlTemplate.replace(
                         '__HOLIDAY_ID__',
-                        holidayId
+                        pendingHoliday.id
                     );
 
-                btn.disabled = true;
+                deleteConfirmBtn.disabled = true;
 
-                btn.innerHTML =
+                deleteConfirmBtn.innerHTML =
                     '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
 
                 try {
@@ -600,6 +700,8 @@
 
                     loadHolidays();
 
+                    deleteModal.hide();
+
                 } catch (error) {
 
                     showToast(
@@ -607,9 +709,11 @@
                         error.message || 'Failed to delete holiday.'
                     );
 
-                    btn.disabled = false;
+                } finally {
 
-                    btn.innerHTML =
+                    deleteConfirmBtn.disabled = false;
+
+                    deleteConfirmBtn.innerHTML =
                         '<i class="bi bi-trash3" aria-hidden="true"></i><span>Delete</span>';
                 }
             }

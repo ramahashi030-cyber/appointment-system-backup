@@ -110,6 +110,11 @@
         {{-- ============ RIGHT: artwork ============ --}}
         <aside class="auth-art" aria-hidden="true">
 
+            {{-- Optional full-bleed visual (photo + brand). Empty for every page
+                 that does not define the section, so the shared artwork below
+                 still renders for register / reset / verify. --}}
+            @yield('art')
+
             <div class="auth-icons">
                 @php
                     $authIcons = [

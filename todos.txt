@@ -1,20 +1,19 @@
 ADMIN PANEL TODO :
 
 	ADMIN DASHBOARD
-		- display how many online booking in current date --
-		- display how many walking registration -- 
-
+		- display how many walking registration and telemedicine in admin-stat-card in dashboard.blade.php -- 
+		- in the admin panels dashboard staff activity table, display only the current date.
+		
 	PATIENTS PAGE
 		  - move the 'add patient' button with the same row of stat card
  		  - contact number on both edit and add patient should be required
 
 	DOCTORS PAGE
+- In adding doctors, you cannot save the doctor when it doesn't have a schedule. The schedule part is required it needed at least 3-5 days schedule
 
 
 
---------------------------
-	TRIAGER PANEL and ADMIN PANEL
-		change the color of the telemedicine mark into #1e5eb1 and the fill to #f4f8ff
+
 
 ----------------------------------------------
 	Doctors Page.

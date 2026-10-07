@@ -16,6 +16,15 @@
         $auditTimezone = config('app.display_timezone');
     @endphp
 
+    {{-- Desktop/PC only: the trust row in the banner below is hidden on phones. --}}
+    <style>
+        @media (max-width: 767.98px) {
+            .admin-telemedicine-trust[aria-label="Audit log features"] {
+                display: none !important;
+            }
+        }
+    </style>
+
     <div class="admin-dashboard-content admin-doctor-content">
         <section class="admin-telemedicine-banner admin-doctor-banner" aria-labelledby="auditLogTitle">
             <div class="admin-telemedicine-glow" aria-hidden="true"></div>
@@ -27,6 +36,13 @@
                     <h1 id="auditLogTitle">Audit Logs</h1>
                     <p class="admin-telemedicine-welcome">System Audit Trail</p>
                     <p class="admin-telemedicine-description">Every action by admins, triagers and doctors across the admin panel.</p>
+                    <div class="admin-telemedicine-trust" aria-label="Audit log features">
+                        <span><i class="bi bi-journal-text" aria-hidden="true"></i> Activity Tracking</span>
+                        <b aria-hidden="true">•</b>
+                        <span>Full History</span>
+                        <b aria-hidden="true">•</b>
+                        <span>Accountability</span>
+                    </div>
                 </div>
             </div>
         </section>

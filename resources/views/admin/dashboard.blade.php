@@ -20,6 +20,16 @@
         $auditTimezone = config('app.display_timezone');
     @endphp
 
+    {{-- Mobile-only: the "Administration benefits" trust row is hidden on phones;
+         desktop and tablet stay outside this query and render it unchanged. --}}
+    <style>
+        @media (max-width: 767.98px) {
+            .admin-telemedicine-trust[aria-label="Administration benefits"] {
+                display: none !important;
+            }
+        }
+    </style>
+
     <div class="admin-dashboard-content">
         <section class="admin-telemedicine-banner" aria-label="QMMC telemedicine consultation">
             <div class="admin-telemedicine-glow" aria-hidden="true"></div>

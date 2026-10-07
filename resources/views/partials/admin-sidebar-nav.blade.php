@@ -42,6 +42,7 @@
             ],
         ],
         ['route' => 'admin.triagers', 'label' => 'Triagers', 'icon' => 'bi-clipboard2-pulse-fill'],
+        ['route' => 'admin.kiosk', 'label' => 'Kiosk', 'icon' => 'bi-qr-code-scan'],
         [
             'label' => 'Reports',
             'icon' => 'bi-calendar2-week-fill',

@@ -81,90 +81,9 @@
     }
 }
 
-#deleteTimeslotModal .modal-content {
-    border: 2px solid transparent;
-    border-radius: 12px;
-    font-family: inherit;
-}
-
-#deleteTimeslotModal .modal-header {
-    border-bottom: 1px solid #f1f5f9;
-    padding: 1rem 1.25rem 0.75rem;
-}
-
-#deleteTimeslotModal .modal-title {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 600;
-    color: #0f172a;
-}
-
-#deleteTimeslotModal .modal-body {
-    padding: 1rem 1.25rem 0.5rem;
-    color: #1f2937;
-    line-height: 1.5;
-}
-
-#deleteTimeslotModal .modal-footer {
-    border-top: 1px solid #f1f5f9;
-    padding: 0.75rem 1.25rem 1rem;
-    justify-content: flex-end;
-    gap: 0.5rem;
-}
-
-#deleteTimeslotModal .btn-danger {
-    background: #dc3545;
-    border-color: #dc3545;
-    color: #fff;
-}
-
-#deleteTimeslotModal .btn-danger:hover,
-#deleteTimeslotModal .btn-danger:focus-visible {
-    background: #bb2d3b;
-    border-color: #bb2d3b;
-}
-
-#deleteTimeslotModal .btn-light {
-    background: #fff;
-    color: #000;
-    border: 1px solid #000;
-}
-
-#deleteTimeslotModal .btn-light:hover,
-#deleteTimeslotModal .btn-light:focus-visible {
-    background: #f5f5f5;
-}
-
-#deleteTimeslotModal.modal-static .modal-dialog {
-    transform: none;
-}
-
-@keyframes deleteTimeslotBlink {
-    0% {
-        border-color: transparent;
-        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
-    }
-    25% {
-        border-color: #dc3545;
-        box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.25);
-    }
-    100% {
-        border-color: transparent;
-        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
-    }
-}
-
-#deleteTimeslotModal .delete-modal-blink {
-    animation: deleteTimeslotBlink 0.6s ease-out;
-}
-
-@media (max-width: 575.98px) {
-    #deleteTimeslotModal .modal-dialog {
-        width: calc(100% - 16px);
-        margin: 8px auto;
-    }
-}
+/* deleteTimeslotModal now uses the shared Services-style modal
+   (admin-doctor-modal admin-service-modal admin-service-modal-narrow);
+   its styles come from admin-css/doctor.css and pages/services.css. */
 
 .admin-dashboard-content.admin-timeslots-page .delete-timeslot-btn,
 .admin-dashboard-content.admin-timeslots-page .delete-timeslot-btn:hover,

@@ -1,3 +1,56 @@
+@once
+    <style>
+        /* Live date/time pinned to the LEFT side of the admin navbar.
+           overflow:hidden plus a very large flex-shrink let the clock absorb any
+           overflow itself, so it can never squeeze the bell/profile/logout
+           controls when the viewport is narrow. */
+        .admin-header-datetime {
+            min-width: 0;
+            overflow: hidden;
+            flex-shrink: 999;
+            color: #dbeaff;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: .2px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .admin-header-datetime-time,
+        .admin-header-datetime-seconds {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* Phones/small tablets: keep the time, drop the date (not enough room). */
+        @media (max-width: 767.98px) {
+            .admin-header-datetime-date,
+            .admin-header-datetime-sep {
+                display: none;
+            }
+        }
+
+        /* Narrow phones: time only, without seconds/AM-PM. */
+        @media (max-width: 479.98px) {
+            .admin-header-datetime {
+                font-size: 10px;
+            }
+
+            .admin-header-datetime-seconds,
+            .admin-header-datetime-meridiem {
+                display: none;
+            }
+        }
+
+        @media (max-width: 379.98px) {
+            .admin-header-datetime {
+                font-size: 9px;
+            }
+        }
+    </style>
+@endonce
+
 @php
     $admin = auth('admin')->user();
     $adminName = $admin !== null
@@ -28,20 +81,44 @@
             <i class="bi bi-list" aria-hidden="true"></i>
         </button>
 
+        {{-- Running date/time — always on the left of the bar, kept live by the script below. --}}
+        <div class="admin-header-datetime" id="adminHeaderDateTime" role="timer" aria-live="off"
+             aria-label="Current date and time"><span class="admin-header-datetime-date" data-admin-clock-date></span><span class="admin-header-datetime-sep" data-admin-clock-sep aria-hidden="true"></span><span class="admin-header-datetime-time" data-admin-clock-time></span><span class="admin-header-datetime-seconds" data-admin-clock-seconds></span><span class="admin-header-datetime-meridiem" data-admin-clock-meridiem></span></div>
+
         <div class="admin-header-actions">
 
             @include('partials.notification-bell', ['rtVariant' => 'admin', 'rtModalId' => 'realtimeNotificationsModal'])
 
-            <div class="admin-user" title="My profile" aria-label="My profile" style="cursor: pointer;"
-                 @if ($admin !== null)
-                     role="button" tabindex="0" aria-haspopup="dialog"
-                     data-bs-toggle="modal" data-bs-target="#adminProfileModal" data-admin-profile-trigger
-                 @endif>
-                <span class="admin-user-avatar" aria-hidden="true"><i class="bi bi-person-fill"></i></span>
-                <span class="admin-user-copy">
-                    <strong>{{ $adminName }}</strong>
-                    <small>Administrator</small>
-                </span>
+            <div class="dropdown">
+                <button class="admin-user" type="button" id="adminUserMenuToggle"
+                        title="Account menu" aria-label="Open admin account menu"
+                        @if ($admin !== null)
+                            data-admin-profile-trigger
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                        @endif>
+                    <span class="admin-user-avatar" aria-hidden="true"><i class="bi bi-person-fill"></i></span>
+                    <span class="admin-user-copy">
+                        <strong>{{ $adminName }}</strong>
+                        <small>Administrator</small>
+                    </span>
+                </button>
+
+                @if ($admin !== null)
+                    <div class="dropdown-menu dropdown-menu-end admin-user-menu" aria-labelledby="adminUserMenuToggle">
+                        <div class="admin-user-menu-header">
+                            <span>Admin Profile</span>
+                            <small>{{ $adminName }}</small>
+                        </div>
+                        <button type="button" class="dropdown-item"
+                                data-bs-toggle="modal" data-bs-target="#adminProfileModal">
+                            <i class="bi bi-person-circle" aria-hidden="true"></i> Show Profile
+                        </button>
+                        <button type="button" class="dropdown-item"
+                                data-bs-toggle="modal" data-bs-target="#newAdminModal">
+                            <i class="bi bi-person-plus" aria-hidden="true"></i> New Admin
+                        </button>
+                    </div>
+                @endif
             </div>
 
             <button type="button" class="admin-logout-btn" data-bs-toggle="modal" data-bs-target="#adminLogoutModal">
@@ -51,6 +128,61 @@
         </div>
     </div>
 </header>
+
+@push('scripts')
+<script>
+/*
+ * Running date/time in the admin navbar (e.g. "October 7, 2026 | 08:16:25 AM").
+ * Reads the browser's local clock on every tick and schedules the next tick on
+ * the upcoming second boundary, so it stays accurate while the page stays open.
+ */
+(function () {
+    var root = document.getElementById('adminHeaderDateTime');
+
+    if (!root) {
+        return;
+    }
+
+    // The header outlives the admin's page-swap navigation, which re-runs inline
+    // scripts on every swap, so clear any previous timer first: one clock only.
+    if (window.__adminHeaderDateTimeTimer) {
+        window.clearTimeout(window.__adminHeaderDateTimeTimer);
+    }
+
+    var dateEl = root.querySelector('[data-admin-clock-date]');
+    var sepEl = root.querySelector('[data-admin-clock-sep]');
+    var timeEl = root.querySelector('[data-admin-clock-time]');
+    var secondsEl = root.querySelector('[data-admin-clock-seconds]');
+    var meridiemEl = root.querySelector('[data-admin-clock-meridiem]');
+
+    function pad(value) {
+        return value < 10 ? '0' + value : String(value);
+    }
+
+    function render() {
+        var now = new Date();
+        var hours = now.getHours();
+
+        dateEl.textContent = now.toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+        });
+        sepEl.textContent = ' | ';
+        timeEl.textContent = pad(hours % 12 || 12) + ':' + pad(now.getMinutes());
+        secondsEl.textContent = ':' + pad(now.getSeconds());
+        meridiemEl.textContent = hours >= 12 ? ' PM' : ' AM';
+    }
+
+    function tick() {
+        render();
+        window.__adminHeaderDateTimeTimer = window.setTimeout(tick, 1000 - (Date.now() % 1000));
+    }
+
+    tick();
+})();
+</script>
+@endpush
 
 {{-- Real-time notification bell detail modal (additive — see partials/notification-modal). --}}
 @include('partials.notification-modal', ['rtVariant' => 'admin', 'rtModalId' => 'realtimeNotificationsModal'])
@@ -152,6 +284,49 @@
             </div>
         </div>
     </div>
+
+    {{-- NEW ADMIN MODAL (blank — input fields and functionality come in a later task) --}}
+    <div class="modal fade admin-doctor-modal" id="newAdminModal" tabindex="-1" aria-labelledby="newAdminModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <header class="modal-header admin-doctor-modal-header">
+                    <div class="admin-telemedicine-glow" aria-hidden="true"></div>
+                    <div class="admin-telemedicine-content">
+                        <div class="admin-telemedicine-mark" aria-hidden="true">
+                            <i class="bi bi-person-plus"></i>
+                        </div>
+                        <div class="admin-telemedicine-copy">
+                            <h2 class="modal-title" id="newAdminModalTitle">New Admin</h2>
+                            <p class="admin-telemedicine-description">Add a new administrator account.</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </header>
+
+                <div class="modal-body">
+                    {{-- New Admin form fields will be added in a separate task. --}}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+    <script>
+    $(function () {
+        var $newAdminModal = $('#newAdminModal');
+
+        if (!$newAdminModal.length) {
+            return;
+        }
+
+        // Keep the modal directly under <body> (same stacking-context safeguard
+        // as the profile modal) so the header can never place it behind the backdrop.
+        if (!$newAdminModal.parent().is('body')) {
+            $newAdminModal.appendTo(document.body);
+        }
+    });
+    </script>
+    @endpush
 
     @push('scripts')
     <script>

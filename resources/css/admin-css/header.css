@@ -70,6 +70,20 @@
     min-width: 0;
     align-items: center;
     gap: 8px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    padding: 0;
+    text-align: left;
+    cursor: pointer;
+}
+
+.admin-user:hover,
+.admin-user:focus-visible,
+.admin-user[aria-expanded="true"] {
+    background: rgba(255, 255, 255, .15);
 }
 
 .admin-user-avatar {
@@ -105,6 +119,56 @@
     margin-top: 2px;
     color: #dbeaff;
     font-size: 10px;
+}
+
+/* Admin profile dropdown menu (triggered by .admin-user in the header). */
+.admin-user-menu {
+    min-width: 220px;
+    margin-top: 10px !important;
+    padding: 8px;
+    border: 1px solid #d5e4f5;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 14px 35px rgba(6, 44, 102, .16);
+}
+
+.admin-user-menu-header {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 10px 10px;
+    border-bottom: 1px solid #e1ebf6;
+    color: #0d1c34;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.admin-user-menu-header small {
+    margin-top: 2px;
+    color: #6b84a4;
+    font-size: 11px;
+    font-weight: 400;
+}
+
+.admin-user-menu .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 3px;
+    padding: 9px 10px;
+    border-radius: 9px;
+    color: #0d1c34;
+    font-size: 13px;
+}
+
+.admin-user-menu .dropdown-item:hover,
+.admin-user-menu .dropdown-item:focus {
+    background: #edf5ff;
+    color: #0877ed;
+}
+
+.admin-user-menu .dropdown-item i {
+    font-size: 15px;
+    color: #0877ed;
 }
 
 /* Logout Button - Danger/Red Style Consistent Across All Sizes */

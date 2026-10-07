@@ -47,6 +47,12 @@
             .admin-main [data-doctor-table-wrap] .admin-doctor-table > tbody > tr:nth-child(n+4) {
                 display: none !important;
             }
+
+            {{-- Mobile-only: the "Directory features" trust row is hidden on phones;
+                 desktop and tablet stay outside this query and render it unchanged. --}}
+            .admin-doctor-content .admin-telemedicine-trust[aria-label="Directory features"] {
+                display: none !important;
+            }
         }
     </style>
     <div class="admin-dashboard-content admin-doctor-content">
@@ -362,6 +368,77 @@
                     modal.show();
                 }
             });
+
+            const addForm = document.querySelector('#addDoctorModal form');
+
+            function showToast(type, message) {
+                document.querySelectorAll('.admin-toast').forEach((toast) => toast.remove());
+
+                const toast = document.createElement('div');
+                toast.className = 'admin-toast alert alert-' + (type === 'success' ? 'success' : 'danger')
+                    + ' alert-dismissible fade show position-fixed';
+                toast.style.cssText = 'top: 1rem; right: 1rem; z-index: 9999; min-width: 300px;';
+                toast.setAttribute('role', 'alert');
+
+                const text = document.createElement('span');
+                text.textContent = message;
+                toast.appendChild(text);
+
+                const close = document.createElement('button');
+                close.type = 'button';
+                close.className = 'btn-close';
+                close.setAttribute('data-bs-dismiss', 'alert');
+                close.setAttribute('aria-label', 'Close');
+                toast.appendChild(close);
+
+                document.body.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 150);
+                }, 3000);
+            }
+
+            if (addForm) {
+                addForm.addEventListener('submit', (event) => {
+                    const password = addForm.querySelector('#password');
+                    let passwordError = '';
+
+                    if (password && password.value !== '') {
+                        if (!/[A-Z]/.test(password.value)) {
+                            passwordError = 'Password must contain at least one uppercase letter.';
+                        } else if (!/[a-z]/.test(password.value)) {
+                            passwordError = 'Password must contain at least one lowercase letter.';
+                        } else if (!/[^A-Za-z0-9]/.test(password.value)) {
+                            passwordError = 'Password must contain at least one special character (e.g. @, #, $, %).';
+                        }
+                    }
+
+                    if (passwordError) {
+                        event.preventDefault();
+                        password.focus();
+                        showToast('error', passwordError);
+
+                        return;
+                    }
+
+                    const selectedDays = addForm.querySelectorAll('input[name="availability_days[]"]:checked').length;
+
+                    if (selectedDays >= 3) {
+                        return;
+                    }
+
+                    event.preventDefault();
+
+                    const firstDay = addForm.querySelector('input[name="availability_days[]"]');
+
+                    if (firstDay) {
+                        firstDay.focus();
+                    }
+
+                    showToast('error', 'Doctor must have at least 3 scheduled days before it can be saved.');
+                });
+            }
 
             const form = document.querySelector('[data-doctor-filters]');
 

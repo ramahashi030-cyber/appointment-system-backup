@@ -59,6 +59,13 @@
                 margin: 8px auto;
             }
         }
+
+        /* Desktop/PC only: the Service management trust row is hidden on phones. */
+        @media (max-width: 767.98px) {
+            .admin-telemedicine-trust[aria-label="Service management features"] {
+                display: none !important;
+            }
+        }
     </style>
 @endpush
 
@@ -179,6 +186,13 @@
                     <h1 id="servicesTitle">{{ $config['title'] }}</h1>
                     <p class="admin-telemedicine-welcome">Service Management</p>
                     <p class="admin-telemedicine-description">{{ $config['description'] }}</p>
+                    <div class="admin-telemedicine-trust" aria-label="Service management features">
+                        <span><i class="bi bi-briefcase-fill" aria-hidden="true"></i> Service Management</span>
+                        <b aria-hidden="true">•</b>
+                        <span>Available Days</span>
+                        <b aria-hidden="true">•</b>
+                        <span>Timeslot Capacity</span>
+                    </div>
                 </div>
             </div>
         </section>

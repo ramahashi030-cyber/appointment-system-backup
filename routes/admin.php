@@ -60,6 +60,8 @@ Route::prefix('admin')->name('admin.')->group(function (): void {
         Route::put('/triagers/{admin}', [TriagerAccountController::class, 'update'])->name('triagers.update');
         Route::delete('/triagers/{admin}', [TriagerAccountController::class, 'destroy'])->name('triagers.destroy');
 
+        Route::view('/kiosk', 'admin.pankiosk')->name('kiosk');
+
         /*
          | Services. Each listing manages one pair of tables, so every action
          | repeats the type in the URL and supplies the controller's `type`

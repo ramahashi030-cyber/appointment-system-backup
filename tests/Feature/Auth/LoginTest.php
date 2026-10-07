@@ -76,7 +76,7 @@ test('the login screen renders', function () {
         ->assertOk()
         ->assertSee('Login page')
         ->assertSee('Signup')
-        ->assertSee('Reset Password')
+        ->assertSee('Forgot password?')
         ->assertSee(route('login.attempt'), false);
 });
 

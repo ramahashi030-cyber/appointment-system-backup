@@ -12,6 +12,15 @@
 
 @section('content')
 
+    {{-- Desktop/PC only: the trust row in the banner below is hidden on phones. --}}
+    <style>
+        @media (max-width: 767.98px) {
+            .admin-telemedicine-trust[aria-label="Time slot features"] {
+                display: none !important;
+            }
+        }
+    </style>
+
     <div class="admin-dashboard-content admin-doctor-content admin-timeslots-page"
          data-timeslots-page
          data-service-type="{{ $serviceType }}"
@@ -32,6 +41,13 @@
                     <h1 id="timeslotsTitle">{{ $config['title'] }}</h1>
                     <p class="admin-telemedicine-welcome">Timeslot Management</p>
                     <p class="admin-telemedicine-description">{{ $config['description'] }}</p>
+                    <div class="admin-telemedicine-trust" aria-label="Time slot features">
+                        <span><i class="bi bi-clock-fill" aria-hidden="true"></i> Time Slot Management</span>
+                        <b aria-hidden="true">•</b>
+                        <span>Scheduling</span>
+                        <b aria-hidden="true">•</b>
+                        <span>Capacity Limits</span>
+                    </div>
                 </div>
             </div>
         </section>
@@ -171,23 +187,40 @@
         </div>
     </div>
 
-    {{-- Delete confirmation modal --}}
-    <div class="modal fade" id="deleteTimeslotModal" tabindex="-1" aria-labelledby="deleteTimeslotModalTitle" aria-hidden="true" data-bs-backdrop="static">
-        <div class="modal-dialog modal-dialog-centered modal-sm">
+    {{-- DELETE TIMESLOT MODAL
+         Mirror of the Services Delete Service modal: same header banner, icon
+         treatment, static backdrop, Delete / Cancel buttons. The selected
+         timeslot's details are filled from the row's data attributes, and
+         confirming runs the existing AJAX destroy flow. --}}
+    <div class="modal fade admin-doctor-modal admin-service-modal admin-service-modal-narrow" id="deleteTimeslotModal" tabindex="-1"
+         aria-labelledby="deleteTimeslotModalTitle" aria-hidden="true"
+         data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title fs-5" id="deleteTimeslotModalTitle">
-                        <i class="bi bi-trash3 text-danger" aria-hidden="true"></i>
-                        Delete timeslot?
-                    </h2>
-                </div>
+                <header class="modal-header admin-doctor-modal-header">
+                    <div class="admin-telemedicine-glow" aria-hidden="true"></div>
+                    <div class="admin-telemedicine-content">
+                        <div class="admin-telemedicine-mark" aria-hidden="true">
+                            <i class="bi bi-trash3-fill"></i>
+                        </div>
+                        <div class="admin-telemedicine-copy">
+                            <h2 class="modal-title" id="deleteTimeslotModalTitle">Delete Timeslot</h2>
+                            <p class="admin-telemedicine-description">This removes the unavailable time slot from the schedule.</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </header>
                 <div class="modal-body">
-                    Delete the unavailable timeslot for <strong id="deleteTimeslotService"></strong> on <strong id="deleteTimeslotDate"></strong> (<span id="deleteTimeslotTime"></span>)?
-                    <div class="text-muted small mt-2">This action cannot be undone.</div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" id="deleteTimeslotConfirm">Yes, I want to delete</button>
+                    <p class="admin-service-delete-question">Delete this timeslot?</p>
+                    <p class="admin-service-delete-name" data-delete-name></p>
+                    <p class="text-danger small">This action cannot be undone.</p>
+                    <div class="admin-doctor-form-actions admin-service-form-actions">
+                        <button type="button" class="admin-danger-button" data-delete-confirm>
+                            <i class="bi bi-trash3" aria-hidden="true"></i>
+                            <span>Delete</span>
+                        </button>
+                        <button type="button" class="admin-secondary-button" data-bs-dismiss="modal">Cancel</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -382,15 +415,13 @@
             const editModal = bootstrap.Modal.getOrCreateInstance(editModalEl);
             const deleteModalEl = document.getElementById('deleteTimeslotModal');
             const deleteModal = deleteModalEl ? bootstrap.Modal.getOrCreateInstance(deleteModalEl) : null;
-            const deleteTimeslotService = document.getElementById('deleteTimeslotService');
-            const deleteTimeslotDate = document.getElementById('deleteTimeslotDate');
-            const deleteTimeslotTime = document.getElementById('deleteTimeslotTime');
-            const deleteTimeslotConfirm = document.getElementById('deleteTimeslotConfirm');
+            const deleteNameEl = deleteModalEl ? deleteModalEl.querySelector('[data-delete-name]') : null;
+            const deleteConfirmBtn = deleteModalEl ? deleteModalEl.querySelector('[data-delete-confirm]') : null;
             let pendingDeleteId = null;
             let isDeleting = false;
 
-            if (deleteModalEl && deleteTimeslotConfirm) {
-                deleteTimeslotConfirm.addEventListener('click', () => {
+            if (deleteModalEl && deleteConfirmBtn) {
+                deleteConfirmBtn.addEventListener('click', () => {
                     if (!pendingDeleteId || isDeleting) {
                         return;
                     }
@@ -400,11 +431,13 @@
                 deleteModalEl.addEventListener('hidePrevented.bs.modal', () => {
                     const content = deleteModalEl.querySelector('.modal-content');
                     if (!content) return;
-                    content.classList.remove('delete-modal-blink');
+                    content.classList.remove('admin-service-modal-blocked');
                     void content.offsetWidth;
-                    content.classList.add('delete-modal-blink');
-                    content.addEventListener('animationend', () => {
-                        content.classList.remove('delete-modal-blink');
+                    content.classList.add('admin-service-modal-blocked');
+                    content.addEventListener('animationend', (event) => {
+                        if (event.animationName === 'adminServiceModalBlocked') {
+                            content.classList.remove('admin-service-modal-blocked');
+                        }
                     }, { once: true });
                 });
             }
@@ -466,9 +499,9 @@
                 if (!item || !deleteModal) return;
 
                 pendingDeleteId = item.id;
-                if (deleteTimeslotService) deleteTimeslotService.textContent = item.service_name || '';
-                if (deleteTimeslotDate) deleteTimeslotDate.textContent = item.date || '';
-                if (deleteTimeslotTime) deleteTimeslotTime.textContent = item.time_label || '';
+                if (deleteNameEl) {
+                    deleteNameEl.textContent = `${item.service_name || ''} — ${item.date || ''} (${item.time_label || ''})`;
+                }
                 deleteModal.show();
             }
 
@@ -477,9 +510,9 @@
                 const destroyUrl = destroyUrlTemplate.replace('__ID__', id);
 
                 isDeleting = true;
-                if (deleteTimeslotConfirm) {
-                    deleteTimeslotConfirm.disabled = true;
-                    deleteTimeslotConfirm.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...';
+                if (deleteConfirmBtn) {
+                    deleteConfirmBtn.disabled = true;
+                    deleteConfirmBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span><span>Deleting...</span>';
                 }
 
                 try {
@@ -503,9 +536,9 @@
                 } finally {
                     isDeleting = false;
                     pendingDeleteId = null;
-                    if (deleteTimeslotConfirm) {
-                        deleteTimeslotConfirm.disabled = false;
-                        deleteTimeslotConfirm.innerHTML = 'Yes, I want to delete';
+                    if (deleteConfirmBtn) {
+                        deleteConfirmBtn.disabled = false;
+                        deleteConfirmBtn.innerHTML = '<i class="bi bi-trash3" aria-hidden="true"></i><span>Delete</span>';
                     }
                 }
             }

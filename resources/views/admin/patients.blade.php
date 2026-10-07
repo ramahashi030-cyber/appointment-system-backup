@@ -169,6 +169,12 @@
             .admin-main .admin-patients-page .admin-patient-table > tbody > tr:nth-child(n+4) {
                 display: none !important;
             }
+
+            {{-- Mobile-only: the "Directory features" trust row is hidden on phones;
+                 desktop and tablet stay outside this query and render it unchanged. --}}
+            .admin-patients-page .admin-telemedicine-trust[aria-label="Directory features"] {
+                display: none !important;
+            }
         }
     </style>
 @endpush

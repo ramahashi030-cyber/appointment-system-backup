@@ -569,6 +569,12 @@
             .admin-sms-page .admin-sms-booked-table .admin-doctor-empty span {
                 font-size: 12px;
             }
+
+            {{-- Mobile-only: the "SMS module features" trust row is hidden on phones;
+                 desktop and tablet stay outside this query and render it unchanged. --}}
+            .admin-sms-page .admin-telemedicine-trust[aria-label="SMS module features"] {
+                display: none !important;
+            }
         }
 
         /* Tablet: ensure table scrolls if needed */

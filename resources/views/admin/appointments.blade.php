@@ -63,6 +63,12 @@
             .admin-doctor-filters > .form-select {
                 line-height: 0.85;
             }
+
+            {{-- Mobile-only: the "Appointment features" trust row is hidden on phones;
+                 desktop and tablet stay outside this query and render it unchanged. --}}
+            .admin-doctor-content .admin-telemedicine-trust[aria-label="Appointment features"] {
+                display: none !important;
+            }
         }
     </style>
     <div class="admin-dashboard-content admin-doctor-content">

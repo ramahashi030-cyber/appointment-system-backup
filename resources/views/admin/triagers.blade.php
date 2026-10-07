@@ -116,11 +116,10 @@
                                 <td>
                                     <div class="admin-doctor-actions">
                                         <a href="{{ route('admin.triagers', ['edit' => $triager->id]) }}" data-bs-toggle="modal" data-bs-target="#editTriagerModal" data-edit-id="{{ $triager->id }}" data-edit-firstname="{{ $triager->firstname }}" data-edit-lastname="{{ $triager->lastname }}" data-edit-username="{{ $triager->username }}" data-edit-email="{{ $triager->email }}" data-edit-contact="{{ $triager->contact_no }}">Edit</a>
-                                        <form method="POST" action="{{ route('admin.triagers.destroy', $triager) }}" onsubmit="return confirm('Delete this triager account?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-danger">Delete</button>
-                                        </form>
+                                        <button type="button" class="text-danger delete-triager-btn"
+                                                data-triager-delete="{{ $triager->id }}"
+                                                data-triager-name="{{ trim($triager->firstname.' '.$triager->lastname) ?: 'Unnamed triager' }}"
+                                                aria-label="Delete triager account">Delete</button>
                                     </div>
                                 </td>
                             </tr>
@@ -284,6 +283,50 @@
             </div>
         </div>
     </div>
+
+    {{-- DELETE TRIAGER MODAL
+         Mirror of the Services Delete Service modal: same header banner, icon
+         treatment, static backdrop, Delete / Cancel buttons. The selected
+         triager's name is filled from the row's data attributes, and confirming
+         submits the same destroy form as before. --}}
+    <div class="modal fade admin-doctor-modal admin-service-modal admin-service-modal-narrow" id="deleteTriagerModal" tabindex="-1"
+         aria-labelledby="deleteTriagerModalTitle" aria-hidden="true"
+         data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <header class="modal-header admin-doctor-modal-header">
+                    <div class="admin-telemedicine-glow" aria-hidden="true"></div>
+                    <div class="admin-telemedicine-content">
+                        <div class="admin-telemedicine-mark" aria-hidden="true">
+                            <i class="bi bi-trash3-fill"></i>
+                        </div>
+                        <div class="admin-telemedicine-copy">
+                            <h2 class="modal-title" id="deleteTriagerModalTitle">Delete Triager</h2>
+                            <p class="admin-telemedicine-description">This removes the triager account from the system.</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </header>
+                <div class="modal-body">
+                    <form method="POST" id="deleteTriagerForm"
+                          action="{{ route('admin.triagers.destroy', ['admin' => '__ID__']) }}"
+                          data-action-template="{{ route('admin.triagers.destroy', ['admin' => '__ID__']) }}">
+                        @csrf
+                        @method('DELETE')
+                        <p class="admin-service-delete-question">Delete this triager account?</p>
+                        <p class="admin-service-delete-name" data-delete-name></p>
+                        <div class="admin-doctor-form-actions admin-service-form-actions">
+                            <button type="submit" class="admin-danger-button" data-delete-confirm>
+                                <i class="bi bi-trash3" aria-hidden="true"></i>
+                                <span>Delete</span>
+                            </button>
+                            <button type="button" class="admin-secondary-button" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -310,6 +353,36 @@
                 document.getElementById('editTriagerEmail').value = email;
                 document.getElementById('editTriagerContact').value = contact;
                 document.getElementById('editTriagerPassword').value = '';
+            });
+
+            const deleteTriagerModal = document.getElementById('deleteTriagerModal');
+            const deleteTriagerForm = document.getElementById('deleteTriagerForm');
+            const deleteTriagerName = deleteTriagerModal.querySelector('[data-delete-name]');
+
+            document.querySelectorAll('.delete-triager-btn').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const template = deleteTriagerForm.dataset.actionTemplate;
+                    deleteTriagerForm.setAttribute('action', template.replace('__ID__', encodeURIComponent(btn.dataset.triagerDelete)));
+                    deleteTriagerName.textContent = btn.dataset.triagerName || '';
+                    bootstrap.Modal.getOrCreateInstance(deleteTriagerModal).show();
+                });
+            });
+
+            /* Static backdrop: an outside click (or Escape) does not close the
+               modal — it flashes the danger border once, like the Services
+               delete modal. X and Cancel are the only ways out. */
+            const deleteTriagerContent = deleteTriagerModal.querySelector('.modal-content');
+
+            deleteTriagerModal.addEventListener('hidePrevented.bs.modal', () => {
+                deleteTriagerContent.classList.remove('admin-service-modal-blocked');
+                void deleteTriagerContent.offsetWidth;
+                deleteTriagerContent.classList.add('admin-service-modal-blocked');
+            });
+
+            deleteTriagerContent.addEventListener('animationend', (event) => {
+                if (event.animationName === 'adminServiceModalBlocked') {
+                    deleteTriagerContent.classList.remove('admin-service-modal-blocked');
+                }
             });
 
             @if ($createMode)
