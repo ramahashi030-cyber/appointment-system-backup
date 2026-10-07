@@ -5,14 +5,16 @@ ADMIN PANEL TODO :
 		- in the admin panels dashboard staff activity table, display only the current date.
 		
 	PATIENTS PAGE
-		  - move the 'add patient' button with the same row of stat card
  		  - contact number on both edit and add patient should be required
 
 	DOCTORS PAGE
-- In adding doctors, you cannot save the doctor when it doesn't have a schedule. The schedule part is required it needed at least 3-5 days schedule
 
 
+Modal
+- have a standard one design modal. 
 
+patients.blade.php
+-the date of birth must be required so as address and email
 
 
 ----------------------------------------------

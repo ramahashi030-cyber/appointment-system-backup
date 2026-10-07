@@ -301,6 +301,20 @@
                 margin: 8px auto;
             }
         }
+
+        /* Required-field markers for the Add Doctor modal. The form markup lives in
+           the read-only doctors._form partial, so asterisks are appended with CSS
+           pseudo-elements, scoped to this page's add modal (edit modal untouched). */
+        #addDoctorModal .form-field:has(> input[required]) > label::after,
+        #addDoctorModal .form-field:has(> select[required]) > label::after {
+            content: ' *';
+            color: #dc3545;
+        }
+
+        #addDoctorModal .admin-doctor-schedule-fields > .form-field > label::after {
+            content: ' *';
+            color: #dc3545;
+        }
     </style>
 @endpush
 
@@ -420,6 +434,18 @@
                         showToast('error', passwordError);
 
                         return;
+                    }
+
+                    const passwordConfirm = addForm.querySelector('#password_confirmation');
+
+                    if (passwordConfirm && password.value !== '' && passwordConfirm.value !== '') {
+                        if (password.value !== passwordConfirm.value) {
+                            event.preventDefault();
+                            passwordConfirm.focus();
+                            showToast('error', 'Password confirmation must match the password.');
+
+                            return;
+                        }
                     }
 
                     const selectedDays = addForm.querySelectorAll('input[name="availability_days[]"]:checked').length;

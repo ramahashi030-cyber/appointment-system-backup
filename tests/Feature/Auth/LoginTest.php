@@ -75,7 +75,7 @@ test('the login screen renders', function () {
     $this->get('/')
         ->assertOk()
         ->assertSee('Login page')
-        ->assertSee('Signup')
+        ->assertSee('Register')
         ->assertSee('Forgot password?')
         ->assertSee(route('login.attempt'), false);
 });
@@ -83,7 +83,7 @@ test('the login screen renders', function () {
 test('the unified login screen has no separate admin form', function () {
     $this->get('/')
         ->assertOk()
-        ->assertSee('Patient or administrator login')
+        ->assertSee('Sign in to your patient portal')
         ->assertSee(route('login.attempt'), false)
         ->assertDontSee('Admin login');
 

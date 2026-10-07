@@ -189,7 +189,7 @@
 
 @if ($admin !== null)
     {{-- MY PROFILE MODAL (same structure as the Add patient modal on the Patients page) --}}
-    <div class="modal fade admin-doctor-modal" id="adminProfileModal" tabindex="-1" aria-labelledby="adminProfileModalTitle" aria-hidden="true">
+    <div class="modal fade admin-doctor-modal" id="adminProfileModal" tabindex="-1" aria-labelledby="adminProfileModalTitle" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <header class="modal-header admin-doctor-modal-header">
@@ -214,12 +214,12 @@
                         @csrf
                         @method('PUT')
 
-                        <div class="d-flex align-items-center gap-2 mb-3">
+                        <div class="d-flex align-items-center gap-2 mb-2">
                             <i class="bi bi-person-fill text-primary" aria-hidden="true"></i>
                             <h3 class="h6 fw-semibold mb-0">Personal information</h3>
                         </div>
 
-                        <div class="row g-3">
+                        <div class="row g-2">
                             <div class="{{ $nameColumn }}">
                                 <label class="form-label" for="adminProfileFirstname">First name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="adminProfileFirstname" name="firstname" value="{{ $admin->firstname }}" placeholder="First name" required maxlength="100" pattern="{{ $namePattern }}" data-letters-only autocomplete="given-name">
@@ -236,28 +236,37 @@
                                 <input type="text" class="form-control" id="adminProfileLastname" name="lastname" value="{{ $admin->lastname }}" placeholder="Last name" required maxlength="100" pattern="{{ $namePattern }}" data-letters-only autocomplete="family-name">
                                 <div class="form-text">Letters and spaces only</div>
                             </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label" for="adminProfileEmail">Email</label>
+                                <input type="text" class="form-control" id="adminProfileEmail" value="{{ $admin->email }}" readonly autocomplete="off">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="adminProfileContactNo">Contact number</label>
+                                <input type="text" class="form-control" id="adminProfileContactNo" value="{{ $admin->contact_no }}" readonly autocomplete="off">
+                            </div>
                         </div>
 
-                        <div class="d-flex justify-content-end mt-3">
+                        <div class="d-flex justify-content-end mt-2">
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-check-lg" aria-hidden="true"></i> Save changes
                             </button>
                         </div>
                     </form>
 
-                    <hr class="my-4">
+                    <hr class="my-2">
 
                     {{-- Change password --}}
                     <form id="adminPasswordForm" method="POST" action="{{ route('admin.profile.password') }}" novalidate>
                         @csrf
                         @method('PUT')
 
-                        <div class="d-flex align-items-center gap-2 mb-3">
+                        <div class="d-flex align-items-center gap-2 mb-2">
                             <i class="bi bi-shield-lock-fill text-primary" aria-hidden="true"></i>
                             <h3 class="h6 fw-semibold mb-0">Change password</h3>
                         </div>
 
-                        <div class="row g-3">
+                        <div class="row g-2">
                             <div class="col-12">
                                 <label class="form-label" for="adminProfileCurrentPassword">Current password <span class="text-danger">*</span></label>
                                 <input type="password" class="form-control" id="adminProfileCurrentPassword" name="current_password" placeholder="Current password" required maxlength="100" autocomplete="current-password">
@@ -273,7 +282,7 @@
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-end gap-2 mt-3">
+                        <div class="d-flex justify-content-end gap-2 mt-2">
                             <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-check-lg" aria-hidden="true"></i> Change password
@@ -284,6 +293,82 @@
             </div>
         </div>
     </div>
+
+    @once
+        <style>
+            /* My Profile modal: compact fields/buttons, borderless inputs kept
+               delineated by a soft shadow, and a one-shot danger border blink
+               when an outside click is blocked. Scoped to #adminProfileModal so
+               no other admin-doctor-modal is affected. */
+            #adminProfileModal .modal-body .form-control {
+                border-color: transparent;
+                box-shadow: 0 1px 2px rgba(13, 40, 90, .08), 0 3px 10px rgba(13, 40, 90, .06);
+                padding: .45rem .7rem;
+                font-size: 13px;
+            }
+
+            #adminProfileModal .modal-body .form-control:focus {
+                border-color: transparent;
+                box-shadow: 0 0 0 .25rem rgba(13, 110, 253, .25), 0 1px 2px rgba(13, 40, 90, .08), 0 3px 10px rgba(13, 40, 90, .06);
+            }
+
+            #adminProfileModal .modal-body .form-control::placeholder {
+                font-size: 12px;
+            }
+
+            #adminProfileModal .modal-body .btn {
+                padding: .3rem .75rem;
+                font-size: 13px;
+            }
+
+            /* Compact vertical rhythm: tighter modal-body padding and label
+               spacing, plus the slightly larger section icons. */
+            #adminProfileModal .modal-body {
+                padding: 14px 20px 16px;
+            }
+
+            #adminProfileModal .form-label {
+                margin-bottom: .25rem;
+            }
+
+            #adminProfileModal .form-text {
+                margin-top: .2rem;
+            }
+
+            #adminProfileModal .admin-telemedicine-mark > i {
+                font-size: 32px;
+            }
+
+            #adminProfileModal .modal-body .bi-shield-lock-fill {
+                font-size: 20px;
+                line-height: 1;
+            }
+
+            @keyframes adminProfileModalBlocked {
+                0%,
+                100% {
+                    border-color: #1b4d91;
+                    box-shadow: 0 24px 60px rgba(7, 30, 61, .3);
+                }
+
+                45% {
+                    border-color: #d9534f;
+                    box-shadow: 0 0 0 4px rgba(217, 83, 79, .22), 0 24px 60px rgba(7, 30, 61, .3);
+                }
+            }
+
+            #adminProfileModal .modal-content.admin-profile-modal-blocked {
+                border-color: #d9534f;
+                animation: adminProfileModalBlocked .5s ease-in-out 1;
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                #adminProfileModal .modal-content.admin-profile-modal-blocked {
+                    animation-duration: .4s;
+                }
+            }
+        </style>
+    @endonce
 
     {{-- NEW ADMIN MODAL (blank — input fields and functionality come in a later task) --}}
     <div class="modal fade admin-doctor-modal" id="newAdminModal" tabindex="-1" aria-labelledby="newAdminModalTitle" aria-hidden="true">
@@ -381,6 +466,30 @@
         $modal.off('.adminProfile');
 
         $modal.on('hidden.bs.modal.adminProfile', resetModal);
+
+        var $profileContent = $modal.find('.modal-content');
+        $profileContent.off('.adminProfile');
+
+        // Outside clicks cannot close this modal (static backdrop, keyboard
+        // disabled): a blocked hide attempt flashes the content border once
+        // with the danger color, then the animation returns it to normal.
+        $modal.on('hidePrevented.bs.modal.adminProfile', function () {
+            var content = $profileContent[0];
+
+            content.classList.remove('admin-profile-modal-blocked');
+            void content.offsetWidth;
+            content.classList.add('admin-profile-modal-blocked');
+        });
+
+        $profileContent.on('animationend.adminProfile animationcancel.adminProfile', function (event) {
+            if (event.originalEvent && event.originalEvent.animationName === 'adminProfileModalBlocked') {
+                $profileContent.removeClass('admin-profile-modal-blocked');
+            }
+        });
+
+        $modal.on('hidden.bs.modal.adminProfile', function () {
+            $profileContent.removeClass('admin-profile-modal-blocked');
+        });
 
         // First and last name are letters only. Anything else is dropped as it
         // is typed or pasted, and surrounding spaces are trimmed, so the value

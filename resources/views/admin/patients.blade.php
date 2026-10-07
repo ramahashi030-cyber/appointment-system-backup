@@ -744,7 +744,7 @@
                     @endif
                     <div class="row g-3">
                         <div class="col-md-4">
-                            <label class="form-label" for="cpFirst">First name</label>
+                            <label class="form-label" for="cpFirst">First name <span class="text-danger">*</span></label>
                             <input class="form-control" id="cpFirst" name="firstname" value="{{ old('firstname') }}" placeholder="First name" required maxlength="100" pattern="{{ $namePattern }}" data-letters-only>
                         </div>
                         <div class="col-md-4">
@@ -752,53 +752,53 @@
                             <input class="form-control" id="cpMiddle" name="middlename" value="{{ old('middlename') }}" placeholder="Middle name" maxlength="100" pattern="{{ $namePattern }}" data-letters-only>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label" for="cpLast">Last name</label>
+                            <label class="form-label" for="cpLast">Last name <span class="text-danger">*</span></label>
                             <input class="form-control" id="cpLast" name="lastname" value="{{ old('lastname') }}" placeholder="Last name" required maxlength="100" pattern="{{ $namePattern }}" data-letters-only>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label" for="cpUsername">Username</label>
+                            <label class="form-label" for="cpUsername">Username <span class="text-danger">*</span></label>
                             <input class="form-control" id="cpUsername" name="username" value="{{ old('username') }}" placeholder="Username" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label" for="cpEmail">Email</label>
-                            <input class="form-control" type="email" id="cpEmail" name="email" value="{{ old('email') }}" placeholder="Email">
+                            <label class="form-label" for="cpEmail">Email <span class="text-danger">*</span></label>
+                            <input class="form-control" type="email" id="cpEmail" name="email" value="{{ old('email') }}" placeholder="Email" required>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label" for="cpDob">Date of birth</label>
-                            <input class="form-control" type="date" id="cpDob" name="dob" value="{{ old('dob') }}">
+                            <label class="form-label" for="cpDob">Date of Birth <span class="text-danger">*</span></label>
+                            <input class="form-control" type="date" id="cpDob" name="dob" value="{{ old('dob') }}" required>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label" for="cpGender">Gender</label>
+                            <label class="form-label" for="cpGender">Gender <span class="text-danger">*</span></label>
                             <select class="form-select" id="cpGender" name="gender" required>
                                 <option value="Male" @selected(old('gender') === 'Male')>Male</option>
                                 <option value="Female" @selected(old('gender') === 'Female')>Female</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label" for="cpContact">Contact number</label>
+                            <label class="form-label" for="cpContact">Contact number <span class="text-danger">*</span></label>
                             <input class="form-control" id="cpContact" name="contactno" value="{{ old('contactno') }}" placeholder="Contact number" required maxlength="11" pattern="[0-9]*" inputmode="numeric" data-digits-only>
                         </div>
                         <div class="col-12">
-                            <label class="form-label" for="cpAddress">Address</label>
-                            <input class="form-control" id="cpAddress" name="address" value="{{ old('address') }}" placeholder="Address" maxlength="500" pattern="[A-Za-z0-9 ]*" data-address-only>
+                            <label class="form-label" for="cpAddress">Address <span class="text-danger">*</span></label>
+                            <input class="form-control" id="cpAddress" name="address" value="{{ old('address') }}" placeholder="Address" maxlength="500" pattern="[A-Za-z0-9 ]*" data-address-only required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="cpHospital">Hospital no.</label>
                             <input class="form-control" id="cpHospital" name="hospital_number" value="{{ old('hospital_number') }}" placeholder="Hospital no." maxlength="10" pattern="[0-9]*" inputmode="numeric" data-digits-only>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label" for="cpStatus">Status</label>
+                            <label class="form-label" for="cpStatus">Status <span class="text-danger">*</span></label>
                             <select class="form-select" id="cpStatus" name="status" required>
                                 <option value="Active" @selected(old('status', 'Active') === 'Active')>Active</option>
                                 <option value="Pending" @selected(old('status') === 'Pending')>Pending</option>
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label" for="cpPassword">Password</label>
+                            <label class="form-label" for="cpPassword">Password <span class="text-danger">*</span></label>
                             <input class="form-control" type="password" id="cpPassword" name="password" placeholder="Password" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label" for="cpPasswordConfirm">Confirm password</label>
+                            <label class="form-label" for="cpPasswordConfirm">Confirm password <span class="text-danger">*</span></label>
                             <input class="form-control" type="password" id="cpPasswordConfirm" name="password_confirmation" placeholder="Confirm password" required>
                         </div>
                     </div>
@@ -1055,6 +1055,58 @@
                     showPatientFieldError(this, message);
                     firstInvalid = firstInvalid || this;
                 });
+
+                const $submittedForm = $(this);
+
+                // The create form uses `novalidate`, so the extra required fields that
+                // are not covered by patientFieldRules must be checked here as well.
+                if ($submittedForm.closest('#createPatientModal').length > 0) {
+                    const createOnlyRequiredFields = [
+                        { name: 'username', label: 'Username' },
+                        { name: 'gender', label: 'Gender' },
+                        { name: 'status', label: 'Status' },
+                        { name: 'password', label: 'Password' },
+                        { name: 'password_confirmation', label: 'Confirm password' },
+                        { name: 'dob', label: 'Date of Birth' },
+                        { name: 'address', label: 'Address' },
+                        { name: 'email', label: 'Email' },
+                    ];
+
+                    createOnlyRequiredFields.forEach(({ name, label }) => {
+                        const $input = $submittedForm.find('[name="' + name + '"]');
+                        const value = $input.val();
+                        const isEmpty = value === null || value === undefined || String(value).trim() === '';
+
+                        if (isEmpty) {
+                            showPatientFieldError($input[0], label + ' is required.');
+                            firstInvalid = firstInvalid || $input[0];
+
+                            return;
+                        }
+
+                        clearPatientFieldError($input[0]);
+                    });
+
+                    const $password = $submittedForm.find('[name="password"]');
+                    const $passwordConfirmation = $submittedForm.find('[name="password_confirmation"]');
+
+                    if (
+                        String($password.val()) !== ''
+                        && String($passwordConfirmation.val()) !== ''
+                        && $password.val() !== $passwordConfirmation.val()
+                    ) {
+                        showPatientFieldError($passwordConfirmation[0], 'Password confirmation must match the password.');
+                        firstInvalid = firstInvalid || $passwordConfirmation[0];
+                    }
+
+                    const $email = $submittedForm.find('[name="email"]');
+                    const emailValue = String($email.val() || '');
+
+                    if (emailValue !== '' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
+                        showPatientFieldError($email[0], 'Enter a valid email address.');
+                        firstInvalid = firstInvalid || $email[0];
+                    }
+                }
 
                 if (!firstInvalid) {
                     return;
