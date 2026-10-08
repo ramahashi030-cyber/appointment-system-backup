@@ -5,6 +5,8 @@ use App\Http\Controllers\Admin\AppointmentController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\DoctorController;
 use App\Http\Controllers\Admin\HolidayController;
+use App\Http\Controllers\Admin\KioskController;
+use App\Http\Controllers\Admin\KioskHistoryController;
 use App\Http\Controllers\Admin\PatientController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\RecordController;
@@ -60,7 +62,16 @@ Route::prefix('admin')->name('admin.')->group(function (): void {
         Route::put('/triagers/{admin}', [TriagerAccountController::class, 'update'])->name('triagers.update');
         Route::delete('/triagers/{admin}', [TriagerAccountController::class, 'destroy'])->name('triagers.destroy');
 
-        Route::view('/kiosk', 'admin.pankiosk')->name('kiosk');
+        /*
+         | Kiosk. The page is a standalone full-screen patient experience (no
+         | admin layout), and its JSON endpoints stay behind the admin guard so
+         | only the kiosk terminal itself can verify and confirm scans. The QR
+         | verification token is accepted here but never leaves the server.
+         */
+        Route::get('/kiosk', [KioskController::class, 'show'])->name('kiosk');
+        Route::post('/kiosk/verify', [KioskController::class, 'verify'])->name('kiosk.verify');
+        Route::post('/kiosk/confirm', [KioskController::class, 'confirm'])->name('kiosk.confirm');
+        Route::get('/kiosk-history', [KioskHistoryController::class, 'index'])->name('kiosk-history');
 
         /*
          | Services. Each listing manages one pair of tables, so every action

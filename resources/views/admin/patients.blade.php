@@ -299,27 +299,32 @@
            matches these selectors.
            ============================================================= */
 
-        #confirmDeactivatePatient .modal-dialog {
+        #confirmDeactivatePatient .modal-dialog,
+        #confirmActivatePatient .modal-dialog {
             max-width: 420px;
         }
 
-        #confirmDeactivatePatient .modal-content {
+        #confirmDeactivatePatient .modal-content,
+        #confirmActivatePatient .modal-content {
             overflow: hidden;
             border: 1px solid #f2c9c6;
             border-top: 3px solid #c93f36;
             border-radius: 12px;
             background: #fff;
             box-shadow: 0 24px 60px rgba(7, 30, 61, .3);
+            color: #0a326c;
         }
 
-        #confirmDeactivatePatient .admin-patient-confirm-body {
+        #confirmDeactivatePatient .admin-patient-confirm-body,
+        #confirmActivatePatient .admin-patient-confirm-body {
             position: relative;
             display: flex;
             gap: 14px;
             padding: 22px 22px 14px;
         }
 
-        #confirmDeactivatePatient .admin-patient-confirm-icon {
+        #confirmDeactivatePatient .admin-patient-confirm-icon,
+        #confirmActivatePatient .admin-patient-confirm-icon {
             display: inline-flex;
             width: 44px;
             height: 44px;
@@ -333,46 +338,53 @@
             font-size: 20px;
         }
 
-        #confirmDeactivatePatient .admin-patient-confirm-copy {
+        #confirmDeactivatePatient .admin-patient-confirm-copy,
+        #confirmActivatePatient .admin-patient-confirm-copy {
             min-width: 0;
             padding-right: 20px; /* keeps text clear of the close button */
         }
 
-        #confirmDeactivatePatient .admin-patient-confirm-body .modal-title {
+        #confirmDeactivatePatient .admin-patient-confirm-body .modal-title,
+        #confirmActivatePatient .admin-patient-confirm-body .modal-title {
             margin: 0;
             color: #0a326c;
             font-size: 17px;
             font-weight: 700;
         }
 
-        #confirmDeactivatePatient .admin-patient-confirm-text {
+        #confirmDeactivatePatient .admin-patient-confirm-text,
+        #confirmActivatePatient .admin-patient-confirm-text {
             margin: 6px 0 0;
             color: #315786;
             font-size: 13px;
             line-height: 1.5;
         }
 
-        #confirmDeactivatePatient .admin-patient-confirm-text strong {
+        #confirmDeactivatePatient .admin-patient-confirm-text strong,
+        #confirmActivatePatient .admin-patient-confirm-text strong {
             color: #0a326c;
             font-weight: 700;
             overflow-wrap: anywhere; /* long patient names wrap cleanly */
         }
 
-        #confirmDeactivatePatient .admin-patient-confirm-note {
+        #confirmDeactivatePatient .admin-patient-confirm-note,
+        #confirmActivatePatient .admin-patient-confirm-note {
             margin: 6px 0 0;
             color: #8ca2bd;
             font-size: 12px;
             line-height: 1.45;
         }
 
-        #confirmDeactivatePatient .btn-close {
+        #confirmDeactivatePatient .btn-close,
+        #confirmActivatePatient .btn-close {
             position: absolute;
             top: 12px;
             right: 12px;
             padding: .4rem;
         }
 
-        #confirmDeactivatePatient .admin-patient-confirm-actions {
+        #confirmDeactivatePatient .admin-patient-confirm-actions,
+        #confirmActivatePatient .admin-patient-confirm-actions {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
@@ -402,25 +414,30 @@
             animation: admin-patient-confirm-danger-nudge .75s ease-out 1 forwards;
         }
 
-        /* Bootstrap's own static-backdrop scale pop is replaced by the red
-           outline above, so the card itself never moves. */
+        #confirmActivatePatient .modal-content.is-danger-nudge {
+            animation: admin-patient-confirm-danger-nudge .75s ease-out 1 forwards;
+        }
         #confirmDeactivatePatient.modal-static .modal-dialog {
             transform: none;
         }
 
-        /* Phones: 16px gutters like the other admin modals, and the card
-           fills the viewport minus those gutters. */
+        #confirmActivatePatient.modal-static .modal-dialog {
+            transform: none;
+        }
         @media (max-width: 575.98px) {
-            #confirmDeactivatePatient .modal-dialog {
+            #confirmDeactivatePatient .modal-dialog,
+            #confirmActivatePatient .modal-dialog {
                 width: calc(100% - 16px);
                 margin: 8px auto;
             }
 
-            #confirmDeactivatePatient .admin-patient-confirm-body {
+            #confirmDeactivatePatient .admin-patient-confirm-body,
+            #confirmActivatePatient .admin-patient-confirm-body {
                 padding: 18px 16px 12px;
             }
 
-            #confirmDeactivatePatient .admin-patient-confirm-actions {
+            #confirmDeactivatePatient .admin-patient-confirm-actions,
+            #confirmActivatePatient .admin-patient-confirm-actions {
                 padding: 0 16px 18px;
             }
         }
@@ -564,33 +581,35 @@
                                         <span class="admin-avatar">{{ $initials }}</span>
                                         <span>
                                             <strong>{{ $patientName ?: 'Unnamed patient' }}</strong>
-                                            <small>{{ $patient->username ? '@'.$patient->username : 'No username' }} · {{ $patient->gender ?: 'Unspecified' }}</small>
+                                            <small>
+                                                <span class="patient-username">{{ $patient->username ? '@'.$patient->username : 'No username' }}</span><span class="patient-gender-sep"> · </span><span class="patient-gender">{{ $patient->gender ?: 'Unspecified' }}</span>
+                                            </small>
                                         </span>
                                     </div>
                                 </td>
                                 <td data-label="Contact">
-                                    <span class="admin-doctor-primary-text">{{ $patient->contact_number ?: '—' }}</span>
-                                    <small class="admin-doctor-secondary-text">{{ $patient->email ?: 'No email' }}</small>
+                                    <span class="admin-doctor-primary-text patient-contact">{{ $patient->contact_number ?: '—' }}</span>
+                                    <small class="admin-doctor-secondary-text patient-email">{{ $patient->email ?: 'No email' }}</small>
                                 </td>
                                 <td data-label="Hospital no.">
                                     @if ($patient->hospital_number)
-                                        <span class="admin-patient-code">{{ $patient->hospital_number }}</span>
+                                        <span class="admin-patient-code patient-hospital">{{ $patient->hospital_number }}</span>
                                     @else
-                                        <span class="admin-patient-empty-value">—</span>
+                                        <span class="admin-patient-empty-value patient-hospital">—</span>
                                     @endif
                                 </td>
                                 <td data-label="Registered">
                                     @if ($registeredAt)
-                                        <time datetime="{{ $registeredAt->toDateString() }}">{{ $registeredAt->format('M j, Y') }}</time>
+                                        <time class="patient-registered" datetime="{{ $registeredAt->toDateString() }}">{{ $registeredAt->format('M j, Y') }}</time>
                                     @else
-                                        <span class="admin-patient-empty-value">—</span>
+                                        <span class="admin-patient-empty-value patient-hospital">—</span>
                                     @endif
                                 </td>
                                 <td data-label="Status">
                                     <span class="admin-status-pill {{ strtolower((string) $patient->status) }}">{{ $patient->status ?: 'Unknown' }}</span>
                                 </td>
                                 <td class="admin-patient-actions-cell">
-                                    <div class="admin-doctor-actions">
+                                    <div class="admin-doctor-actions patient-actions-compact">
                                         <a href="{{ route('admin.patients', ['view' => $patient->id]) }}" data-patient-modal="view" aria-label="View {{ $patientName ?: 'patient' }}">
                                             <i class="bi bi-eye" aria-hidden="true"></i><span>View</span>
                                         </a>
@@ -1094,6 +1113,38 @@
                     <button type="button" class="admin-danger-button" data-confirm-deactivate>
                         <i class="bi bi-person-x" aria-hidden="true"></i>
                         <span>Deactivate</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Patient Activation confirmation flashcard.
+         Mirrors the Patient Deactivation flashcard: the question (patient name included)
+         is filled from the button's existing data-name, the X and Cancel are the only
+         ways it closes, and the flashcard's Activate button runs the same PATCH the
+         existing activation operation would have sent. --}}
+    <div class="modal fade" id="confirmActivatePatient" tabindex="-1"
+         data-bs-backdrop="static" data-bs-keyboard="false"
+         aria-labelledby="confirmActivatePatientTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="admin-patient-confirm-body">
+                    <span class="admin-patient-confirm-icon" aria-hidden="true">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                    </span>
+                    <div class="admin-patient-confirm-copy">
+                        <h2 class="modal-title" id="confirmActivatePatientTitle">Activate Patient?</h2>
+                        <p class="admin-patient-confirm-text">Are you sure you want to activate <strong data-confirm-patient-name-activate></strong>?</p>
+                        <p class="admin-patient-confirm-note">Their status will be updated; they can be deactivated at any time.</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="admin-patient-confirm-actions">
+                    <button type="button" class="admin-secondary-button" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="admin-primary-button" data-confirm-activate>
+                        <i class="bi bi-person-check" aria-hidden="true"></i>
+                        <span>Activate</span>
                     </button>
                 </div>
             </div>
@@ -1748,7 +1799,9 @@
             const confirmDeactivateModal = bootstrap.Modal.getOrCreateInstance(
                 document.getElementById('confirmDeactivatePatient'),
             );
-            let pendingDeactivation = null;
+            const confirmActivateModal = bootstrap.Modal.getOrCreateInstance(
+                document.getElementById('confirmActivatePatient'),
+            );
 
             const runPatientToggle = ({ $button, $label, isActive, verb }) => {
                 $button.prop('disabled', true);
@@ -1804,11 +1857,9 @@
                     return;
                 }
 
-                if (!window.confirm(verb + ' ' + $button.attr('data-name') + '?')) {
-                    return;
-                }
-
-                runPatientToggle({ $button, $label, isActive, verb });
+                pendingDeactivation = { $button, $label, isActive, verb };
+                $('[data-confirm-patient-name-activate]').text($button.attr('data-name'));
+                confirmActivateModal.show();
             });
 
             $('[data-confirm-deactivate]').on('click', () => {
@@ -1823,7 +1874,23 @@
                 runPatientToggle(pending);
             });
 
+            $('[data-confirm-activate]').on('click', () => {
+                const pending = pendingDeactivation;
+                pendingDeactivation = null;
+
+                if (!pending) {
+                    return;
+                }
+
+                confirmActivateModal.hide();
+                runPatientToggle(pending);
+            });
+
             document.getElementById('confirmDeactivatePatient').addEventListener('hidden.bs.modal', () => {
+                pendingDeactivation = null;
+            });
+
+            document.getElementById('confirmActivatePatient').addEventListener('hidden.bs.modal', () => {
                 pendingDeactivation = null;
             });
 
@@ -1837,6 +1904,23 @@
 
             document.getElementById('confirmDeactivatePatient').addEventListener('hidePrevented.bs.modal', () => {
                 const content = document.querySelector('#confirmDeactivatePatient .modal-content');
+
+                if (!content) {
+                    return;
+                }
+
+                content.classList.remove('is-danger-nudge');
+                void content.offsetWidth; /* restart the animation on rapid repeat clicks */
+                content.classList.add('is-danger-nudge');
+                window.clearTimeout(dangerNudgeTimer);
+                dangerNudgeTimer = window.setTimeout(() => {
+                    content.classList.remove('is-danger-nudge');
+                    dangerNudgeTimer = null;
+                }, 750);
+            });
+
+            document.getElementById('confirmActivatePatient').addEventListener('hidePrevented.bs.modal', () => {
+                const content = document.querySelector('#confirmActivatePatient .modal-content');
 
                 if (!content) {
                     return;
@@ -1915,6 +1999,16 @@
                 event.preventDefault();
                 event.stopPropagation(); // keeps the layout's page navigation out of this click
                 openPatientModal(this.href, $(this).attr('data-patient-modal'));
+            });
+
+            // Mobile patient row expand/collapse (patients page only)
+            $(document).on('click', '.admin-patients-page .patient-row', function (e) {
+                const $target = $(e.target);
+                if ($target.closest('a[data-patient-modal], button[data-patient-toggle]').length) {
+                    return;
+                }
+                $('.admin-patients-page .patient-row.expanded').not(this).removeClass('expanded');
+                $(this).toggleClass('expanded');
             });
         });
     </script>

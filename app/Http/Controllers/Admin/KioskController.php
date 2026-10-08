@@ -39,9 +39,7 @@ class KioskController extends Controller
      */
     private const STALE_PROCESSING_MINUTES = 3;
 
-    public function __construct(private HomisGateway $homis)
-    {
-    }
+    public function __construct(private HomisGateway $homis) {}
 
     /**
      * Full-screen kiosk landing page (standalone, no admin layout).
@@ -149,13 +147,16 @@ class KioskController extends Controller
                 return $message;
             }
 
+            // Reservations this kiosk session already holds are tracked in the
+            // session itself, so a rotation of the session id can never make a
+            // kiosk look like a competing terminal.
+            $reservedIds = $this->reservedCheckinIds();
+
             $foreignProcessing = AppointmentCheckin::query()
                 ->where('appointment_id', $locked->id)
                 ->where('result', 'processing')
                 ->where('scanned_at', '>=', Carbon::now()->subMinutes(self::STALE_PROCESSING_MINUTES))
-                ->where(function ($query) use ($sessionHash): void {
-                    $query->whereNull('session_hash')->orWhere('session_hash', '!=', $sessionHash);
-                })
+                ->whereNotIn('id', $reservedIds === [] ? [-1] : $reservedIds)
                 ->exists();
 
             if ($foreignProcessing) {
@@ -166,10 +167,10 @@ class KioskController extends Controller
             }
 
             // Scans this kiosk abandoned earlier (new QR, refresh, crashed
-            // confirm) never reached HOMIS under their own reservation, so
-            // they are resolved before the new one is taken.
+            // confirm) never completed, so they are resolved before the new
+            // reservation is taken.
             AppointmentCheckin::query()
-                ->where('session_hash', $sessionHash)
+                ->whereIn('id', $reservedIds)
                 ->where('result', 'processing')
                 ->update(['result' => 'failed', 'reason' => 'superseded']);
 
@@ -186,6 +187,9 @@ class KioskController extends Controller
                 'session_hash' => $sessionHash,
                 'scanned_at' => Carbon::now(),
             ]);
+
+            $reservedIds[] = $checkin->id;
+            session(['kiosk_reserved' => array_slice($reservedIds, -10)]);
 
             return [
                 'checkin_id' => $checkin->id,
@@ -246,13 +250,13 @@ class KioskController extends Controller
         $ticket = session('kiosk_scan');
 
         if ($scanId === '' || ! is_array($ticket) || ($ticket['scan_id'] ?? '') !== $scanId) {
-            session()->forget('kiosk_scan');
+            $this->abandonTicket($ticket);
 
             return $this->answer(false, 'Please scan your QR code again.');
         }
 
         if (Carbon::now()->getTimestamp() > (int) ($ticket['expires_at'] ?? 0)) {
-            session()->forget('kiosk_scan');
+            $this->abandonTicket($ticket, 'expired');
 
             return $this->answer(false, 'Your scan has expired. Please scan your QR code again.');
         }
@@ -261,7 +265,7 @@ class KioskController extends Controller
         $checkin = AppointmentCheckin::find((int) ($ticket['checkin_id'] ?? 0));
 
         if ($appointment === null || $checkin === null || $checkin->result !== 'processing') {
-            session()->forget('kiosk_scan');
+            $this->abandonTicket($ticket);
 
             return $this->answer(false, 'Please scan your QR code again.');
         }
@@ -443,6 +447,22 @@ class KioskController extends Controller
     }
 
     /**
+     * Drop a scan ticket that cannot be honoured and release its reservation
+     * so the terminal (or any other) can scan again immediately.
+     */
+    private function abandonTicket($ticket, string $reason = 'abandoned'): void
+    {
+        if (is_array($ticket)) {
+            AppointmentCheckin::query()
+                ->whereKey((int) ($ticket['checkin_id'] ?? 0))
+                ->where('result', 'processing')
+                ->update(['result' => 'failed', 'reason' => $reason]);
+        }
+
+        session()->forget('kiosk_scan');
+    }
+
+    /**
      * Patient-friendly wording for a confirmation-time refusal.
      */
     private function confirmStateMessage(string $state, Appointment $appointment): string
@@ -561,12 +581,29 @@ class KioskController extends Controller
     }
 
     /**
-     * Digest of this session's id: lets the reservation rows prove they belong
-     * to this kiosk session without storing the session id itself.
+     * Digest of this session's id, recorded on each scan as audit metadata.
      */
     private function sessionHash(): string
     {
         return hash('sha256', (string) session()->getId());
+    }
+
+    /**
+     * Check-in rows this kiosk session is allowed to treat as its own
+     * reservations (stored in the session, so it survives session id rotation
+     * and is invisible to other terminals).
+     *
+     * @return list<int>
+     */
+    private function reservedCheckinIds(): array
+    {
+        $ids = session('kiosk_reserved');
+
+        if (! is_array($ids)) {
+            return [];
+        }
+
+        return array_values(array_map('intval', $ids));
     }
 
     private function timezone(): string

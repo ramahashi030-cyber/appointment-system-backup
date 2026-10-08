@@ -169,7 +169,14 @@
                                         <form method="POST" action="{{ route('admin.doctors.status', $doctor) }}">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit">{{ $doctor->is_active ? 'Deactivate' : 'Activate' }}</button>
+                                            <button type="button"
+                                                    data-doctor-toggle
+                                                    data-active="{{ $doctor->is_active ? '1' : '0' }}"
+                                                    data-name="{{ $doctor->full_name ?: 'this provider' }}"
+                                                    aria-label="{{ $doctor->is_active ? 'Deactivate' : 'Activate' }} {{ $doctor->full_name ?: 'provider' }}">
+                                                <i class="bi {{ $doctor->is_active ? 'bi-toggle-on' : 'bi-toggle-off' }}" aria-hidden="true"></i>
+                                                <span data-doctor-toggle-label>{{ $doctor->is_active ? 'Deactivate' : 'Activate' }}</span>
+                                            </button>
                                         </form>
                                     </div>
                                 </td>
@@ -290,6 +297,75 @@
             </div>
         </div>
     @endif
+
+    {{-- Doctor Deactivation confirmation flashcard.
+         Mirrors the Patient Deactivation flashcard on the Patients page
+         (#confirmDeactivatePatient): the question (doctor's name) is filled
+         from the toggle button's existing data-name, the X and Cancel are the
+         only ways it closes, and this flashcard's Deactivate button submits
+         the same PATCH status form the old submit button sent. --}}
+    {{-- data-bs-backdrop="static" + data-bs-keyboard="false": outside clicks and
+         Escape report a "hidePrevented" event (answered below with a brief red
+         danger outline) instead of closing. Only X and Cancel dismiss this
+         flashcard; Deactivate submits. --}}
+    <div class="modal fade" id="confirmDeactivateDoctor" tabindex="-1"
+         data-bs-backdrop="static" data-bs-keyboard="false"
+         aria-labelledby="confirmDeactivateDoctorTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="admin-doctor-confirm-body">
+                    <span class="admin-doctor-confirm-icon" aria-hidden="true">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                    </span>
+                    <div class="admin-doctor-confirm-copy">
+                        <h2 class="modal-title" id="confirmDeactivateDoctorTitle">Deactivate Provider?</h2>
+                        <p class="admin-doctor-confirm-text">Are you sure you want to deactivate <strong data-confirm-doctor-name></strong>?</p>
+                        <p class="admin-doctor-confirm-note">Their access to the system will be disabled; they can be reactivated at any time.</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="admin-doctor-confirm-actions">
+                    <button type="button" class="admin-secondary-button" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="admin-danger-button" data-confirm-doctor-deactivate>
+                        <i class="bi bi-person-x" aria-hidden="true"></i>
+                        <span>Deactivate</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Doctor Activation confirmation flashcard.
+         Mirrors the Doctor Deactivation flashcard: the question (doctor's name) is filled
+         from the toggle button's existing data-name, the X and Cancel are the only
+         ways it closes, and this flashcard's Activate button submits the same PATCH
+         status form the old submit button sent. --}}
+    <div class="modal fade" id="confirmActivateDoctor" tabindex="-1"
+         data-bs-backdrop="static" data-bs-keyboard="false"
+         aria-labelledby="confirmActivateDoctorTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="admin-doctor-confirm-body">
+                    <span class="admin-doctor-confirm-icon" aria-hidden="true">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                    </span>
+                    <div class="admin-doctor-confirm-copy">
+                        <h2 class="modal-title" id="confirmActivateDoctorTitle">Activate Provider?</h2>
+                        <p class="admin-doctor-confirm-text">Are you sure you want to activate <strong data-confirm-doctor-name-activate></strong>?</p>
+                        <p class="admin-doctor-confirm-note">Their access to the system will be enabled; they can be deactivated at any time.</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="admin-doctor-confirm-actions">
+                    <button type="button" class="admin-secondary-button" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="admin-primary-button" data-confirm-doctor-activate>
+                        <i class="bi bi-person-check" aria-hidden="true"></i>
+                        <span>Activate</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('styles')
@@ -385,16 +461,22 @@
            modals and the shared doctors._form partial stay as they are.
            ============================================================= */
 
-        /* Sections get the standard light treatment: quiet head with a
-           hairline divider instead of the dark strip, no heavy shadow. */
+        /* Sections get the standard light treatment: the reference body is a
+           flat surface (no cards or strips), so the panels drop their dark
+           surface/border and each section heading becomes a quiet label row
+           finished with a hairline divider. */
         #addDoctorModal .admin-panel {
-            border-color: #e2ecf8;
+            border: none;
+            border-radius: 0;
+            background: transparent;
             box-shadow: none;
         }
 
         #addDoctorModal .admin-panel-header {
+            min-height: 0;
+            padding: 0 16px 8px;
             border-bottom: 1px solid #eaf1f9;
-            background: linear-gradient(120deg, #f5faff, #fff 70%);
+            background: transparent;
             color: #0a326c;
         }
 
@@ -415,6 +497,21 @@
             gap: 12px;
         }
 
+        /* Action button: the Add form's submit also carries the shared
+           .admin-doctor-add-button look (44px tall, 11px radius, 20px padding,
+           1px border). Inside this modal it is restored to the reference
+           footer's primary button (40px tall, 9px radius, 18px padding, no
+           border) so the footer reads exactly like the Add Patient modal.
+           Behaviour is untouched. */
+        #addDoctorModal .admin-doctor-form-actions .admin-primary-button {
+            height: 40px;
+            min-height: 40px;
+            gap: 7px;
+            padding: 0 18px;
+            border: 0;
+            border-radius: 9px;
+        }
+
         /* Password guidance reads as helper text, and the switch label
            follows control sizing — both on the standard type scale. */
         #addDoctorModal .form-text {
@@ -426,11 +523,33 @@
             font-size: 13px;
         }
 
-        /* Phones: section padding matches the reference's 14px body padding. */
+        /* Phones: matches the reference modal's mobile behaviour — section and
+           heading padding line up with the shared 14px body padding, the shift
+           fields stack full width, and the body/dialog get the same
+           viewport-height scroll caps as the Add Patient modal (patients.css)
+           so nothing is clipped or cut off. */
         @media (max-width: 767.98px) {
+            #addDoctorModal .admin-panel-header {
+                padding: 0 14px 8px;
+            }
+
             #addDoctorModal .admin-doctor-form-grid,
             #addDoctorModal .admin-doctor-schedule-fields {
                 padding: 14px;
+            }
+
+            #addDoctorModal .admin-doctor-time-grid {
+                grid-template-columns: 1fr;
+            }
+
+            #addDoctorModal .modal-dialog {
+                max-height: calc(100vh - 2rem);
+            }
+
+            #addDoctorModal .modal-body {
+                max-height: calc(100vh - 14rem);
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
             }
         }
 
@@ -446,6 +565,208 @@
         #addDoctorModal .admin-doctor-schedule-fields > .form-field > label::after {
             content: ' *';
             color: #dc3545;
+        }
+
+        /* =============================================================
+           Doctor Deactivation — row button + confirmation flashcard.
+
+           Mirrors the Patient Deactivation UI (Patients page toggle button
+           and #confirmDeactivatePatient flashcard). Scoped to this page's
+           own classes / modal id, so no other Doctor/Staff control moves.
+           ============================================================= */
+
+        /* Row toggle: the patient's bare Deactivate/Activate link — no box,
+           body font, toggle icon at 16px, danger red while active and the
+           activation green while inactive. */
+        .admin-doctor-content .admin-doctor-actions button[data-doctor-toggle] {
+            background: none;
+            border: 0;
+            padding: 0;
+            font: inherit;
+            color: #b42318;
+            cursor: pointer;
+        }
+
+        .admin-doctor-content .admin-doctor-actions button[data-doctor-toggle] i {
+            font-size: 16px;
+        }
+
+        .admin-doctor-content .admin-doctor-actions button[data-doctor-toggle][data-active="0"] {
+            color: #067647;
+        }
+
+        .admin-doctor-content .admin-doctor-actions button[data-doctor-toggle]:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+        /* Flashcard: compact 420px card in this page's modal language (12px
+           radius, admin elevation), with a danger treatment for the
+           destructive action — identical to the Patient flashcard. */
+        #confirmDeactivateDoctor .modal-dialog,
+        #confirmActivateDoctor .modal-dialog {
+            max-width: 420px;
+        }
+
+        #confirmDeactivateDoctor .modal-content,
+        #confirmActivateDoctor .modal-content {
+            overflow: hidden;
+            border: 1px solid #f2c9c6;
+            border-top: 3px solid #c93f36;
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 24px 60px rgba(7, 30, 61, .3);
+            color: #0a326c;
+        }
+
+        #confirmDeactivateDoctor .admin-doctor-confirm-body,
+        #confirmActivateDoctor .admin-doctor-confirm-body {
+            position: relative;
+            display: flex;
+            gap: 14px;
+            padding: 22px 22px 14px;
+        }
+
+        #confirmDeactivateDoctor .admin-doctor-confirm-icon,
+        #confirmActivateDoctor .admin-doctor-confirm-icon {
+            display: inline-flex;
+            width: 44px;
+            height: 44px;
+            flex: 0 0 44px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #e05a52, #c93f36);
+            box-shadow: 0 8px 16px rgba(201, 63, 54, .22);
+            color: #fff;
+            font-size: 20px;
+        }
+
+        #confirmDeactivateDoctor .admin-doctor-confirm-copy,
+        #confirmActivateDoctor .admin-doctor-confirm-copy {
+            min-width: 0;
+            padding-right: 20px; /* keeps text clear of the close button */
+        }
+
+        #confirmDeactivateDoctor .admin-doctor-confirm-body .modal-title,
+        #confirmActivateDoctor .admin-doctor-confirm-body .modal-title {
+            margin: 0;
+            color: #0a326c;
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        #confirmDeactivateDoctor .admin-doctor-confirm-text,
+        #confirmActivateDoctor .admin-doctor-confirm-text {
+            margin: 6px 0 0;
+            color: #315786;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        #confirmDeactivateDoctor .admin-doctor-confirm-text strong,
+        #confirmActivateDoctor .admin-doctor-confirm-text strong {
+            color: #0a326c;
+            font-weight: 700;
+            overflow-wrap: anywhere; /* long doctor names wrap cleanly */
+        }
+
+        #confirmDeactivateDoctor .admin-doctor-confirm-note,
+        #confirmActivateDoctor .admin-doctor-confirm-note {
+            margin: 6px 0 0;
+            color: #8ca2bd;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        #confirmDeactivateDoctor .btn-close,
+        #confirmActivateDoctor .btn-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: .4rem;
+        }
+
+        #confirmDeactivateDoctor .admin-doctor-confirm-actions,
+        #confirmActivateDoctor .admin-doctor-confirm-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            padding: 0 22px 22px;
+        }
+
+        /* Outside-click / Escape acknowledgement. The flashcard refuses to be
+           dismissed from outside, so each invalid attempt answers with one red
+           danger ring that fades out (~3/4s) — visible once, never blinking
+           continuously. Scoped to this flashcard only. */
+        @keyframes admin-doctor-confirm-danger-nudge {
+            0% {
+                box-shadow: 0 24px 60px rgba(7, 30, 61, .3), 0 0 0 4px rgba(224, 90, 82, .95);
+            }
+
+            60% {
+                box-shadow: 0 24px 60px rgba(7, 30, 61, .3), 0 0 0 4px rgba(224, 90, 82, .95);
+            }
+
+            100% {
+                box-shadow: 0 24px 60px rgba(7, 30, 61, .3), 0 0 0 4px rgba(224, 90, 82, 0);
+            }
+        }
+
+        #confirmDeactivateDoctor .modal-content.is-danger-nudge {
+            animation: admin-doctor-confirm-danger-nudge .75s ease-out 1 forwards;
+        }
+
+        #confirmActivateDoctor .modal-content.is-danger-nudge {
+            animation: admin-doctor-confirm-danger-nudge .75s ease-out 1 forwards;
+        }
+
+        /* Bootstrap's own static-backdrop scale pop is replaced by the red
+           outline above, so the card itself never moves. */
+        #confirmDeactivateDoctor.modal-static .modal-dialog {
+            transform: none;
+        }
+
+        #confirmActivateDoctor.modal-static .modal-dialog {
+            transform: none;
+        }
+        @media (max-width: 575.98px) {
+            #confirmDeactivateDoctor .modal-dialog,
+            #confirmActivateDoctor .modal-dialog {
+                width: calc(100% - 16px);
+                margin: 8px auto;
+            }
+
+            #confirmDeactivateDoctor .admin-doctor-confirm-body,
+            #confirmActivateDoctor .admin-doctor-confirm-body {
+                padding: 18px 16px 12px;
+            }
+
+            #confirmDeactivateDoctor .admin-doctor-confirm-actions,
+            #confirmActivateDoctor .admin-doctor-confirm-actions {
+                padding: 0 16px 18px;
+            }
+        }
+
+        /* Mobile roster: the toggle keeps the patient's compact chip target
+           (colored border, matching the other stacked-table actions) instead
+           of the shared pill from admin-css/mobile.css. */
+        @media (max-width: 767.98px) {
+            .admin-main .admin-doctor-content .admin-doctor-actions button[data-doctor-toggle] {
+                flex: 1 1 0;
+                justify-content: center;
+                min-height: 38px;
+                padding: 0 8px;
+                border: 1px solid #d5e4f5;
+                border-radius: 8px;
+                background: #fff;
+                font-size: 12px;
+            }
+
+            .admin-main .admin-doctor-content .admin-doctor-actions button[data-doctor-toggle] {
+                border-color: currentcolor;
+            }
         }
     </style>
 @endpush
@@ -597,6 +918,118 @@
                     showToast('error', 'Doctor must have at least 3 scheduled days before it can be saved.');
                 });
             }
+
+            /* Doctor Deactivation — mirrors the Patient Deactivation flashcard
+               flow: clicking Deactivate asks inside #confirmDeactivateDoctor
+               instead of the browser's confirm(); the X and Cancel are the only
+               ways it closes, outside clicks and Escape answer with a brief red
+               danger outline, and the flashcard's Deactivate button submits the
+               same PATCH status form the old submit button posted. Delegated on
+               the table wrap because the rows are re-rendered by the filters. */
+            const confirmDeactivateDoctorModal = bootstrap.Modal.getOrCreateInstance(
+                document.getElementById('confirmDeactivateDoctor'),
+            );
+            const confirmActivateDoctorModal = bootstrap.Modal.getOrCreateInstance(
+                document.getElementById('confirmActivateDoctor'),
+            );
+            let pendingDoctorDeactivation = null;
+
+            document.querySelector('[data-doctor-table-wrap]')?.addEventListener('click', (event) => {
+                const button = event.target.closest('[data-doctor-toggle]');
+
+                if (!button) {
+                    return;
+                }
+
+                event.preventDefault();
+                event.stopPropagation(); /* keep the outside-click search clear from firing */
+
+                if (button.dataset.active === '1') {
+                    pendingDoctorDeactivation = button.closest('form');
+                    document.querySelector('[data-confirm-doctor-name]').textContent = button.dataset.name;
+                    confirmDeactivateDoctorModal.show();
+                    return;
+                }
+
+                /* Activation */
+                pendingDoctorDeactivation = button.closest('form');
+                document.querySelector('[data-confirm-doctor-name-activate]').textContent = button.dataset.name;
+                confirmActivateDoctorModal.show();
+            });
+
+            document.querySelector('[data-confirm-doctor-deactivate]')?.addEventListener('click', () => {
+                const form = pendingDoctorDeactivation;
+                pendingDoctorDeactivation = null;
+
+                if (!form) {
+                    return;
+                }
+
+                confirmDeactivateDoctorModal.hide();
+                form.submit();
+            });
+
+            document.querySelector('[data-confirm-doctor-activate]')?.addEventListener('click', () => {
+                const form = pendingDoctorDeactivation;
+                pendingDoctorDeactivation = null;
+
+                if (!form) {
+                    return;
+                }
+
+                confirmActivateDoctorModal.hide();
+                form.submit();
+            });
+
+            document.getElementById('confirmDeactivateDoctor').addEventListener('hidden.bs.modal', () => {
+                pendingDoctorDeactivation = null;
+            });
+
+            document.getElementById('confirmActivateDoctor').addEventListener('hidden.bs.modal', () => {
+                pendingDoctorDeactivation = null;
+            });
+
+            /* Outside clicks and Escape never dismiss this flashcard: with the
+               static backdrop Bootstrap reports every invalid dismiss attempt
+               as "hidePrevented" instead of hiding, and we answer it with a
+               single brief red danger outline on the card. The card stays open
+               throughout — only X and Cancel close it, and nothing is
+               submitted from here. */
+            let dangerNudgeTimer = null;
+
+            document.getElementById('confirmDeactivateDoctor').addEventListener('hidePrevented.bs.modal', () => {
+                const content = document.querySelector('#confirmDeactivateDoctor .modal-content');
+
+                if (!content) {
+                    return;
+                }
+
+                content.classList.remove('is-danger-nudge');
+                void content.offsetWidth; /* restart the animation on rapid repeat clicks */
+                content.classList.add('is-danger-nudge');
+                window.clearTimeout(dangerNudgeTimer);
+                dangerNudgeTimer = window.setTimeout(() => {
+                    content.classList.remove('is-danger-nudge');
+                    dangerNudgeTimer = null;
+                }, 750);
+            });
+
+            document.getElementById('confirmActivateDoctor').addEventListener('hidePrevented.bs.modal', () => {
+                const content = document.querySelector('#confirmActivateDoctor .modal-content');
+
+                if (!content) {
+                    return;
+                }
+
+                content.classList.remove('is-danger-nudge');
+                void content.offsetWidth; /* restart the animation on rapid repeat clicks */
+                content.classList.add('is-danger-nudge');
+                window.clearTimeout(dangerNudgeTimer);
+                dangerNudgeTimer = window.setTimeout(() => {
+                    content.classList.remove('is-danger-nudge');
+                    dangerNudgeTimer = null;
+                }, 750);
+            });
 
             const form = document.querySelector('[data-doctor-filters]');
 

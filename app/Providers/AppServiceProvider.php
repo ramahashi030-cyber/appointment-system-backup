@@ -9,6 +9,7 @@ use App\Observers\AuditObserver;
 use App\Support\Kiosk\HomisGateway;
 use App\Support\Kiosk\OdbcHomisGateway;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,6 +26,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (app()->environment('production', 'staging')) {
+            URL::forceScheme('https');
+        }
+
         Patient::observe(AuditObserver::class);
         Staff::observe(AuditObserver::class);
         Admin::observe(AuditObserver::class);

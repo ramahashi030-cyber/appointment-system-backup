@@ -562,6 +562,90 @@
     }
 }
 
+/* Responsive patient roster: collapsed view on <=767px */
+@media (max-width: 767px) {
+    .admin-patients-page .admin-patient-table tbody tr.patient-row {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 12px 14px;
+        cursor: pointer;
+    }
+
+    /* Hide desktop columns 3-6 on mobile (Hospital, Registered, Status, Actions) in collapsed state? */
+    .admin-patients-page .admin-patient-table tbody tr.patient-row td:nth-child(3),
+    .admin-patients-page .admin-patient-table tbody tr.patient-row td:nth-child(4),
+    .admin-patients-page .admin-patient-table tbody tr.patient-row td:nth-child(5),
+    .admin-patients-page .admin-patient-table tbody tr.patient-row td:nth-child(6) {
+        display: none;
+    }
+
+    .admin-patients-page .admin-patient-table tbody tr.patient-row td:nth-child(1),
+    .admin-patients-page .admin-patient-table tbody tr.patient-row td:nth-child(2) {
+        display: block;
+    }
+
+    .admin-patients-page .admin-patient-table tbody tr.patient-row td:nth-child(1) {
+        order: 1;
+    }
+
+    .admin-patients-page .admin-patient-table tbody tr.patient-row td:nth-child(2) {
+        order: 2;
+    }
+
+    .admin-patients-page .admin-patient-table tbody tr.patient-row td.patient-mobile-details {
+        display: none;
+        order: 3;
+        padding-top: 0.75rem;
+        border-top: 1px solid #e4edf7;
+    }
+
+    .admin-patients-page .admin-patient-table tbody tr.patient-row.expanded td:nth-child(3),
+    .admin-patients-page .admin-patient-table tbody tr.patient-row.expanded td:nth-child(4),
+    .admin-patients-page .admin-patient-table tbody tr.patient-row.expanded td:nth-child(5),
+    .admin-patients-page .admin-patient-table tbody tr.patient-row.expanded td:nth-child(6) {
+        display: block;
+    }
+
+    .admin-patients-page .admin-patient-table tbody tr.patient-row.expanded td.patient-mobile-details {
+        display: block;
+    }
+
+    .admin-patients-page .admin-patient-table tbody tr.patient-row.expanded td:nth-child(1),
+    .admin-patients-page .admin-patient-table tbody tr.patient-row.expanded td:nth-child(2) {
+        display: none;
+    }
+
+    .admin-patients-page .patient-mobile-details-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .admin-patients-page .patient-mobile-details-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+        justify-content: space-between;
+    }
+
+    .admin-patients-page .patient-mobile-details-actions a,
+    .admin-patients-page .patient-mobile-details-actions button {
+        flex: 1 1 0;
+        padding: 0.5rem;
+        text-align: center;
+        border: 1px solid #d5e4f5;
+        border-radius: 0.5rem;
+        background: #fff;
+        font-size: 0.875rem;
+    }
+
+    .admin-patients-page .patient-mobile-details-actions button[data-patient-toggle] {
+        border-color: currentcolor;
+    }
+}
+
 /* Create Patient Modal */
 #createPatientModal .modal-dialog { max-width: 640px; }
 #createPatientModal .modal-body .form-label { font-size: 12px; margin-bottom: 4px; }

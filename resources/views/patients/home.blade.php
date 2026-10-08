@@ -301,24 +301,19 @@
             <aside class="dashboard-quick-actions" aria-labelledby="quickActionsTitle">
                 <h2 id="quickActionsTitle"><i class="bi bi-lightning-charge-fill" aria-hidden="true"></i> Quick Actions</h2>
                 <div class="dashboard-quick-action-list">
-                    <button type="button" class="dashboard-quick-action blue" data-open-consent>
-                        <span class="dashboard-quick-action-icon" aria-hidden="true"><i class="bi bi-person-fill"></i></span>
-                        <span><strong>Consult a Doctor</strong><small>Get medical advice online</small></span>
-                        <i class="bi bi-chevron-right" aria-hidden="true"></i>
-                    </button>
-                    <a href="{{ route('patient.prescriptions') }}" class="dashboard-quick-action purple">
-                        <span class="dashboard-quick-action-icon" aria-hidden="true"><i class="bi bi-clipboard-fill"></i></span>
-                        <span><strong>View Prescriptions</strong><small>Check your e-prescriptions</small></span>
-                        <i class="bi bi-chevron-right" aria-hidden="true"></i>
-                    </a>
                     <a href="{{ route('records.index') }}" class="dashboard-quick-action green">
                         <span class="dashboard-quick-action-icon" aria-hidden="true"><i class="bi bi-file-earmark-text-fill"></i></span>
-                        <span><strong>Download Reports</strong><small>Lab results and medical records</small></span>
+                        <span><strong>Medical Records</strong><small>View your medical records</small></span>
                         <i class="bi bi-chevron-right" aria-hidden="true"></i>
                     </a>
-                    <a href="{{ route('patient.notifications') }}" class="dashboard-quick-action orange">
-                        <span class="dashboard-quick-action-icon" aria-hidden="true"><i class="bi bi-headset"></i></span>
-                        <span><strong>Need Help?</strong><small>Contact QMMC Support</small></span>
+                    <a href="{{ route('patient.prescriptions') }}" class="dashboard-quick-action purple">
+                        <span class="dashboard-quick-action-icon" aria-hidden="true"><i class="bi bi-capsule-pill"></i></span>
+                        <span><strong>Prescription</strong><small>Check your prescriptions</small></span>
+                        <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                    </a>
+                    <a href="{{ route('patient.procedures') }}" class="dashboard-quick-action blue">
+                        <span class="dashboard-quick-action-icon" aria-hidden="true"><i class="bi bi-activity"></i></span>
+                        <span><strong>Procedures</strong><small>View your procedures</small></span>
                         <i class="bi bi-chevron-right" aria-hidden="true"></i>
                     </a>
                 </div>

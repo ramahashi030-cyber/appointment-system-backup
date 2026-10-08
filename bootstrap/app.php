@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         channels: __DIR__.'/../routes/channels.php',
         health: '/up',
     )
+
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectGuestsTo(fn (): string => route('auth.login'));
         $middleware->alias([
@@ -24,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'patient.active' => EnsurePatientIsActive::class,
         ]);
     })
+    
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),

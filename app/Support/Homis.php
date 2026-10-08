@@ -775,7 +775,10 @@ SELECT
     r.pcchrgcod,
     r.enccode,
     r.dodate,
-    r.licno,
+    SUBSTRING(r.licno, 3, LEN(r.licno)) AS licno,
+    RTRIM(doc.firstname) + ' ' +
+        LEFT(RTRIM(ISNULL(doc.middlename, '')), 1) + '. ' +
+        RTRIM(doc.lastname) + ',MD' AS doctor_name,
     r.qtyintake,
     r.uomintake,
     r.reppatrn1,
@@ -783,14 +786,20 @@ SELECT
     r.repdayno1,
     r.remarks,
     r.pchrgqty AS qty,
-    r.medname,
-    ISNULL(md.itemdesc, r.medname) AS itemdesc,
-    RTRIM(doc.firstname) + ' ' +
-        LEFT(RTRIM(ISNULL(doc.middlename, '')), 1) + '. ' +
-        RTRIM(doc.lastname) + ',MD' AS doctor_name
+    ISNULL(md.itemdesc, 'Medicine') AS itemdesc,
+    ISNULL(
+        CAST(ISNULL(r.qtyintake, 0) AS VARCHAR(20)) + ' ' +
+        ISNULL(uf.formdesc, '') + ' ' +
+        CAST(ISNULL(r.reppatrn1, '') AS VARCHAR(50)) + ' ' +
+        CAST(ISNULL(r.reppatru1, '') AS VARCHAR(50)) + ' FOR ' +
+        CAST(ISNULL(r.repdayno1, 0) AS VARCHAR(20)) + ' DAYS',
+    '') AS signa,
+    e.toecode
 FROM hrxo r WITH (NOLOCK)
+LEFT JOIN henctr e ON e.enccode = r.enccode
 LEFT JOIN hprovider hp ON hp.licno = r.licno
 LEFT JOIN hpersonal doc ON doc.employeeid = hp.employeeid
+LEFT JOIN hform uf ON uf.formcode = r.uomintake
 LEFT JOIN (
     SELECT
         hdmhdr.dmdcomb,
@@ -805,14 +814,14 @@ LEFT JOIN (
     LEFT JOIN hform ON hform.formcode = hdmhdr.formcode
 ) md ON md.dmdcomb = r.dmdcomb
 WHERE r.hpercode = ?
-ORDER BY r.dodate DESC, r.pcchrgcod
+ORDER BY r.pcchrgcod, r.dodate
 SQL;
     }
 
     private static function simplePrescriptionQuery(): string
     {
         return <<<'SQL'
-SELECT pcchrgcod, dodate, medname, qty
+SELECT pcchrgcod, dodate, pchrgqty AS qty, uomintake, reppatrn1, reppatru1, repdayno1, remarks
 FROM hrxo WITH (NOLOCK)
 WHERE hpercode = ?
 ORDER BY dodate DESC
