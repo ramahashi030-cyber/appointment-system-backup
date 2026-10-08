@@ -9,16 +9,16 @@ use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Ensure the logged-in admin account has the triager role.
+ * Ensure the logged-in admin account has the admin role (not triager).
  */
-class EnsureTriagerRole
+class EnsureAdminRole
 {
     public function handle(Request $request, Closure $next): Response|RedirectResponse
     {
         $admin = Auth::guard('admin')->user();
 
-        if ($admin === null || $admin->role !== 'triager') {
-            return redirect()->route('admin.dashboard')->with('status', 'You do not have permission to access that area.');
+        if ($admin === null || $admin->role !== 'admin') {
+            return redirect()->route('triager.dashboard')->with('status', 'You do not have permission to access that area.');
         }
 
         return $next($request);

@@ -15,8 +15,8 @@
         </span>
         <span class="login-hero-divider" aria-hidden="true"></span>
         <span class="login-hero-text">
-            <strong>Quirino Memorial</strong>
-            <span>Medical Center</span>
+            <strong>QUIRINO MEMORIAL</strong>
+            <strong>MEDICAL CENTER</strong>
         </span>
     </div>
 

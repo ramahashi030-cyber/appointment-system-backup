@@ -62,6 +62,14 @@ class AppointmentController extends Controller
         return redirect()->route("admin.appointments.{$segment}", $request->query());
     }
 
+    /** A filter date must look like YYYY-MM-DD (what <input type="date"> sends); anything else is ignored. */
+    private function dateFilter(Request $request, string $key): string
+    {
+        $value = trim((string) $request->query($key, ''));
+
+        return preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) === 1 ? $value : '';
+    }
+
     public function index(Request $request, string $type): View
     {
         $config = $this->typeConfig($type);
@@ -70,7 +78,22 @@ class AppointmentController extends Controller
         $search = trim((string) $request->query('search', ''));
         $status = (string) $request->query('status', '');
         $doctor = (string) $request->query('doctor', '');
-        $date = (string) $request->query('date', '');
+
+        // Date range: From / To calendars. The old single `date` parameter
+        // (bookmarks, links from other pages) still works as a one-day range.
+        $dateFrom = $this->dateFilter($request, 'date_from');
+        $dateTo = $this->dateFilter($request, 'date_to');
+        $singleDate = $this->dateFilter($request, 'date');
+
+        if ($singleDate !== '' && $dateFrom === '' && $dateTo === '') {
+            $dateFrom = $singleDate;
+            $dateTo = $singleDate;
+        }
+
+        // A reversed range would match nothing, so put the dates in order.
+        if ($dateFrom !== '' && $dateTo !== '' && $dateFrom > $dateTo) {
+            [$dateFrom, $dateTo] = [$dateTo, $dateFrom];
+        }
 
         $query = Appointment::query()
             ->where('mode', $mode)
@@ -93,7 +116,8 @@ class AppointmentController extends Controller
             })
             ->when($status !== '', fn (Builder $builder): Builder => $builder->where('status', $status))
             ->when($doctor !== '', fn (Builder $builder): Builder => $builder->where('staff_id', $doctor))
-            ->when($date !== '', fn (Builder $builder): Builder => $builder->whereDate('date', $date))
+            ->when($dateFrom !== '', fn (Builder $builder): Builder => $builder->whereDate('date', '>=', $dateFrom))
+            ->when($dateTo !== '', fn (Builder $builder): Builder => $builder->whereDate('date', '<=', $dateTo))
             ->orderByDesc('date')
             ->orderByDesc('time_slot');
 
@@ -101,7 +125,8 @@ class AppointmentController extends Controller
             'search' => $search,
             'status' => $status,
             'doctor' => $doctor,
-            'date' => $date,
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
         ]);
 
         $providerModal = null;
@@ -142,7 +167,8 @@ class AppointmentController extends Controller
                 'search' => $search,
                 'status' => $status,
                 'doctor' => $doctor,
-                'date' => $date,
+                'date_from' => $dateFrom,
+                'date_to' => $dateTo,
             ],
             'doctors' => Staff::where('is_active', true)->orderBy('LastName')->orderBy('FirstName')->get(),
             'patients' => Patient::orderBy('last_name')->orderBy('first_name')->get(),

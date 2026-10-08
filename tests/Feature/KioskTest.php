@@ -107,6 +107,7 @@ function kioskAdmin(array $overrides = []): Admin
         'password' => 'Password@123',
         'email' => 'kiosk-admin@example.com',
         'contact_no' => '09170000000',
+        'role' => 'admin', // admin.role middleware on the kiosk routes
     ], $overrides));
 }
 

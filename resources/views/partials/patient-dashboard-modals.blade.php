@@ -326,8 +326,8 @@
                     <a href="{{ route('records.index') }}" class="modal-record-option"
                        data-patient-modal data-title="Medical Records">
                         <span><i class="bi bi-folder2-open" aria-hidden="true"></i></span>
-                        <strong>Medical Records</strong>
-                        <small>View your medical record entries</small>
+                        <strong>Transaction Records</strong>
+                        <small>View your transaction record entries</small>
                         <i class="bi bi-chevron-right" aria-hidden="true"></i>
                     </a>
                     <a href="{{ route('patient.prescriptions') }}" class="modal-record-option"
@@ -585,6 +585,18 @@
     $bookingLimits = $bookingLimits ?? ['face' => false, 'tele' => false];
     $bookingLimitFace = (bool) ($bookingLimits['face'] ?? false);
     $bookingLimitTele = (bool) ($bookingLimits['tele'] ?? false);
+
+    // Presentation icons per consultation reason (UI only; labels/data stay the same).
+    $bookingReasonIcons = [
+        'dental_check_up' => 'bi-bandaid-fill',
+        'prescription_refill' => 'bi-prescription',
+        'laboratory_diagnostic_requests' => 'bi-droplet-fill',
+        'general_check_up' => 'bi-clipboard2-pulse-fill',
+        'medical_certificate_issuance' => 'bi-file-medical-fill',
+        'stable_chronic_disease_follow_up' => 'bi-heart-pulse-fill',
+        'results_interpretation' => 'bi-chat-dots-fill',
+        'none_of_the_above' => 'bi-slash-circle-fill',
+    ];
 @endphp
 
 @if (! ($bookingLimitFace && $bookingLimitTele))
@@ -611,15 +623,22 @@
                     <div class="modal-body dashboard-modal-body booking-modal-body">
                         <fieldset class="booking-intake-section">
                             <legend class="booking-step-label">
-                                <span>1</span>
+                                <span>01</span>
                                 <span>
-                                    Ano ang ipapakonsulta? (Pumili ng Isa)
+                                    Appointment Type
                                     <small>What would you like to consult about? (Choose one)</small>
+                                    <small lang="fil">Ano ang ipapakonsulta? (Pumili ng Isa)</small>
                                 </span>
                             </legend>
 
                             <div class="booking-reason-grid">
                                 @foreach (($consultationReasons ?? []) as $reasonValue => $reasonLabel)
+                                    @php
+                                        $reasonSplitAt = strrpos($reasonLabel, ' / ');
+                                        $reasonTitle = $reasonSplitAt === false ? $reasonLabel : substr($reasonLabel, 0, $reasonSplitAt);
+                                        $reasonDescription = $reasonSplitAt === false ? 'General dental examination and cleaning.' : substr($reasonLabel, $reasonSplitAt + 3);
+                                        $reasonIcon = $bookingReasonIcons[$reasonValue] ?? 'bi-calendar2-plus-fill';
+                                    @endphp
                                     <label class="booking-choice-card booking-reason-card">
                                         <input
                                             type="radio"
@@ -629,7 +648,11 @@
                                             data-booking-reason
                                             required
                                         >
-                                        <span>{{ $reasonLabel }}</span>
+                                        <span class="booking-choice-icon" aria-hidden="true"><i class="bi {{ $reasonIcon }}"></i></span>
+                                        <span class="booking-choice-copy">
+                                            <strong>{{ $reasonTitle }}</strong>
+                                            <small>{{ $reasonDescription }}</small>
+                                        </span>
                                     </label>
                                 @endforeach
                             </div>
@@ -638,9 +661,10 @@
                         <div data-symptom-section hidden>
                             <fieldset class="booking-intake-section">
                                 <legend class="booking-step-label booking-symptom-heading">
-                                    <span>2</span>
+                                    <span>02</span>
                                     <span>
-                                        Please select at least 1 and maximum of 3 symptoms.
+                                        Symptoms
+                                        <small>Please select at least 1 and maximum of 3 symptoms.</small>
                                         <small lang="fil">Pumili ng Isa o hanggang sa Tatlong Sintomas</small>
                                     </span>
                                     <strong data-booking-symptom-count aria-live="polite">0 / 3 selected</strong>
@@ -664,25 +688,26 @@
 
                             <fieldset class="booking-intake-section">
                                 <legend class="booking-step-label">
-                                    <span>3</span>
+                                    <span>03</span>
                                     <span>
-                                        Details about your Complaint
+                                        Tell Us About Your Concern
+                                        <small>Details about your Complaint</small>
                                         <small lang="fil">Magbigay ng konting detalye ukol sa inyong karamdaman</small>
                                     </span>
                                 </legend>
 
                                 <label class="visually-hidden" for="bookingComplaintDetails">Details about your complaint</label>
+                                <p class="booking-complaint-hint">Keep the details clear and medically relevant.</p>
                                 <textarea
                                     class="booking-complaint-input"
                                     id="bookingComplaintDetails"
                                     name="complaint_details"
                                     rows="5"
                                     maxlength="2000"
-                                    placeholder="Enter here..."
+                                    placeholder="e.g. Duration of symptoms, previous medical history, current medications, etc."
                                     data-booking-complaint-details
                                 >{{ old('complaint_details') }}</textarea>
                                 <div class="booking-character-count">
-                                    <span>Keep the details clear and medically relevant.</span>
                                     <span data-booking-detail-count>0 / 2000</span>
                                 </div>
                             </fieldset>
@@ -695,7 +720,7 @@
                         <span class="dashboard-modal-footer-note"><i class="bi bi-shield-check" aria-hidden="true"></i> Your consent has been recorded for this request.</span>
                         <button type="button" class="dashboard-modal-button secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="dashboard-modal-button primary" data-booking-submit disabled>
-                            Submit Request <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                            <i class="bi bi-send-fill" aria-hidden="true"></i> Submit Request
                         </button>
                     </footer>
                 </form>
@@ -858,6 +883,8 @@
 @push('scripts')
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="{{ asset('js/records.js') }}"></script>
+    {{-- Print/Renew on the prescriptions page when it opens inside #patientPageModal. --}}
+    <script src="{{ asset('js/rx-prescriptions.js') }}" defer></script>
     <script>
         (() => {
             const modalEl = document.getElementById('patientPageModal');

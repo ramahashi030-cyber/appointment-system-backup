@@ -144,8 +144,18 @@
                         <option value="{{ $doc->id }}" @selected(($filters['doctor'] ?? '') == $doc->id)>{{ $doc->full_name }}</option>
                     @endforeach
                 </select>
-                <input type="date" class="form-control" name="date" value="{{ $filters['date'] ?? '' }}" aria-label="Filter by date" style="width: auto;">
-                @if (($filters['search'] ?? '') !== '' || ($filters['status'] ?? '') !== '' || ($filters['doctor'] ?? '') !== '' || ($filters['date'] ?? '') !== '')
+                {{-- Date range: two calendars. From can never be later than To (and the
+                     other way round); the script below keeps min/max in step, and the
+                     server puts a reversed range back in order as a safety net. --}}
+                <label class="admin-date-filter" for="appointmentDateFrom">
+                    <span>From</span>
+                    <input type="date" class="form-control" id="appointmentDateFrom" name="date_from" value="{{ $filters['date_from'] ?? '' }}" @if (($filters['date_to'] ?? '') !== '') max="{{ $filters['date_to'] }}" @endif aria-label="Filter from date">
+                </label>
+                <label class="admin-date-filter" for="appointmentDateTo">
+                    <span>To</span>
+                    <input type="date" class="form-control" id="appointmentDateTo" name="date_to" value="{{ $filters['date_to'] ?? '' }}" @if (($filters['date_from'] ?? '') !== '') min="{{ $filters['date_from'] }}" @endif aria-label="Filter to date">
+                </label>
+                @if (($filters['search'] ?? '') !== '' || ($filters['status'] ?? '') !== '' || ($filters['doctor'] ?? '') !== '' || ($filters['date_from'] ?? '') !== '' || ($filters['date_to'] ?? '') !== '')
                     <a class="admin-clear-filter" href="{{ route("admin.appointments.{$serviceType}") }}">Clear</a>
                 @endif
             </form>
@@ -499,6 +509,48 @@
                 flex: 0 0 auto;
             }
         }
+
+        /* Date range filter (From / To calendars in the roster filter bar).
+           Each calendar is a small label + date input pair that matches the
+           search box and dropdowns beside it. Scoped to .admin-date-filter so
+           no other filter bar is affected. */
+        .admin-doctor-filters .admin-date-filter {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0;
+            color: #6a83a4;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .admin-doctor-filters .admin-date-filter .form-control {
+            width: auto;
+            min-width: 140px;
+            border-color: #d5e4f5;
+            color: #315786;
+            font-size: 11px;
+        }
+
+        .admin-doctor-filters .admin-date-filter .form-control:focus {
+            border-color: #55a9ff;
+            box-shadow: 0 0 0 3px rgba(85, 169, 255, .14);
+        }
+
+        /* Phones: the filter bar is a single column (mobile.css), so each
+           calendar takes the full row with its label above the field. */
+        @media (max-width: 767.98px) {
+            .admin-doctor-filters .admin-date-filter {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 4px;
+            }
+
+            .admin-doctor-filters .admin-date-filter .form-control {
+                width: 100%;
+            }
+        }
     </style>
 @endpush
 
@@ -557,6 +609,31 @@
             const pagination = document.querySelector('[data-appointment-pagination]');
             let debounceTimer;
             let requestController;
+
+            // Keep the two calendars consistent: From cannot be picked after To,
+            // and To cannot be picked before From.
+            const dateFrom = form.querySelector('input[name="date_from"]');
+            const dateTo = form.querySelector('input[name="date_to"]');
+            const syncDateLimits = () => {
+                if (dateTo) {
+                    if (dateFrom?.value) {
+                        dateTo.min = dateFrom.value;
+                    } else {
+                        dateTo.removeAttribute('min');
+                    }
+                }
+
+                if (dateFrom) {
+                    if (dateTo?.value) {
+                        dateFrom.max = dateTo.value;
+                    } else {
+                        dateFrom.removeAttribute('max');
+                    }
+                }
+            };
+            syncDateLimits();
+            dateFrom?.addEventListener('change', syncDateLimits);
+            dateTo?.addEventListener('change', syncDateLimits);
 
             const updateFilters = async (url = null) => {
                 const query = new URLSearchParams(new FormData(form)).toString();

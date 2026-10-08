@@ -1050,8 +1050,8 @@
                             <input class="form-control" id="cpAddress" name="address" value="{{ old('address') }}" placeholder="Address" maxlength="500" pattern="[A-Za-z0-9 ]*" data-address-only required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label" for="cpHospital">Hospital no.</label>
-                            <input class="form-control" id="cpHospital" name="hospital_number" value="{{ old('hospital_number') }}" placeholder="Hospital no." maxlength="10" pattern="[0-9]*" inputmode="numeric" data-digits-only>
+                            <label class="form-label" for="cpHospital">Hospital no. <span class="text-danger">*</span></label>
+                            <input class="form-control" id="cpHospital" name="hospital_number" value="{{ old('hospital_number') }}" placeholder="Hospital no." required maxlength="10" pattern="[0-9]*" inputmode="numeric" data-digits-only>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="cpStatus">Status <span class="text-danger">*</span></label>
@@ -1399,6 +1399,8 @@
 
                 // The create form uses `novalidate`, so the extra required fields that
                 // are not covered by patientFieldRules must be checked here as well.
+                // Hospital number is required only when adding a patient: the edit form
+                // keeps it optional so existing patients without one can still be saved.
                 if ($submittedForm.closest('#createPatientModal').length > 0) {
                     const createOnlyRequiredFields = [
                         { name: 'username', label: 'Username' },
@@ -1409,6 +1411,7 @@
                         { name: 'dob', label: 'Date of Birth' },
                         { name: 'address', label: 'Address' },
                         { name: 'email', label: 'Email' },
+                        { name: 'hospital_number', label: 'Hospital number' },
                     ];
 
                     createOnlyRequiredFields.forEach(({ name, label }) => {

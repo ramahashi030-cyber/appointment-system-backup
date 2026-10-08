@@ -95,6 +95,8 @@
 
             @include('partials.notification-bell', ['rtVariant' => 'admin', 'rtModalId' => 'realtimeNotificationsModal'])
 
+            @if ($admin !== null && $admin->role === 'admin')
+
             <div class="dropdown">
                 <button class="admin-user" type="button" id="adminUserMenuToggle"
                         title="Account menu" aria-label="Open admin account menu"
@@ -122,6 +124,8 @@
                     </div>
                 @endif
             </div>
+
+            @endif
 
             <button type="button" class="admin-logout-btn" data-bs-toggle="modal" data-bs-target="#adminLogoutModal">
                     <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
@@ -304,42 +308,54 @@
 
     @once
         <style>
-            /* My Profile modal: compact fields/buttons, borderless inputs kept
-               delineated by a soft shadow, and a one-shot danger border blink
-               when an outside click is blocked. Scoped to #adminProfileModal so
-               no other admin-doctor-modal is affected. */
-            #adminProfileModal .modal-body .form-control {
+            /* My Profile and New Admin modals: compact fields/buttons, borderless
+               inputs kept delineated by a soft shadow, and a one-shot danger border
+               blink when an outside click is blocked. Scoped to #adminProfileModal
+               and #newAdminModal so no other admin-doctor-modal is affected. */
+            #adminProfileModal .modal-body .form-control,
+            #newAdminModal .modal-body .form-control {
                 border-color: transparent;
                 box-shadow: 0 1px 2px rgba(13, 40, 90, .08), 0 3px 10px rgba(13, 40, 90, .06);
                 padding: .52rem .8rem;
                 font-size: 14px;
             }
 
-            #adminProfileModal .modal-body .form-control:focus {
+            #adminProfileModal .modal-body .form-control:focus,
+            #newAdminModal .modal-body .form-control:focus {
                 border-color: transparent;
                 box-shadow: 0 0 0 .25rem rgba(13, 110, 253, .25), 0 1px 2px rgba(13, 40, 90, .08), 0 3px 10px rgba(13, 40, 90, .06);
             }
 
-            #adminProfileModal .modal-body .form-control::placeholder {
+            #adminProfileModal .modal-body .form-control.is-invalid,
+            #newAdminModal .modal-body .form-control.is-invalid {
+                border-color: #d9534f;
+            }
+
+            #adminProfileModal .modal-body .form-control::placeholder,
+            #newAdminModal .modal-body .form-control::placeholder {
                 font-size: 13px;
             }
 
-            #adminProfileModal .modal-body .btn {
+            #adminProfileModal .modal-body .btn,
+            #newAdminModal .modal-body .btn {
                 padding: .3rem .75rem;
                 font-size: 13px;
             }
 
             /* Compact vertical rhythm: tighter modal-body padding and label
                spacing, plus the slightly larger section icons. */
-            #adminProfileModal .modal-body {
+            #adminProfileModal .modal-body,
+            #newAdminModal .modal-body {
                 padding: 14px 20px 16px;
             }
 
-            #adminProfileModal .form-label {
+            #adminProfileModal .form-label,
+            #newAdminModal .form-label {
                 margin-bottom: .25rem;
             }
 
-            #adminProfileModal .form-text {
+            #adminProfileModal .form-text,
+            #newAdminModal .form-text {
                 margin-top: .2rem;
             }
 
@@ -365,21 +381,23 @@
                 }
             }
 
-            #adminProfileModal .modal-content.admin-profile-modal-blocked {
+            #adminProfileModal .modal-content.admin-profile-modal-blocked,
+            #newAdminModal .modal-content.admin-profile-modal-blocked {
                 border-color: #d9534f;
                 animation: adminProfileModalBlocked .5s ease-in-out 1;
             }
 
             @media (prefers-reduced-motion: reduce) {
-                #adminProfileModal .modal-content.admin-profile-modal-blocked {
+                #adminProfileModal .modal-content.admin-profile-modal-blocked,
+                #newAdminModal .modal-content.admin-profile-modal-blocked {
                     animation-duration: .4s;
                 }
             }
         </style>
     @endonce
 
-    {{-- NEW ADMIN MODAL (blank — input fields and functionality come in a later task) --}}
-    <div class="modal fade admin-doctor-modal" id="newAdminModal" tabindex="-1" aria-labelledby="newAdminModalTitle" aria-hidden="true">
+    {{-- NEW ADMIN MODAL: creates another administrator account (admin table, role = admin). --}}
+    <div class="modal fade admin-doctor-modal" id="newAdminModal" tabindex="-1" aria-labelledby="newAdminModalTitle" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <header class="modal-header admin-doctor-modal-header">
@@ -397,7 +415,61 @@
                 </header>
 
                 <div class="modal-body">
-                    {{-- New Admin form fields will be added in a separate task. --}}
+                    <div id="newAdminNotice" class="alert d-none" role="status" aria-live="polite"></div>
+
+                    <form id="newAdminForm" method="POST" action="{{ route('admin.admins.store') }}" novalidate autocomplete="off">
+                        @csrf
+
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-person-fill text-primary" aria-hidden="true"></i>
+                            <h3 class="h6 fw-semibold mb-0">Account information</h3>
+                        </div>
+
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label class="form-label" for="newAdminFirstname">First name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="newAdminFirstname" name="firstname" placeholder="First name" required maxlength="100" pattern="{{ $namePattern }}" data-letters-only autocomplete="off">
+                                <div class="form-text">Letters and spaces only</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="newAdminLastname">Last name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="newAdminLastname" name="lastname" placeholder="Last name" required maxlength="100" pattern="{{ $namePattern }}" data-letters-only autocomplete="off">
+                                <div class="form-text">Letters and spaces only</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label" for="newAdminUsername">Username <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="newAdminUsername" name="username" placeholder="Username" required maxlength="100" autocomplete="off">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="newAdminContactNo">Contact number <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="newAdminContactNo" name="contact_no" placeholder="Contact number" required maxlength="11" inputmode="numeric" data-digits-only autocomplete="off">
+                                <div class="form-text">11 digits, numbers only</div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label" for="newAdminEmail">Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="newAdminEmail" name="email" placeholder="Email" required maxlength="191" autocomplete="off">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label" for="newAdminPassword">Password <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="newAdminPassword" name="password" placeholder="Password" required minlength="{{ $passwordMinLength }}" maxlength="{{ $passwordMaxLength }}" autocomplete="new-password">
+                                <div class="form-text">{{ $passwordHint }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="newAdminPasswordConfirm">Confirm password <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="newAdminPasswordConfirm" name="password_confirmation" placeholder="Confirm password" required minlength="{{ $passwordMinLength }}" maxlength="{{ $passwordMaxLength }}" autocomplete="new-password">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-3">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg" aria-hidden="true"></i> Create admin
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -406,17 +478,133 @@
     @push('scripts')
     <script>
     $(function () {
-        var $newAdminModal = $('#newAdminModal');
+        var $modal = $('#newAdminModal');
 
-        if (!$newAdminModal.length) {
+        if (!$modal.length) {
             return;
         }
 
         // Keep the modal directly under <body> (same stacking-context safeguard
         // as the profile modal) so the header can never place it behind the backdrop.
-        if (!$newAdminModal.parent().is('body')) {
-            $newAdminModal.appendTo(document.body);
+        if (!$modal.parent().is('body')) {
+            $modal.appendTo(document.body);
         }
+
+        var $notice = $('#newAdminNotice');
+        var $content = $modal.find('.modal-content');
+
+        function notify(type, message) {
+            $notice
+                .removeClass('d-none alert-success alert-danger')
+                .addClass(type === 'success' ? 'alert-success' : 'alert-danger')
+                .text(message);
+        }
+
+        function hideNotice() {
+            $notice.addClass('d-none').removeClass('alert-success alert-danger').empty();
+        }
+
+        function clearErrors($form) {
+            $form.find('.is-invalid').removeClass('is-invalid');
+            $form.find('.new-admin-field-error').remove();
+        }
+
+        function showErrors($form, errors) {
+            $.each(errors, function (field, messages) {
+                var $input = $form.find('[name="' + field + '"]').addClass('is-invalid');
+                $('<div class="new-admin-field-error invalid-feedback d-block"></div>')
+                    .text(messages[0])
+                    .insertAfter($input);
+            });
+            $form.find('.is-invalid').first().trigger('focus');
+        }
+
+        function resetModal() {
+            $modal.find('form').each(function () {
+                this.reset();
+                clearErrors($(this));
+            });
+            hideNotice();
+        }
+
+        // The header persists between page navigations and this script runs
+        // again on each one, so remove the old handlers before adding new ones.
+        $(document).off('.newAdmin');
+        $modal.off('.newAdmin');
+        $content.off('.newAdmin');
+
+        $modal.on('hidden.bs.modal.newAdmin', function () {
+            resetModal();
+            $content.removeClass('admin-profile-modal-blocked');
+        });
+
+        // Outside clicks cannot close this modal (static backdrop, keyboard
+        // disabled): a blocked hide attempt flashes the border once.
+        $modal.on('hidePrevented.bs.modal.newAdmin', function () {
+            var content = $content[0];
+
+            content.classList.remove('admin-profile-modal-blocked');
+            void content.offsetWidth;
+            content.classList.add('admin-profile-modal-blocked');
+        });
+
+        $content.on('animationend.newAdmin animationcancel.newAdmin', function (event) {
+            if (event.originalEvent && event.originalEvent.animationName === 'adminProfileModalBlocked') {
+                $content.removeClass('admin-profile-modal-blocked');
+            }
+        });
+
+        // Names: letters and spaces only. Anything else is dropped as it is
+        // typed or pasted, and surrounding spaces are trimmed.
+        $modal.on('input.newAdmin', '[data-letters-only]', function () {
+            this.value = this.value
+                .replace(/[^A-Za-z ]+/g, '')
+                .replace(/^ +| +$/g, '');
+        });
+
+        // Contact number: digits only, at most 11.
+        $modal.on('input.newAdmin', '[data-digits-only]', function () {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11);
+        });
+
+        $(document).on('submit.newAdmin', '#newAdminForm', function (event) {
+            event.preventDefault();
+
+            var $form = $(this);
+            var $submit = $form.find('button[type="submit"]');
+
+            if ($submit.prop('disabled')) {
+                return;
+            }
+
+            var originalHtml = $submit.html();
+
+            clearErrors($form);
+            hideNotice();
+            $submit.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Creating...');
+
+            $.ajax({
+                url: $form.attr('action'),
+                method: 'POST',
+                data: $form.serialize(),
+                dataType: 'json',
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+            }).done(function (response) {
+                $form[0].reset();
+                clearErrors($form);
+                notify('success', response.message || 'New admin account created successfully.');
+            }).fail(function (xhr) {
+                if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                    showErrors($form, xhr.responseJSON.errors);
+                } else if (xhr.status === 429) {
+                    notify('error', 'Too many attempts. Please wait a moment and try again.');
+                } else {
+                    notify('error', (xhr.responseJSON && xhr.responseJSON.message) || 'Something went wrong. Please try again.');
+                }
+            }).always(function () {
+                $submit.prop('disabled', false).html(originalHtml);
+            });
+        });
     });
     </script>
     @endpush

@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="Vsdby1EtUqyyxxPWtjfh0njoXDzfWGk5eyZqMLhs">
+    <meta name="description" content="Sign in to the QMMC portal with your administrator or patient credentials.">
+
+    <title>Login page — QMMC Portal</title>
+
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+        <link rel="preload" as="style" href="https://190.190.0.56:3000/build/assets/auth-Ck9ERks3.css" /><link rel="modulepreload" as="script" href="https://190.190.0.56:3000/build/assets/app-Bkd0s2_U.js" /><link rel="modulepreload" as="script" href="https://190.190.0.56:3000/build/assets/patient-dashboard-D4V62Nhk.js" /><link rel="stylesheet" href="https://190.190.0.56:3000/build/assets/auth-Ck9ERks3.css" /><script type="module" src="https://190.190.0.56:3000/build/assets/app-Bkd0s2_U.js"></script>
+    <style>
+            
+    /* =====================================================================
+       QMMC auth portal: shared split layout (login + register).
+       Raw CSS only (auth.css wraps the styles stack in a <style> tag).
+       Scoped to body.auth-portal, so other auth screens are untouched.
+       ===================================================================== */
+    body.auth-portal {
+        padding: 0;
+        align-items: stretch;
+        background: #ecf7fa;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+
+    /* auth.css gives body.auth-body.auth-registration-page its own top/bottom
+       padding at the same specificity; this cancels it so the layout is full-bleed. */
+    body.auth-body.auth-portal { padding: 0; }
+
+    body.auth-portal .auth-card {
+        max-width: none;
+        min-height: 100vh;
+        border-radius: 0;
+        box-shadow: none;
+        background: #ecf7fa;
+        grid-template-columns: minmax(0, 1.74fr) minmax(340px, 1fr);
+    }
+
+    body.auth-portal .auth-card::before { display: none; }
+
+    /* ---------- right pane ---------- */
+    body.auth-portal .auth-pane-form {
+        order: 2;
+        align-items: flex-start;
+        margin-left: -2px; /* hides the photo pane's subpixel edge */
+        padding: 40px clamp(36px, 4.4vw, 80px) 40px 0;
+        background:
+            /* pale circle behind the shield, top-right */
+            radial-gradient(circle 10.6vw at calc(100% - .7vw) 0, rgba(150, 212, 226, .26) 0, rgba(150, 212, 226, .26) 97%, rgba(150, 212, 226, 0) 100%),
+            /* soft white glow near the seam */
+            radial-gradient(520px 620px at 0% 40%, rgba(255, 255, 255, .7) 0, rgba(255, 255, 255, 0) 72%),
+            /* deeper teal corner, bottom-right */
+            radial-gradient(circle 16vw at calc(100% + 3vw) 108%, rgba(56, 170, 186, .2) 0, rgba(56, 170, 186, .2) 96%, rgba(56, 170, 186, 0) 100%),
+            #ecf7fa;
+    }
+
+    /* Shield badge, top-right */
+    body.auth-portal .auth-pane-form::before {
+        content: '';
+        position: absolute;
+        top: 2.15vw;
+        right: 2.7vw;
+        width: 3.83vw;
+        height: 4.73vw;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 79'%3E%3Cpath d='M32 0 L63 12 L63 45 C63 62 49 73 32 78 C15 73 1 62 1 45 L1 12 Z' fill='%23a9dbe5'/%3E%3Crect x='30' y='24' width='9' height='24' rx='2' fill='%23ffffff' fill-opacity='.85'/%3E%3Crect x='22' y='32' width='25' height='9' rx='2' fill='%23ffffff' fill-opacity='.85'/%3E%3C/svg%3E") no-repeat center / contain;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    /* (the old white ring is gone: the mockup has none) */
+    body.auth-portal .auth-pane-form::after { display: none; }
+
+    /* ---------- left pane (photo) ---------- */
+    body.auth-portal .auth-art {
+        order: 1;
+        overflow: hidden;
+        border-radius: 0;
+        background: #0d3b52;
+    }
+
+    body.auth-portal .auth-frond,
+    body.auth-portal .auth-icons,
+    body.auth-portal .auth-wave,
+    body.auth-portal .auth-deco,
+    body.auth-portal .auth-foot { display: none; }
+
+    .login-hero {
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 54px 56px 64px;
+        background-color: #0b3a5a;
+    }
+
+    .login-hero-media {
+        position: absolute;
+        inset: 0;
+        display: block;
+    }
+
+    /* The photo has the curved edge built in and ends in the panel colour, so it
+       is anchored to the right (meets the form pane seamlessly) and cropped from
+       the left / bottom when the pane is a different shape. */
+    .login-hero-img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: 100% 30%;
+    }
+
+    /* Light top scrim so the white brand text stays readable over the sky. */
+    .login-hero::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        background: linear-gradient(180deg, rgba(4, 38, 68, .3) 0%, rgba(4, 38, 68, .1) 16%, rgba(4, 38, 68, 0) 28%);
+    }
+
+    .login-hero-brand {
+        position: relative;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .login-hero-mark {
+        width: 56px;
+        height: 56px;
+        flex: none;
+        display: grid;
+        place-items: center;
+        border-radius: 16px;
+        background: #fff;
+        box-shadow: 0 12px 28px rgba(4, 32, 54, .3);
+    }
+
+    .login-hero-mark img {
+        width: 36px;
+        height: 36px;
+        object-fit: contain;
+    }
+
+    .login-hero-divider {
+        width: 1px;
+        height: 44px;
+        flex: none;
+        background: rgba(255, 255, 255, .6);
+    }
+
+    .login-hero-text {
+        line-height: 1.25;
+        text-shadow: 0 1px 12px rgba(0, 30, 54, .4);
+    }
+
+    .login-hero-text strong {
+        display: block;
+        color: #fff;
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: .1px;
+    }
+
+    .login-hero-text span {
+        display: block;
+        color: rgba(255, 255, 255, .92);
+        font-size: 15px;
+    }
+
+    .login-hero-tagline {
+        position: relative;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin: 0;
+        color: #fff;
+        font-size: 17px;
+        font-style: italic;
+        letter-spacing: .3px;
+        text-shadow: 0 2px 12px rgba(0, 40, 60, .5);
+    }
+
+    .login-hero-rule {
+        width: 38px;
+        height: 2px;
+        flex: none;
+        border-radius: 2px;
+        background: rgba(255, 255, 255, .92);
+    }
+
+    .login-hero-dot { opacity: .8; }
+
+    /* ---------- card ---------- */
+    body.auth-portal .auth-inner {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        max-width: clamp(460px, 32.2vw, 640px);
+        margin-left: auto;
+        padding: 46px 45px 52px;
+        background: #fff;
+        border: 1px solid rgba(255, 255, 255, .9);
+        border-radius: 28px;
+        box-shadow: 0 24px 56px rgba(14, 82, 104, .16), 0 4px 14px rgba(14, 82, 104, .06);
+    }
+
+    body.auth-portal .auth-submit {
+        border: 0;
+        border-radius: 12px;
+        background: linear-gradient(90deg, #1b9299 0%, #016091 100%);
+        color: #fff;
+        font-weight: 600;
+        letter-spacing: .3px;
+        box-shadow: 0 14px 26px rgba(15, 110, 140, .26);
+        transition: transform .15s ease, box-shadow .15s ease, background .2s ease;
+    }
+
+    body.auth-portal .auth-submit:hover:not(:disabled) {
+        background: linear-gradient(90deg, #17858c 0%, #01547f 100%);
+        box-shadow: 0 18px 32px rgba(15, 110, 140, .34);
+        transform: translateY(-1px);
+    }
+
+    body.auth-portal .auth-submit:active:not(:disabled) { transform: translateY(0); }
+
+    body.auth-portal .auth-submit:focus-visible,
+    body.auth-portal .auth-input:focus-visible,
+    body.auth-portal a:focus-visible {
+        outline: 3px solid rgba(27, 146, 153, .45);
+        outline-offset: 2px;
+    }
+
+    /* ---------- narrow desktop: keep the card comfortable ---------- */
+    @media (min-width: 992px) and (max-width: 1199.98px) {
+        body.auth-portal .auth-pane-form { padding-right: 28px; }
+        body.auth-portal .auth-inner { padding: 36px 28px 40px; border-radius: 24px; }
+        .login-hero { padding: 40px 36px 48px; }
+    }
+
+    /* ---------- mobile: photo banner on top, card below ---------- */
+    @media (max-width: 991.98px) {
+        body.auth-portal .auth-card {
+            grid-template-columns: 1fr;
+            min-height: 100vh;
+            background: #f2f7fb;
+        }
+
+        body.auth-portal .auth-art {
+            order: 1;
+            display: block;
+            height: 210px;
+            border-radius: 0 0 30px 30px;
+        }
+
+        .login-hero { gap: 16px; padding: 22px 22px 20px; }
+
+        .login-hero-img { width: 130%; object-position: 0% 38%; }
+
+        body.auth-portal .auth-pane-form::before,
+        body.auth-portal .auth-pane-form::after { display: none; }
+
+        .login-hero-mark { width: 44px; height: 44px; border-radius: 14px; }
+        .login-hero-mark img { width: 28px; height: 28px; }
+        .login-hero-divider { height: 34px; }
+        .login-hero-brand { gap: 12px; }
+        .login-hero-text strong { font-size: 15.5px; }
+        .login-hero-text span { font-size: 12.5px; }
+        .login-hero-tagline { gap: 10px; font-size: 13px; }
+        .login-hero-rule { width: 26px; }
+
+        body.auth-portal .auth-pane-form {
+            order: 2;
+            min-height: 0;
+            margin-left: 0;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 18px 34px;
+            background: #f2f7fb;
+        }
+
+        body.auth-portal .auth-inner {
+            max-width: 540px;
+            margin: 0 auto;
+            padding: 34px 28px 30px;
+            border-radius: 24px;
+            box-shadow: 0 18px 40px rgba(13, 55, 92, .12);
+        }
+    }
+
+    @media (max-width: 420px) {
+        body.auth-portal .auth-art { height: 180px; }
+        body.auth-portal .auth-pane-form { padding: 24px 14px 30px; }
+        .login-hero { padding: 18px 16px 16px; }
+        body.auth-portal .auth-inner { padding: 30px 20px 26px; border-radius: 22px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        body.auth-portal .auth-submit { transition: none; transform: none; }
+    }
+    /* =====================================================================
+       Login-only styles
+       ===================================================================== */
+
+    /* ---------- brand + heading ---------- */
+    .pl-brand {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 26px;
+        text-align: center;
+    }
+
+    .pl-brand-logo { height: 60px; width: auto; display: block; }
+    .pl-brand-text { line-height: 1.2; }
+
+    .pl-brand-text strong {
+        display: block;
+        font-size: 21px;
+        font-weight: 700;
+        color: #0a3d66;
+    }
+
+    .pl-brand-text span {
+        display: block;
+        margin-top: 2px;
+        font-size: 18px;
+        font-weight: 500;
+        color: #0a3d66;
+    }
+
+    .pl-head { margin-bottom: 30px; }
+
+    .pl-title {
+        margin: 0;
+        text-align: center;
+        font-size: 38px;
+        line-height: 1.15;
+        font-weight: 700;
+        letter-spacing: -.6px;
+        color: #0a3d66;
+    }
+
+    .pl-subtitle {
+        margin: 12px 0 0;
+        text-align: center;
+        font-size: 16.5px;
+        color: #4d6278;
+    }
+
+    /* ---------- fields ---------- */
+    body.auth-login-page .pl-field {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .pl-field .pl-field-icon {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 2;
+        font-size: 17px;
+        color: #1f7a92;
+        pointer-events: none;
+        transition: color .15s ease;
+    }
+
+    .pl-field:focus-within .pl-field-icon { color: #0a5f86; }
+
+    body.auth-login-page .pl-field .auth-input {
+        height: 60px;
+        padding-left: 52px;
+        padding-right: 20px;
+        border: 1px solid #dce7ee;
+        border-radius: 14px;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(15, 70, 95, .04);
+        font-size: 15.5px;
+        color: #0f2b46;
+        transition: border-color .15s ease, box-shadow .15s ease;
+    }
+
+    body.auth-login-page .pl-field .auth-input::placeholder { color: #8a9bb0; }
+    body.auth-login-page .pl-field .auth-input.has-eye { padding-right: 52px; }
+
+    body.auth-login-page .pl-field .auth-input:focus {
+        border-color: rgba(27, 146, 153, .7);
+        box-shadow: 0 0 0 4px rgba(27, 146, 153, .15);
+    }
+
+    body.auth-login-page .pl-field .auth-input.is-invalid { border-color: var(--auth-coral); }
+
+    .pl-field .auth-eye { right: 16px; width: 34px; color: #2b6e8a; }
+    .pl-field .auth-eye:hover,
+    .pl-field .auth-eye:focus { color: #0a5f86; }
+
+    body.auth-login-page .auth-error-text {
+        display: block;
+        font-size: 12.5px;
+        color: var(--auth-coral-dark);
+        margin: -13px 0 16px 4px;
+    }
+
+    /* ---------- actions ---------- */
+    .pl-meta {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        margin: 20px 0 32px;
+    }
+
+    .pl-forgot {
+        font-size: 14.5px;
+        font-weight: 500;
+        color: #0f6a86;
+        text-decoration: none;
+    }
+
+    .pl-forgot:hover,
+    .pl-forgot:focus { color: #0a5f86; text-decoration: underline; }
+
+    body.auth-login-page .pl-submit {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        height: 60px;
+        margin: 0;
+        font-size: 16.5px;
+    }
+
+    .pl-btn-arrow {
+        font-size: 18px;
+        line-height: 1;
+        transition: transform .15s ease;
+    }
+
+    body.auth-login-page .pl-submit:hover:not(:disabled) .pl-btn-arrow { transform: translateX(3px); }
+
+    .pl-or {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin: 28px 0 24px;
+        color: #8a9bb0;
+        font-size: 13px;
+    }
+
+    .pl-or::before,
+    .pl-or::after {
+        content: '';
+        flex: 1 1 auto;
+        height: 1px;
+        background: #e1e9ef;
+    }
+
+    .pl-register {
+        margin: 0;
+        text-align: center;
+        font-size: 14.5px;
+        color: #4d6278;
+    }
+
+    .pl-register a { color: #0f6a86; font-weight: 600; text-decoration: none; }
+    .pl-register a:hover,
+    .pl-register a:focus { text-decoration: underline; }
+
+        /* Hospital-number switch: inside the card, under the Register link,
+       separated by a thin divider. */
+    .pl-switch-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        margin-top: 24px;
+        padding-top: 20px;
+        
+    }
+
+    body.auth-login-page .pl-switch {
+        justify-content: center;
+        margin: 0;
+        gap: 8px;
+        font-size: 13px;
+        color: #5f7186;
+    }
+
+    .pl-switch input[type="checkbox"] { accent-color: #1b9299; }
+
+    .pl-switch label {
+        cursor: pointer;
+        border-bottom: 1px dashed #aebccb;
+    }
+
+    .pl-switch input[type="checkbox"]:checked + label {
+        color: #0f6a86;
+        border-bottom-color: #0f6a86;
+        font-weight: 500;
+    }
+
+    body.auth-login-page .pl-hint {
+        text-align: center;
+        margin: 0;
+        font-size: 12px;
+        color: #6f7f94;
+    }
+
+    /* ---------- login-only responsive tweaks ---------- */
+    @media (min-width: 992px) and (max-width: 1199.98px) {
+        .pl-title { font-size: 32px; }
+    }
+
+    @media (max-width: 991.98px) {
+        .pl-brand { gap: 10px; margin-bottom: 20px; }
+        .pl-brand-logo { height: 54px; }
+        .pl-brand-text strong { font-size: 19px; }
+        .pl-brand-text span { font-size: 15px; }
+        .pl-head { margin-bottom: 24px; }
+        .pl-title { font-size: 30px; }
+        .pl-subtitle { font-size: 14.5px; }
+        body.auth-login-page .pl-field .auth-input { height: 54px; }
+        .pl-meta { margin: 16px 0 24px; }
+        .pl-or { margin: 24px 0 20px; }
+        .pl-switch-wrap { margin-top: 20px; padding-top: 16px; }
+    }
+
+    @media (max-width: 420px) {
+        .pl-brand-logo { height: 48px; }
+        .pl-title { font-size: 26px; }
+
+        body.auth-login-page .pl-field .auth-input { height: 50px; padding-left: 46px; }
+        .pl-field .pl-field-icon { left: 17px; font-size: 16px; }
+        body.auth-login-page .pl-submit { height: 52px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .pl-field .pl-field-icon,
+        .pl-btn-arrow { transition: none; transform: none; }
+    }
+    </style>
+</head>
+
+<body class="auth-body auth-login-page auth-portal">
+
+    
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+        <defs>
+            <linearGradient id="gCoral" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#ff7f45"/>
+                <stop offset="100%" stop-color="#ffb877"/>
+            </linearGradient>
+            <linearGradient id="gCoral2" x1="1" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#ff9a52"/>
+                <stop offset="100%" stop-color="#ff6f4d"/>
+            </linearGradient>
+            <linearGradient id="gLeafBlue" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#3fc7d6"/>
+                <stop offset="100%" stop-color="#7fe0e8"/>
+            </linearGradient>
+            <linearGradient id="gLeafBlue2" x1="1" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#1f8f9b"/>
+                <stop offset="100%" stop-color="#49b6c4"/>
+            </linearGradient>
+            <linearGradient id="gHeart" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#3fd0f2"/>
+                <stop offset="100%" stop-color="#1e79dd"/>
+            </linearGradient>
+
+            
+            <path id="qLeaf"
+                  d="M60 4 C 92 56, 116 132, 60 236 C 4 132, 28 56, 60 4 Z"/>
+            <path id="qLeafVeins" fill="none" stroke-linecap="round"
+                  d="M60 24 L60 222
+                     M60 70 L86 96 M60 70 L34 96
+                     M60 118 L90 150 M60 118 L30 150
+                     M60 166 L82 196 M60 166 L38 196"/>
+
+            
+            <path id="qBlade" d="M0 0 C 26 -24, 78 -30, 120 0 C 78 30, 26 24, 0 0 Z"/>
+        </defs>
+    </svg>
+
+    <main class="auth-card">
+
+        
+        <section class="auth-pane auth-pane-form">
+
+            <svg class="auth-frond" viewBox="0 0 220 185" aria-hidden="true">
+                
+                <path d="M-14 -4 C 0 34, 8 76, 12 124"
+                      fill="none" stroke="url(#gCoral2)" stroke-width="7" stroke-linecap="round"/>
+
+                <g>
+                    <g transform="translate(-16 2) rotate(15) scale(1.18)">
+                        <use href="#qBlade" fill="url(#gCoral)" stroke="url(#gCoral)" stroke-width="5"/>
+                    </g>
+                    <g transform="translate(-12 26) rotate(42) scale(1.02)">
+                        <use href="#qBlade" fill="url(#gCoral2)" stroke="url(#gCoral2)" stroke-width="5"/>
+                    </g>
+                    <g transform="translate(-6 54) rotate(68) scale(.92)">
+                        <use href="#qBlade" fill="url(#gCoral)" stroke="url(#gCoral)" stroke-width="5"/>
+                    </g>
+                    <g transform="translate(6 88) rotate(94) scale(.78)">
+                        <use href="#qBlade" fill="url(#gCoral2)" stroke="url(#gCoral2)" stroke-width="5"/>
+                    </g>
+                </g>
+            </svg>
+
+            <div class="auth-inner">
+
+                    <div class="pl-brand">
+                    <img class="pl-brand-logo" src="https://190.190.0.56:3000/images/logo.png" alt="Qalinga logo">
+        
+        <span class="pl-brand-text">
+            <strong>QUIRINO MEMORIAL</strong>
+            <span>MEDICAL CENTER</span>
+        </span>
+    </div>
+
+                
+                
+    <div class="pl-head">
+        <h1 class="pl-title">Welcome Back</h1>
+        <p class="pl-subtitle">Sign in to your patient portal</p>
+    </div>
+
+    
+    <form action="https://190.190.0.56:3000/login" method="POST" id="loginForm" novalidate class="pl-form">
+        <input type="hidden" name="_token" value="Vsdby1EtUqyyxxPWtjfh0njoXDzfWGk5eyZqMLhs" autocomplete="off">    
+        <div class="auth-field pl-field">
+            <label class="visually-hidden" for="username">Username</label>
+            <i class="bi bi-person-fill pl-field-icon" aria-hidden="true"></i>
+            <input
+                type="text"
+                class="auth-input "
+                id="username"
+                name="username"
+                placeholder="Username or Hospital ID"
+                autocomplete="username"
+                autocapitalize="off"
+                spellcheck="false"
+                value=""
+                required
+            >
+        </div>
+        
+        <div class="auth-field pl-field">
+            <label class="visually-hidden" for="password">Password</label>
+            <i class="bi bi-lock-fill pl-field-icon" aria-hidden="true"></i>
+            <div class="auth-input-wrap">
+                <input
+                    type="password"
+                    class="auth-input has-eye"
+                    id="password"
+                    name="password"
+                    placeholder="Password"
+                    autocomplete="current-password"
+                    required
+                >
+                <button class="auth-eye" type="button" id="togglePassword"
+                        aria-label="Show password" aria-pressed="false">
+                    <i class="bi bi-eye" id="toggleIcon"></i>
+                </button>
+            </div>
+        </div>
+        
+        
+        <div class="pl-meta">
+            <a class="pl-forgot" href="https://190.190.0.56:3000/reset-password">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="auth-submit pl-submit" id="loginBtn">
+            <span id="loginBtnLabel">Sign In</span>
+            <i class="bi bi-arrow-right pl-btn-arrow" aria-hidden="true"></i>
+        </button>
+
+        <div class="pl-or"><span>or</span></div>
+
+        <p class="pl-register">Don't have an account? <a href="https://190.190.0.56:3000/patient/register">Register</a></p>
+
+        
+        <div class="pl-switch-wrap">
+            <div class="auth-switch pl-switch">
+                <input type="checkbox" id="toggleHospitalNumber">
+                <label for="toggleHospitalNumber">Sign in with hospital number</label>
+                <input type="hidden" name="use_hospital" id="useHospital" value="0">
+            </div>
+
+            <p class="auth-hint d-none pl-hint" id="hospitalNote">Birthdate format: MMDDYYYY</p>
+        </div>
+    </form>
+
+            </div>
+
+            <p class="auth-foot">© 2026 Qalinga App · QMMC Portal</p>
+        </section>
+
+        
+        <aside class="auth-art" aria-hidden="true">
+
+            
+                <div class="login-hero">
+    <picture class="login-hero-media">
+        <source type="image/avif" srcset="https://190.190.0.56:3000/images/qmmc-hero-wide.avif">
+        <source type="image/webp" srcset="https://190.190.0.56:3000/images/qmmc-hero-wide.webp">
+        <img class="login-hero-img" src="https://190.190.0.56:3000/images/qmmc-hero-wide.jpg"
+             alt="" width="2144" height="1882" fetchpriority="high" decoding="async">
+    </picture>
+
+    <div class="login-hero-brand">
+        <span class="login-hero-mark">
+            <img src="https://190.190.0.56:3000/images/logo.png" alt="">
+        </span>
+        <span class="login-hero-divider" aria-hidden="true"></span>
+        <span class="login-hero-text">
+            <strong>QUIRINO MEMORIAL</strong>
+            <strong>MEDICAL CENTER</strong>
+        </span>
+    </div>
+
+    <p class="login-hero-tagline">
+        <span class="login-hero-rule"></span>
+        Dekalidad na Serbisyo<span class="login-hero-dot">&bull;</span> Alagang QMMC
+    </p>
+</div>
+            <div class="auth-icons">
+                                                    <i class="bi bi-heart-pulse"></i>
+                                    <i class="bi bi-thermometer-half"></i>
+                                    <i class="bi bi-capsule"></i>
+                                    <i class="bi bi-bandaid"></i>
+                                    <i class="bi bi-eye"></i>
+                                    <i class="bi bi-emoji-smile"></i>
+                                    <i class="bi bi-clock-history"></i>
+                                    <i class="bi bi-clipboard2-pulse"></i>
+                                    <i class="bi bi-droplet"></i>
+                                    <i class="bi bi-activity"></i>
+                                    <i class="bi bi-journal-medical"></i>
+                                    <i class="bi bi-pill"></i>
+                                    <i class="bi bi-stethoscope"></i>
+                                    <i class="bi bi-virus2"></i>
+                                    <i class="bi bi-hospital"></i>
+                                    <i class="bi bi-person-badge"></i>
+                                    <i class="bi bi-calendar2-check"></i>
+                                    <i class="bi bi-gender-female"></i>
+                                    <i class="bi bi-smile"></i>
+                                    <i class="bi bi-train-front"></i>
+                                    <i class="bi bi-heart-pulse"></i>
+                                    <i class="bi bi-thermometer-half"></i>
+                                    <i class="bi bi-capsule"></i>
+                                    <i class="bi bi-bandaid"></i>
+                                    <i class="bi bi-eye"></i>
+                                    <i class="bi bi-emoji-smile"></i>
+                                    <i class="bi bi-clock-history"></i>
+                                    <i class="bi bi-clipboard2-pulse"></i>
+                                    <i class="bi bi-droplet"></i>
+                                    <i class="bi bi-activity"></i>
+                                    <i class="bi bi-journal-medical"></i>
+                                    <i class="bi bi-pill"></i>
+                                    <i class="bi bi-stethoscope"></i>
+                                    <i class="bi bi-virus2"></i>
+                                    <i class="bi bi-hospital"></i>
+                                    <i class="bi bi-person-badge"></i>
+                                    <i class="bi bi-calendar2-check"></i>
+                                    <i class="bi bi-gender-female"></i>
+                                    <i class="bi bi-smile"></i>
+                                    <i class="bi bi-train-front"></i>
+                                    <i class="bi bi-heart-pulse"></i>
+                                    <i class="bi bi-thermometer-half"></i>
+                                    <i class="bi bi-capsule"></i>
+                                    <i class="bi bi-bandaid"></i>
+                                    <i class="bi bi-eye"></i>
+                            </div>
+
+            <svg class="auth-wave" viewBox="0 0 340 900" preserveAspectRatio="none" aria-hidden="true">
+                <path fill="#1d3f70" opacity=".85"
+                      d="M74 0 C 24 66, -18 138, -12 244 C -6 348, 116 350, 116 440
+                         C 116 528, 22 566, 14 656 C 6 748, 62 826, 96 900
+                         L 340 900 L 340 0 Z"/>
+                <path fill="#0e1c33"
+                      d="M118 0 C 72 62, 28 134, 38 240 C 48 344, 158 348, 158 438
+                         C 158 526, 66 564, 58 654 C 50 746, 106 824, 142 900
+                         L 340 900 L 340 0 Z"/>
+            </svg>
+
+            
+            <svg class="auth-deco auth-leaf-top" viewBox="0 0 120 240">
+                <use href="#qLeaf" fill="url(#gLeafBlue)"/>
+                <use href="#qLeafVeins" stroke="#eafcff" stroke-width="3.5" opacity=".55"/>
+            </svg>
+            <svg class="auth-deco auth-leaf-top-2" viewBox="0 0 120 240">
+                <use href="#qLeaf" fill="url(#gLeafBlue2)"/>
+                <use href="#qLeafVeins" stroke="#eafcff" stroke-width="3.5" opacity=".5"/>
+            </svg>
+            <svg class="auth-deco auth-leaf-right" viewBox="0 0 120 240">
+                <use href="#qLeaf" fill="url(#gLeafBlue2)"/>
+                <use href="#qLeafVeins" stroke="#eafcff" stroke-width="3.5" opacity=".5"/>
+            </svg>
+            <svg class="auth-deco auth-leaf-bottom" viewBox="0 0 120 240">
+                <use href="#qLeaf" fill="url(#gLeafBlue)"/>
+                <use href="#qLeafVeins" stroke="#eafcff" stroke-width="3.5" opacity=".55"/>
+            </svg>
+            <svg class="auth-deco auth-leaf-bottom-2" viewBox="0 0 120 240">
+                <use href="#qLeaf" fill="url(#gLeafBlue2)"/>
+                <use href="#qLeafVeins" stroke="#eafcff" stroke-width="3.5" opacity=".55"/>
+            </svg>
+
+            
+            <svg class="auth-deco auth-heart" viewBox="0 0 200 184">
+                <defs>
+                    <clipPath id="heartClip">
+                        <path d="M100 178 C 30 126, 4 88, 4 54 C 4 22, 27 4, 52 4 C 73 4, 91 17, 100 36
+                                 C 109 17, 127 4, 148 4 C 173 4, 196 22, 196 54 C 196 88, 170 126, 100 178 Z"/>
+                    </clipPath>
+                </defs>
+                <path fill="url(#gHeart)"
+                      d="M100 178 C 30 126, 4 88, 4 54 C 4 22, 27 4, 52 4 C 73 4, 91 17, 100 36
+                         C 109 17, 127 4, 148 4 C 173 4, 196 22, 196 54 C 196 88, 170 126, 100 178 Z"/>
+                <g clip-path="url(#heartClip)" stroke="#eaf7ff" stroke-width="1.4" fill="#eaf7ff" opacity=".75">
+                    <path d="M20 40 L70 66 L120 34 L176 70 M70 66 L58 118 L112 140 L162 108 L176 70
+                             M112 140 L96 174 M58 118 L20 96 M120 34 L146 14 M112 140 L150 150" fill="none"/>
+                    <circle cx="20" cy="40" r="3.4"/><circle cx="70" cy="66" r="4"/>
+                    <circle cx="120" cy="34" r="3.6"/><circle cx="176" cy="70" r="3.4"/>
+                    <circle cx="58" cy="118" r="3.6"/><circle cx="112" cy="140" r="4.2"/>
+                    <circle cx="162" cy="108" r="3.4"/><circle cx="96" cy="174" r="3.2"/>
+                    <circle cx="20" cy="96" r="3"/><circle cx="146" cy="14" r="3"/>
+                    <circle cx="150" cy="150" r="3.2"/>
+                </g>
+            </svg>
+
+            
+            <svg class="auth-deco auth-steth" viewBox="0 0 300 400">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <!-- ear tips -->
+                    <rect x="70" y="6" width="26" height="46" rx="13" fill="#f2f6ff" stroke="#cdd9f7" stroke-width="4"/>
+                    <rect x="204" y="16" width="26" height="46" rx="13" fill="#f2f6ff" stroke="#cdd9f7" stroke-width="4"/>
+                    <!-- upper (white) tubing -->
+                    <path d="M84 50 C 74 96, 96 124, 126 148" stroke="#e9efff" stroke-width="15"/>
+                    <path d="M217 60 C 232 112, 198 138, 168 164" stroke="#e9efff" stroke-width="15"/>
+                    <!-- blue main tube -->
+                    <path d="M126 148 C 152 176, 170 196, 172 236" stroke="#2f7bff" stroke-width="19"/>
+                    <path d="M168 164 C 176 190, 176 212, 172 236" stroke="#2f7bff" stroke-width="19"/>
+                    <!-- tube curving down into the chest piece -->
+                    <path d="M172 236 C 178 306, 152 356, 112 352 C 76 348, 62 312, 84 290"
+                          stroke="#2f7bff" stroke-width="19"/>
+                </g>
+                <!-- chest piece -->
+                <circle cx="84" cy="286" r="34" fill="#f4f8ff" stroke="#c7d5f5" stroke-width="9"/>
+                <circle cx="84" cy="286" r="13" fill="#dbe5fb"/>
+            </svg>
+        </aside>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    (function () {
+        const checkbox    = document.getElementById('toggleHospitalNumber');
+        const switchLabel = document.querySelector('label[for="toggleHospitalNumber"]');
+        const useHospital = document.getElementById('useHospital');
+        const hospitalNote = document.getElementById('hospitalNote');
+        const userInput   = document.getElementById('username');
+        const passInput   = document.getElementById('password');
+
+        // --- Hospital number / birthdate mode (legacy QALINGA1 toggle) ---
+        checkbox.addEventListener('change', function () {
+            if (checkbox.checked) {
+                userInput.placeholder = 'Hospital number';
+                passInput.placeholder  = 'Birthdate (MMDDYYYY)';
+                hospitalNote.classList.remove('d-none');
+                useHospital.value = '1';
+                switchLabel.textContent = 'Sign in with username and password';
+            } else {
+                userInput.placeholder = 'Username or Hospital ID';
+                passInput.placeholder  = 'Password';
+                hospitalNote.classList.add('d-none');
+                useHospital.value = '0';
+                switchLabel.textContent = 'Sign in with hospital number';
+            }
+        });
+
+        // Birthdate mode → digits only, max 8 (MMDDYYYY)
+        passInput.addEventListener('input', function (e) {
+            if (!checkbox.checked) return;
+            e.target.value = e.target.value.replace(/\D/g, '').slice(0, 8);
+        });
+
+        // --- Show / hide password ---
+        const eyeBtn = document.getElementById('togglePassword');
+        const eyeIcon = document.getElementById('toggleIcon');
+
+        eyeBtn.addEventListener('click', function () {
+            const hidden = passInput.type === 'password';
+            passInput.type = hidden ? 'text' : 'password';
+            eyeIcon.classList.toggle('bi-eye', !hidden);
+            eyeIcon.classList.toggle('bi-eye-slash', hidden);
+            eyeBtn.setAttribute('aria-pressed', hidden ? 'true' : 'false');
+            eyeBtn.setAttribute('aria-label', hidden ? 'Hide password' : 'Show password');
+        });
+
+        // --- Submit loading state ---
+        const form = document.getElementById('loginForm');
+        const btn  = document.getElementById('loginBtn');
+        const label = document.getElementById('loginBtnLabel');
+
+        form.addEventListener('submit', function (e) {
+            if (!form.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+            btn.disabled = true;
+            label.textContent = 'Signing in...';
+        });
+    })();
+</script>
+</body>
+</html>

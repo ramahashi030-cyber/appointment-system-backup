@@ -1126,7 +1126,7 @@
 
 /* Peer notice for a room the other side has opened. It sits on its own line
    under the controls: as a flex sibling of the action button it squeezed the
-   label into three lines and pushed the ⋮ menu into the neighbouring column. */
+   label into three lines and pushed the â‹® menu into the neighbouring column. */
 .dashboard-room-notice {
     margin: 6px 0 0;
     padding: 7px 9px;
@@ -2699,7 +2699,7 @@ body .modal-backdrop.show {
     border-radius: 50%;
     background: #def4e9;
     color: #0a8b52;
-    content: '✓';
+    content: 'âœ“';
     font-size: 10px;
     font-weight: 700;
 }
@@ -4855,3 +4855,449 @@ body:has(#activeAppointmentModal.show) .modal-backdrop.show {
 }
 
 
+
+/* ============================================================
+   Request an Appointment modal (#bookingModal) redesign
+   (scoped overrides; presentation only)
+   ============================================================ */
+
+.dashboard-booking-modal .modal-dialog {
+    max-width: 1140px;
+}
+
+.dashboard-booking-modal form {
+    max-height: calc(100dvh - 2rem);
+    background: #ffffff;
+    border-radius: 18px;
+}
+
+.dashboard-booking-modal .dashboard-modal-header {
+    gap: 16px;
+    padding: 18px 24px;
+    background: #fff;
+}
+
+.dashboard-booking-modal .dashboard-modal-title-group {
+    gap: 15px;
+}
+
+.dashboard-booking-modal .dashboard-modal-title-icon {
+    width: 52px;
+    height: 52px;
+    flex: 0 0 52px;
+    border-radius: 15px;
+    background: linear-gradient(145deg, #1479e8, #0a4cb5);
+    font-size: 24px;
+}
+
+.dashboard-booking-modal .dashboard-modal-title-group h2 {
+    font-size: 20px;
+    line-height: 1.3;
+}
+
+.dashboard-booking-modal .dashboard-modal-title-group small {
+    font-size: 13.5px;
+    color: #4f6b8a;
+}
+
+.dashboard-booking-modal .dashboard-modal-close {
+    width: 40px;
+    height: 40px;
+    flex-basis: 40px;
+}
+
+.dashboard-booking-modal .booking-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 22px 24px;
+    background: #f0f6fd;
+    overscroll-behavior: contain;
+}
+
+.dashboard-booking-modal [data-symptom-section] {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.dashboard-booking-modal [data-symptom-section][hidden],
+.dashboard-booking-modal .booking-modal-footer[hidden] {
+    display: none;
+}
+
+.dashboard-booking-modal .booking-intake-section {
+    min-width: 0;
+    margin: 0;
+    padding: 20px 22px;
+    border: 1px solid #dbe9f7;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(12, 58, 120, 0.06);
+}
+
+.dashboard-booking-modal .booking-step-label {
+    width: 100%;
+    margin-bottom: 16px;
+    gap: 13px;
+    align-items: center;
+    font-size: 16px;
+    line-height: 1.45;
+    flex-wrap: nowrap;
+}
+
+.dashboard-booking-modal .booking-step-label > span:first-child {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #1479e8, #0a4cb5);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.dashboard-booking-modal .booking-step-label > span:nth-child(2) {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 3px;
+    width: auto;
+    height: auto;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #0a326c;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.45;
+    align-items: stretch;
+    justify-content: flex-start;
+    overflow-wrap: anywhere;
+}
+
+.dashboard-booking-modal .booking-step-label > span:nth-child(2) small {
+    margin-top: 0;
+    color: #4f6b8a;
+    font-size: 13.5px;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.dashboard-booking-modal .booking-symptom-heading {
+    flex-wrap: wrap;
+    row-gap: 8px;
+}
+
+.dashboard-booking-modal .booking-symptom-heading > strong {
+    margin-left: auto;
+    padding: 6px 14px;
+    border: 1px solid #cfe3f8;
+    border-radius: 999px;
+    background: #eaf3fc;
+    color: #1c5c9e;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.dashboard-booking-modal .booking-symptom-heading > strong.limit-reached {
+    border-color: #f3d9a4;
+    background: #fff4dd;
+    color: #8a5206;
+}
+
+.dashboard-booking-modal .booking-reason-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.dashboard-booking-modal .booking-symptom-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.dashboard-booking-modal .booking-choice-card {
+    display: flex;
+    min-width: 0;
+    min-height: 56px;
+    align-items: center;
+    gap: 13px;
+    padding: 14px 16px;
+    border: 1px solid #d9e8f6;
+    border-radius: 14px;
+    background: #ffffff;
+    color: #173a5e;
+    cursor: pointer;
+    transition: border-color .15s ease, background-color .15s ease, box-shadow .15s ease;
+}
+
+.dashboard-booking-modal .booking-choice-card:hover {
+    border-color: #86b9e6;
+    background: #f6faff;
+}
+
+.dashboard-booking-modal .booking-choice-card:has(input:checked) {
+    border-color: #0d67d4;
+    background: #eaf3ff;
+    box-shadow: 0 0 0 3px rgba(13, 103, 212, 0.1);
+    color: #0d579e;
+}
+
+.dashboard-booking-modal .booking-choice-card:has(input:focus-visible) {
+    outline: 3px solid rgba(13, 103, 212, 0.3);
+    outline-offset: 2px;
+}
+
+.dashboard-booking-modal .booking-choice-card input {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    margin: 0;
+    accent-color: #0d67d4;
+}
+
+.dashboard-booking-modal .booking-choice-icon {
+    display: inline-flex;
+    width: 46px;
+    height: 46px;
+    flex: 0 0 46px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #eaf3fc;
+    color: #0d67d4;
+    font-size: 21px;
+}
+
+.dashboard-booking-modal .booking-choice-card:has(input:checked) .booking-choice-icon {
+    background: #d5e8fb;
+}
+
+.dashboard-booking-modal .booking-choice-copy {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.dashboard-booking-modal .booking-choice-copy strong {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.35;
+    color: #123c74;
+    overflow-wrap: anywhere;
+}
+
+.dashboard-booking-modal .booking-choice-copy small {
+    font-size: 13px;
+    line-height: 1.45;
+    color: #4f6b8a;
+    overflow-wrap: anywhere;
+}
+
+.dashboard-booking-modal .booking-choice-card:has(input:checked) .booking-choice-copy strong {
+    color: #0d4c9c;
+}
+
+.dashboard-booking-modal .booking-choice-card:has(input:checked) .booking-choice-copy small {
+    color: #3d6591;
+}
+
+.dashboard-booking-modal .booking-symptom-card {
+    align-items: center;
+    padding: 12px 14px;
+    border-radius: 13px;
+}
+
+.dashboard-booking-modal .booking-symptom-card > span {
+    font-size: 14px;
+    line-height: 1.45;
+    color: #173a5e;
+    overflow-wrap: anywhere;
+}
+
+.dashboard-booking-modal .booking-complaint-hint {
+    margin: 0 0 10px;
+    color: #4f6b8a;
+    font-size: 13.5px;
+    line-height: 1.5;
+}
+
+.dashboard-booking-modal .booking-complaint-input {
+    width: 100%;
+    min-height: 128px;
+    padding: 13px 15px;
+    border: 1px solid #caddeb;
+    border-radius: 12px;
+    background: #fbfdff;
+    color: #0a326c;
+    font-family: Poppins, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.dashboard-booking-modal .booking-complaint-input:focus {
+    border-color: #5aa2e3;
+    box-shadow: 0 0 0 4px rgba(13, 103, 212, 0.1);
+}
+
+.dashboard-booking-modal .booking-character-count {
+    justify-content: flex-end;
+    margin-top: 8px;
+    color: #52708f;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.dashboard-booking-modal .booking-intake-error {
+    margin: 0;
+    padding: 12px 15px;
+    border: 1px solid #f0b7c1;
+    border-radius: 12px;
+    background: #fff1f3;
+    color: #a81f38;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.55;
+}
+
+.dashboard-booking-modal .booking-intake-error:not([hidden]) {
+    display: block;
+}
+
+.dashboard-booking-modal .booking-modal-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    padding: 16px 24px;
+    background: #fff;
+}
+
+.dashboard-booking-modal .booking-modal-footer .dashboard-modal-footer-note {
+    align-items: center;
+    margin-right: auto;
+    color: #3f5f82;
+    font-size: 13.5px;
+    line-height: 1.5;
+}
+
+.dashboard-booking-modal .booking-modal-footer .dashboard-modal-footer-note i {
+    font-size: 17px;
+    color: #0d67d4;
+}
+
+.dashboard-booking-modal .booking-modal-footer .dashboard-modal-button {
+    min-height: 48px;
+    padding: 0 22px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.dashboard-booking-modal .booking-modal-footer .dashboard-modal-button.primary {
+    min-width: 190px;
+}
+
+.dashboard-booking-modal .booking-modal-footer .dashboard-modal-button.primary:disabled {
+    opacity: 0.55;
+    box-shadow: none;
+}
+
+@media (max-width: 991.98px) {
+    .dashboard-booking-modal .booking-intake-section {
+        padding: 17px;
+    }
+
+    .dashboard-booking-modal .booking-symptom-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 767.98px) {
+    .dashboard-booking-modal .booking-modal-body {
+        padding: 16px;
+    }
+
+    .dashboard-booking-modal .booking-modal-header {
+        padding: 15px 16px;
+    }
+
+    .dashboard-booking-modal .booking-modal-footer {
+        padding: 14px 16px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .dashboard-booking-modal form {
+        max-height: calc(100dvh - 0.8rem);
+    }
+
+    .dashboard-booking-modal .modal-dialog {
+        max-width: 100%;
+        margin: 0;
+    }
+
+    .dashboard-booking-modal .dashboard-modal-title-group h2 {
+        font-size: 18px;
+    }
+
+    .dashboard-booking-modal .dashboard-modal-title-group small {
+        font-size: 13px;
+    }
+
+    .dashboard-booking-modal .dashboard-modal-title-icon {
+        width: 44px;
+        height: 44px;
+        flex: 0 0 44px;
+        font-size: 20px;
+        border-radius: 13px;
+    }
+
+    .dashboard-booking-modal .booking-modal-body {
+        padding: 13px;
+        gap: 13px;
+    }
+
+    .dashboard-booking-modal .booking-intake-section {
+        padding: 14px;
+        border-radius: 14px;
+    }
+
+    .dashboard-booking-modal .booking-reason-grid,
+    .dashboard-booking-modal .booking-symptom-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-booking-modal .booking-symptom-heading > strong {
+        margin-left: 0;
+    }
+
+    .dashboard-booking-modal .booking-character-count {
+        justify-content: flex-start;
+    }
+
+    .dashboard-booking-modal .booking-modal-footer {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .dashboard-booking-modal .booking-modal-footer .dashboard-modal-footer-note {
+        margin-right: 0;
+        margin-top: 2px;
+    }
+
+    .dashboard-booking-modal .booking-modal-footer .dashboard-modal-button {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .dashboard-booking-modal .booking-modal-footer .dashboard-modal-button.primary {
+        min-width: 0;
+    }
+}

@@ -14,13 +14,9 @@ use Illuminate\Support\Str;
 
 class DoctorAuthController extends Controller
 {
-    public function show(): View|RedirectResponse
+    public function show(): View
     {
         $this->ensureDoctorStorage();
-
-        if ($this->authenticated()) {
-            return redirect()->route('doctor.dashboard');
-        }
 
         return view('doctor.login');
     }

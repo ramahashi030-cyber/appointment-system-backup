@@ -16,8 +16,8 @@
         @endif
 
         <span class="pl-brand-text">
-            <strong>Quirino Memorial</strong>
-            <span>Medical Center</span>
+            <strong>QUIRINO MEMORIAL</strong>
+            <span>MEDICAL CENTER</span>
         </span>
     </div>
 @endsection

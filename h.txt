@@ -1,0 +1,12 @@
+HTTP/1.1 302 Found
+host: 190.190.0.56:3000
+connection: close
+x-powered-by: PHP/8.4.20
+cache-control: no-cache, private
+date: Thu, 08 Oct 2026 07:13:44 GMT
+location: https://190.190.0.56:3000/admin/dashboard
+content-type: text/html; charset=utf-8
+set-cookie: XSRF-TOKEN=eyJpdiI6ImpmZ2FnSml0ckxac2szdGZ3SWpLdlE9PSIsInZhbHVlIjoialVuMGFEeEZQdjc3NFVBUk9XbFd2Z2FIdWN6d2Z1anorTnVtT2N0SVk3Ym9WVjNhY3I4a1AzMnY2a1V5TjVtb1l6b1h2dTNjWmIrMEZuaS9UTGVwTXc2ekU3VU42eFFSUnM5Nm9sWmxxbzRSSXYrK3M2UlQvcHJYdTZ1aFQ5RFciLCJtYWMiOiJiMTIxMDE2MWIxYjBkOGQzNjFhYjM3ODE1ZDYxZTExZmU4ZDk2ZDczNDBkZmQyNjVjMWYxZDg0N2UzNWVlYzUyIiwidGFnIjoiIn0%3D; expires=Thu, 08 Oct 2026 09:13:44 GMT; Max-Age=7200; path=/; samesite=lax
+set-cookie: laravel-session=eyJpdiI6ImRTdFdsOGVGY2xVaHU3eVp6emp5alE9PSIsInZhbHVlIjoiWHFBYzVvMGtUZGhyK0ZQWG91YmhOSHowQklxZWdQcGxnY0NZUHdBMXZVUWlJd2REbUdQTVdUc0R6ckQzTVU4NFJUTVJnemsyTWVVN1B1THNQNDZhTDRyTkZnMXozS3I4UDZLcnlxUVpvZFo2VlBEbWYwUDc2ZGoycnBEaW1wbHciLCJtYWMiOiJiMTAyMWVhN2YzZmE5MjMyNzhiMmM0NjU2NTg0NjFhMmY1MWJkZmM1YjI3ZDFmNjZmMzU3Yzc3M2JkZWU4OTY4IiwidGFnIjoiIn0%3D; expires=Thu, 08 Oct 2026 09:13:44 GMT; Max-Age=7200; path=/; httponly; samesite=lax
+Transfer-Encoding: chunked
+

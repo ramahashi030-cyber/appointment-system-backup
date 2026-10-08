@@ -768,6 +768,14 @@ class Homis
         }
     }
 
+    /**
+     * Prescription lines for one patient, ported from QALINGA1 prescriptions2.php:
+     * hrxo lines joined to hperson (name/age/sex), the encounter's ward/service
+     * location, the medicine description and the prescriber, ordered by charge
+     * slip (pcchrgcod = RX number) then date. prescriptions2.php's current-year
+     * window is deliberately not ported so prescriptions from previous years
+     * stay visible on the portal.
+     */
     private static function prescriptionQuery(): string
     {
         return <<<'SQL'
@@ -785,7 +793,12 @@ SELECT
     r.reppatru1,
     r.repdayno1,
     r.remarks,
-    r.pchrgqty AS qty,
+    p.hpercode AS hospital_number,
+    RTRIM(p.patlast) + ', ' + RTRIM(p.patfirst) AS patname,
+    p.patsex,
+    CAST(DATEDIFF(DAY, p.patbdate, GETDATE()) / 365.25 AS INT) AS age,
+    ISNULL(w.location_label, 'Ward') AS location_label,
+    ISNULL(w.patroom, '') AS ward_name,
     ISNULL(md.itemdesc, 'Medicine') AS itemdesc,
     ISNULL(
         CAST(ISNULL(r.qtyintake, 0) AS VARCHAR(20)) + ' ' +
@@ -794,12 +807,43 @@ SELECT
         CAST(ISNULL(r.reppatru1, '') AS VARCHAR(50)) + ' FOR ' +
         CAST(ISNULL(r.repdayno1, 0) AS VARCHAR(20)) + ' DAYS',
     '') AS signa,
+    r.pchrgqty AS qty,
     e.toecode
 FROM hrxo r WITH (NOLOCK)
+JOIN hperson p ON p.hpercode = r.hpercode
 LEFT JOIN henctr e ON e.enccode = r.enccode
 LEFT JOIN hprovider hp ON hp.licno = r.licno
 LEFT JOIN hpersonal doc ON doc.employeeid = hp.employeeid
 LEFT JOIN hform uf ON uf.formcode = r.uomintake
+LEFT JOIN (
+    SELECT
+        d.enccode,
+        'Ward' AS location_label,
+        (a.wardname + ' ' + b.rmname + ' ' + c.bdname) AS patroom
+    FROM hpatroom d WITH (NOLOCK)
+    INNER JOIN (
+        SELECT enccode, MAX(hprdate) AS max_hprdate
+        FROM hpatroom WITH (NOLOCK)
+        GROUP BY enccode
+    ) latest ON latest.enccode = d.enccode AND latest.max_hprdate = d.hprdate
+    INNER JOIN hward a WITH (NOLOCK) ON d.wardcode = a.wardcode
+    INNER JOIN hroom b WITH (NOLOCK) ON d.rmintkey = b.rmintkey
+    INNER JOIN hbed c WITH (NOLOCK) ON d.bdintkey = c.bdintkey
+    UNION
+    SELECT
+        a.enccode,
+        'Service' AS location_label,
+        'EMERGENCY ROOM - ' + ISNULL(b.tsdesc, '') AS patroom
+    FROM herlog a WITH (NOLOCK)
+    LEFT JOIN htypser b WITH (NOLOCK) ON a.tscode = b.tscode
+    UNION
+    SELECT
+        a.enccode,
+        'Service' AS location_label,
+        'OUTPATIENT DEPARTMENT - ' + ISNULL(b.tsdesc, '') AS patroom
+    FROM hopdlog a WITH (NOLOCK)
+    LEFT JOIN htypser b WITH (NOLOCK) ON a.tscode = b.tscode
+) w ON w.enccode = r.enccode
 LEFT JOIN (
     SELECT
         hdmhdr.dmdcomb,
@@ -856,9 +900,18 @@ SQL;
             'medicine' => $medicine,
             'quantity' => $quantity,
             'instructions' => $instructions,
+            'signa' => self::value($row, ['signa']),
             'remarks' => self::value($row, ['remarks']),
             'encounter_code' => self::value($row, ['enccode']),
             'license_no' => self::value($row, ['licno']),
+            // Patient/ward columns ported from prescriptions2.php for the card
+            // header and the printable prescription.
+            'patient_name' => self::value($row, ['patname', 'patient_name']),
+            'hospital_number' => self::value($row, ['hospital_number']),
+            'sex' => self::value($row, ['patsex', 'sex']),
+            'age' => self::value($row, ['age']),
+            'location_label' => self::value($row, ['location_label']),
+            'ward_name' => self::value($row, ['ward_name']),
         ];
     }
 

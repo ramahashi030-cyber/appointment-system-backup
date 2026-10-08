@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="refresh" content="0;url='https://190.190.0.56:3000/admin/dashboard'" />
+
+        <title>Redirecting to https://190.190.0.56:3000/admin/dashboard</title>
+    </head>
+    <body>
+        Redirecting to <a href="https://190.190.0.56:3000/admin/dashboard">https://190.190.0.56:3000/admin/dashboard</a>.
+    </body>
+</html>

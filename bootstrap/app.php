@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\AuthenticateDoctor;
+use App\Http\Middleware\EnsureAdminRole;
 use App\Http\Middleware\EnsurePatientIsActive;
 use App\Http\Middleware\EnsureTriagerRole;
 use Illuminate\Foundation\Application;
@@ -18,14 +19,18 @@ return Application::configure(basePath: dirname(__DIR__))
     )
 
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(at: '*');
+
         $middleware->redirectGuestsTo(fn (): string => route('auth.login'));
+
         $middleware->alias([
             'doctor.auth' => AuthenticateDoctor::class,
+            'admin.role' => EnsureAdminRole::class,
             'triager.role' => EnsureTriagerRole::class,
             'patient.active' => EnsurePatientIsActive::class,
         ]);
     })
-    
+        
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),

@@ -303,7 +303,7 @@
                 <div class="dashboard-quick-action-list">
                     <a href="{{ route('records.index') }}" class="dashboard-quick-action green">
                         <span class="dashboard-quick-action-icon" aria-hidden="true"><i class="bi bi-file-earmark-text-fill"></i></span>
-                        <span><strong>Medical Records</strong><small>View your medical records</small></span>
+                        <span><strong>Transaction Records</strong><small>View your transaction records</small></span>
                         <i class="bi bi-chevron-right" aria-hidden="true"></i>
                     </a>
                     <a href="{{ route('patient.prescriptions') }}" class="dashboard-quick-action purple">

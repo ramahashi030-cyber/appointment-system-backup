@@ -13,122 +13,69 @@ DON'T TOUCH THIS ---------------------------------------------------------
 ADMIN PANEL TODO :
 
 	ADMIN DASHBOARD
-		- display how many walking registration and telemedicine in admin-stat-card in dashboard.blade.php -- 
-		- in the admin panels dashboard staff activity table, display only the current date.
-		
-	PATIENTS PAGE
- 		  - contact number on both edit and add patient should be required
-
-	DOCTORS PAGE
+		- display how many walk in registration and telemedicine in admin-stat-card in dashboard.blade.php -- 
 
 
 
-
-	- MODALS IN THE ADMIN PANEL UI PATTERN
-		- BORDER SHOWS DANGER COLOR WHEN USER/ADMIN ACCIDENTALLY CLICKED OUTSIDE THE MODALS	
-		- 
+URL
+	-Fix the url searching of doctors login page. it must always be on doctors login page instead of doctors dashboard page when searching the /doctors/login in URL
 
 
+change the design of the logout flashcard. base the design of the logout confirmation flashcard of triager and admin to admin/triager-dashboard.blade.php and admin/dashboard.blade.php
 
-Modal
-- have a standard one design modal. 
-
-	Fix the deactivation flashcard ui of patiens.blade.php
-	The deactivation ui and function of doctors-and-staff must be look like and function like the patients.blade.php
-	Fix the activating flashcard modal in table of both patients.blade.php and doctors-and-staff.blade.php
-
-RBAC
-	triager, doctor and admin.
+transfering css
+admin/patients.blade.php
+admin/dashboard.blade.php
+admin/triager-dashboard.blade.php
 
 
 
 
 
 
-  
-  2026-10-08 09:13:48 /notifications ............................................................... ~ 514.97ms
-  2026-10-08 09:13:53 /login ......................................................................... ~ 0.15ms
-  2026-10-08 09:13:53 /telemed ..................................................................... ~ 507.97ms
-  2026-10-08 09:13:54 /build/assets/app-HSFkDTT6.css ................................................. ~ 0.21ms
-  2026-10-08 09:13:54 /build/assets/patient-dashboard-DDn3AdbB.css ................................... ~ 1.32ms
-  2026-10-08 09:13:54 /build/assets/pages-SEmxRHhG.css ............................................... ~ 2.29ms
-  2026-10-08 09:13:54 /build/assets/notifications-DxicASlj.css ....................................... ~ 3.25ms
-  2026-10-08 09:13:54 /build/assets/app-Bkd0s2_U.js .................................................. ~ 3.23ms
-  2026-10-08 09:13:54 /build/assets/patient-dashboard-D4V62Nhk.js .................................... ~ 4.16ms
-  2026-10-08 09:13:54 /build/assets/notifications-C4Qvg3EJ.js ........................................ ~ 4.39ms
-  2026-10-08 09:13:54 /build/assets/realtime-Dh6RXLx2.js ............................................. ~ 4.16ms
-  2026-10-08 09:13:54 /build/assets/telemed-rooms-BPjTQV5l.js ........................................ ~ 3.84ms
-  2026-10-08 09:13:54 /uploads/profile-pics/dwwcy2ejcz.webp .......................................... ~ 2.87ms
-  2026-10-08 09:13:54 /js/records.js ................................................................. ~ 3.02ms
-  2026-10-08 09:13:54 /notifications ............................................................... ~ 500.11ms
-  2026-10-08 09:13:54 /images/qmmc-telemedicine-banner.jpg ........................................... ~ 0.13ms
-  2026-10-08 09:13:54 /favicon.ico ................................................................... ~ 0.05ms
-  2026-10-08 09:13:55 /notifications ............................................................... ~ 502.60ms
-  2026-10-08 09:13:59 /notifications ............................................................... ~ 502.57ms
-  2026-10-08 09:14:00 /telemed/history ............................................................. ~ 502.16ms
-  2026-10-08 09:14:03 /notifications ................................................................. ~ 0.15ms
-  2026-10-08 09:14:04 /notifications ............................................................... ~ 504.52ms
-  2026-10-08 09:14:09 /notifications ................................................................. ~ 0.23ms
-  2026-10-08 09:14:09 /notifications ............................................................... ~ 515.50ms
-  2026-10-08 09:14:14 /notifications ................................................................. ~ 0.22ms
-  2026-10-08 09:14:18 /notifications ............................................................... ~ 502.88ms
-  2026-10-08 09:14:19 /notifications ................................................................. ~ 0.20ms
-  2026-10-08 09:14:24 /notifications ............................................................... ~ 509.27ms
-  2026-10-08 09:14:24 /notifications ............................................................... ~ 512.32ms
-  2026-10-08 09:14:29 /notifications ............................................................... ~ 511.95ms
-  2026-10-08 09:14:33 /notifications ................................................................. ~ 0.42ms
-  2026-10-08 09:14:34 /notifications ................................................................. ~ 0.15ms
-  2026-10-08 09:14:39 /notifications ............................................................... ~ 501.32ms
-  2026-10-08 09:14:39 /notifications ............................................................... ~ 506.04ms
-  2026-10-08 09:14:44 /notifications ................................................................. ~ 0.13ms
-  2026-10-08 09:14:47 /notifications ................................................................. ~ 0.37ms
-  2026-10-08 09:14:47 /admin/kiosk ................................................................. ~ 515.09ms
-  2026-10-08 09:14:47 /images/logo.png ............................................................. ~ 515.81ms
-  2026-10-08 09:14:48 /notifications ............................................................... ~ 501.67ms
-  2026-10-08 09:14:49 /favicon.ico ................................................................... ~ 0.51ms
-  2026-10-08 09:14:49 /notifications ................................................................. ~ 0.28ms
-  2026-10-08 09:14:54 /notifications ............................................................... ~ 501.99ms
-  2026-10-08 09:14:54 /notifications ..................................................................... ~ 1s
-  2026-10-08 09:14:55 /notifications ............................................................... ~ 502.33ms
-  190.190.0.62:52564 Invalid request (Unsupported SSL request)
-  2026-10-08 09:14:57 ................................................................................ ~ 0.78ms
-  190.190.0.62:63458 Invalid request (Unsupported SSL request)
-  2026-10-08 09:14:57 ................................................................................ ~ 0.12ms
-  190.190.0.62:54286 Invalid request (Unsupported SSL request)
-  2026-10-08 09:14:58 ................................................................................ ~ 1.06ms
-  190.190.0.62:52869 Invalid request (Unsupported SSL request)
-  2026-10-08 09:14:58 ................................................................................ ~ 0.58ms
-  190.190.0.62:63257 Invalid request (Unsupported SSL request)
-  2026-10-08 09:14:58 ................................................................................ ~ 5.15ms
-  190.190.0.62:53965 Invalid request (Unsupported SSL request)
-  2026-10-08 09:14:58 ................................................................................ ~ 0.43ms
-  2026-10-08 09:14:59 /notifications ............................................................... ~ 500.31ms
-  190.190.0.62:49635 Invalid request (Unsupported SSL request)
-  2026-10-08 09:15:00 ................................................................................ ~ 0.17ms
-  190.190.0.62:63257 Invalid request (Unsupported SSL request)
-  2026-10-08 09:15:00 ................................................................................ ~ 0.97ms
-  190.190.0.62:59193 Invalid request (Unsupported SSL request)
-  2026-10-08 09:15:00 ................................................................................ ~ 0.09ms
-  190.190.0.62:58060 Invalid request (Unsupported SSL request)
-  2026-10-08 09:15:00 ................................................................................ ~ 0.08ms
-  2026-10-08 09:15:03 /notifications ................................................................. ~ 0.34ms
-  2026-10-08 09:15:04 /notifications ............................................................... ~ 502.23ms
-  190.190.0.62:64236 Invalid request (Unsupported SSL request)
-  2026-10-08 09:15:05 ................................................................................ ~ 0.96ms
-  190.190.0.62:58320 Invalid request (Unsupported SSL request)
-  2026-10-08 09:15:05 ................................................................................ ~ 4.34ms
-  190.190.0.62:50202 Invalid request (Unsupported SSL request)
-  2026-10-08 09:15:05 ................................................................................ ~ 0.52ms
-  190.190.0.62:63333 Invalid request (Unsupported SSL request)
-  2026-10-08 09:15:05 ................................................................................ ~ 0.41ms
-  2026-10-08 09:14:58 /admin/kiosk ....................................................................... ~ 8s
-  2026-10-08 09:15:06 /images/logo.png ............................................................... ~ 3.81ms
-  2026-10-08 09:15:07 /favicon.ico ................................................................... ~ 0.25ms
-  2026-10-08 09:15:09 /notifications ................................................................. ~ 0.25ms
-  2026-10-08 09:15:18 /notifications ............................................................... ~ 504.40ms
-  2026-10-08 09:15:24 /notifications ............................................................... ~ 518.05ms
-  2026-10-08 09:15:33 /notifications ................................................................. ~ 0.24ms
-  2026-10-08 09:15:47 /notifications ............................................................... ~ 514.47ms
-  2026-10-08 09:15:48 /notifications ............................................................... ~ 500.62ms
-  2026-10-08 09:15:55 /notifications ................................................................. ~ 0.18ms
-  2026-10-08 09:15:55 /notifications ............................................................... ~ 503.74ms
+
+
+
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------
+ADMIN PANEL
+	TRIAGER PAGE
+		- add role for triager can be edit if triager can only accept face to face or telemedicine
+	REPORTS
+		- filter date should be from and to, 2 calendar
+	PATIENTS
+		- add patient must require hospital number
+
+----------------------------------------------------------------------------------
+
+OVERALL DEBUG
+	- patient sometimes throw a 500 server error
+
+
+
+
+
+REMOTE DESKTOP NOTE
+	- DO NOT REMOVE THE ORIGINAL QALINGA FOLDER
+
+
+
+
+-------------------------------------------------------------------------------------------
+
+DOCTORS PANEL
+	- doctor can only tag it's own patient(patients assign to them) same with triager
+
+
+
+PATIENTS 
+	- Procedure with same date and result should also grouped
+
+
+TRIAGERS
+	- both face to face and telemed in triager should set date too before approved if no date has been set don't enable the "SAVE" button
+	- if patients face to face and telemedicine has been approved by triager, patient should receive an email

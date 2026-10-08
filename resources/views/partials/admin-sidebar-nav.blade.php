@@ -1,3 +1,6 @@
+{{-- FILE: resources/views/partials/admin-sidebar-nav.blade.php --}}
+{{-- CHANGE: "Kiosk" and "Kiosk History" merged into one "Kiosk" dropdown with two sub-links. --}}
+
 @once
     <style>
         /* Equal font size for every sidebar item: links, group toggles, and sub-links */
@@ -42,8 +45,18 @@
             ],
         ],
         ['route' => 'admin.triagers', 'label' => 'Triagers', 'icon' => 'bi-clipboard2-pulse-fill'],
-        ['route' => 'admin.kiosk', 'label' => 'Kiosk', 'icon' => 'bi-qr-code-scan'],
-        ['route' => 'admin.kiosk-history', 'label' => 'Kiosk History', 'icon' => 'bi-qr-code-text'],
+
+        // >>> CHANGED: Kiosk is now a dropdown (was two separate top-level links) <<<
+        [
+            'label' => 'Kiosk',
+            'icon' => 'bi-qr-code-scan',
+            'children' => [
+                ['route' => 'admin.kiosk', 'label' => 'Kiosk Scanner', 'icon' => 'bi-qr-code-scan'],
+                ['route' => 'admin.kiosk-history', 'label' => 'Kiosk History', 'icon' => 'bi-clock-history'],
+            ],
+        ],
+        // >>> END CHANGED <<<
+
         [
             'label' => 'Reports',
             'icon' => 'bi-calendar2-week-fill',
